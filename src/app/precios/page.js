@@ -9,7 +9,6 @@ import {
   Clock, 
   ChevronDown, 
   ChevronUp,
-  Zap
 } from 'lucide-react';
 
 
@@ -29,12 +28,6 @@ const Button = ({ children, variant = "primary", className = "", fullWidth = fal
     </button>
   );
 };
-
-const Badge = ({ text }) => (
-  <span className="bg-[#198E7B]/10 text-[#198E7B] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-    {text}
-  </span>
-);
 
 
 const METRICS = [

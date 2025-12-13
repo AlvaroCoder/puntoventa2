@@ -1,19 +1,37 @@
+import { AlertCircle, Check } from "lucide-react";
 import React from "react";
 
-export default function InputField({ label, icon: Icon, ...props }) {
+export default function InputField({ label, icon: Icon, error, checkValue=false, ...props }) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-sm font-bold text-[#333333] ml-1">{label}</label>
-      <div className="group flex items-center bg-white border border-gray-200 rounded-xl px-4 py-3 transition-all hover:border-[#1F4363]/50 focus-within:border-[#FF821E] focus-within:ring-4 focus-within:ring-[#FF821E]/10 shadow-sm">
-        <Icon
-          className="text-[#1F4363] mr-3 transition-colors group-focus-within:text-[#FF821E]"
-          size={20}
-        />
-        <input
-          className="w-full bg-transparent outline-none text-[#333333] placeholder-gray-400 text-sm font-medium"
-          {...props}
-        />
-      </div>
+  <div className="space-y-1.5 text-left">
+    <div className="flex justify-between items-center ml-1">
+      <label className="text-sm font-bold text-[#333333]">{label}</label>
+      {error && (
+        <span className="text-xs text-red-500 font-medium flex items-center gap-1 animate-in slide-in-from-right-2">
+          <AlertCircle size={12} /> {error}
+        </span>
+      )}
     </div>
+    <div className={`
+      group flex items-center bg-white border rounded-xl px-4 py-3 transition-all shadow-sm
+      ${error 
+        ? 'border-red-500 ring-2 ring-red-500/10' 
+        : 'border-gray-200 hover:border-[#1F4363]/50 focus-within:border-[#FF821E] focus-within:ring-4 focus-within:ring-[#FF821E]/10'
+      }
+    `}>
+      <Icon 
+        className={`mr-3 transition-colors ${error ? 'text-red-500' : 'text-[#1F4363] group-focus-within:text-[#FF821E]'}`} 
+        size={20} 
+      />
+      <input 
+        className={`w-full bg-transparent outline-none text-[#333333] placeholder-gray-400 text-sm font-medium ${error ? 'placeholder-red-300' : ''}`} 
+        {...props} 
+        />
+        {
+          checkValue &&
+          <Check className="text-green-400" />
+      }
+    </div>
+  </div>
   );
 }

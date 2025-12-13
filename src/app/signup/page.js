@@ -3,13 +3,9 @@ import React, { useState } from 'react';
 import { 
   User, 
   Mail, 
-  Lock, 
   Phone, 
   CreditCard, 
   Store, 
-  ShoppingBag, 
-  Utensils, 
-  Pill, 
   ArrowRight, 
   ArrowLeft,
   Check,
@@ -19,6 +15,10 @@ import {
 } from 'lucide-react';
 import InputField from '@/elements/InputField';
 import SelectableCard from '@/elements/SelectableCard';
+import InputPassword from '@/elements/InputPassword';
+import { validateEmail } from '@/lib/validation';
+import { getVerificarDocumento, getVerificarEmail } from '../../../API/user/getConnections';
+import GridSelectCardRubro from '@/components/Cards/GridSelectCardRubro';
 
 const STEPS = [
   { id: 1, title: "Tu Cuenta", subtitle: "Credenciales de acceso" },
@@ -36,17 +36,108 @@ export default function SignUpPage() {
     businessName: '', ruc: '', businessType: '',
     storeCount: ''
   });
-
-  const changeStep = (direction) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setCurrentStep(prev => direction === 'next' ? prev + 1 : prev - 1);
-      setIsLoading(false);
-    }, 600); 
+  const [errors, setErrors] = useState(null);
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErr = { ...prev };
+        delete newErr[name];
+        return newErr;
+      });
+    }
   };
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const changeStep = async (direction) => {
+   if (direction === 'prev') {
+      setCurrentStep(prev => prev - 1);
+      return;
+    }
+
+    setIsLoading(true);
+    let hasError = false;
+    setErrors({}); 
+
+    try {
+      switch (currentStep) {
+        case 1:
+          if (!formData.email) {
+             setErrors(prev => ({ ...prev, email: "El correo es obligatorio" }));
+             hasError = true;
+          } else if (!validateEmail(formData.email)) {
+             setErrors(prev => ({ ...prev, email: "Formato de correo inválido" }));
+             hasError = true;
+          }
+
+          if (!formData.password || formData.password.length < 8) {
+             setErrors(prev => ({ ...prev, password: "Mínimo 8 caracteres" }));
+             hasError = true;
+          }
+
+          if (formData.password !== formData.confirmPassword) {
+             alert("Las contraseñas no coinciden"); 
+             hasError = true;
+          }
+
+          if (!hasError) {
+            const emailStatus = await getVerificarEmail(formData.email);
+            if (emailStatus === 404) {
+              setErrors(prev => ({ ...prev, email: "Este correo ya está registrado" }));
+              hasError = true;
+            }
+          }
+          break;
+
+        case 2: 
+          if (!formData.fullName) {
+            setErrors(prev => ({ ...prev, fullName: "Nombre completo requerido" }));
+            hasError = true;
+          }
+          if (!formData.dni) {
+            setErrors(prev => ({ ...prev, dni: "Documento requerido" }));
+            hasError = true;
+          }
+          if (!formData.phone) {
+             setErrors(prev => ({ ...prev, phone: "Teléfono requerido" }));
+             hasError = true;
+          }
+
+          if (!hasError) {
+             const docStatus = await getVerificarDocumento(formData.dni);
+             if (docStatus === 404) {
+               setErrors(prev => ({...prev, dni : "Documento inválido o ya registrado"}));
+               hasError = true;
+             }
+          }
+          break;
+
+        case 3: 
+           if (!formData.businessName) { setErrors(prev => ({...prev, businessName: "Nombre del negocio requerido"})); hasError = true; }
+           if (!formData.ruc) { setErrors(prev => ({...prev, ruc: "RUC requerido"})); hasError = true; }
+           if (!formData.businessType) { alert("Por favor selecciona un rubro para continuar"); hasError = true; }
+           break;
+        
+        case 4: 
+           if (!formData.storeCount) { alert("Selecciona una escala"); hasError = true; }
+           break;
+      }
+    } catch (error) {
+      console.error("Error en validación:", error);
+      hasError = true;
+    }
+
+    setIsLoading(false);
+
+    if (!hasError) {
+       if (currentStep < 4) {
+          setCurrentStep(prev => prev + 1);
+       } else {
+          alert("¡Registro Exitoso! Redirigiendo...");
+       }
+    }
   };
 
   const handleSelect = (field, value) => {
@@ -71,9 +162,31 @@ export default function SignUpPage() {
               <h2 className="text-2xl font-bold text-[#1F4363]">Crea tu cuenta</h2>
               <p className="text-gray-500 text-sm">Comencemos con tus credenciales de acceso.</p>
             </div>
-            <InputField label="Correo Electrónico" icon={Mail} name="email" type="email" placeholder="ejemplo@empresa.com" value={formData.email} onChange={handleInputChange} />
-            <InputField label="Contraseña" icon={Lock} name="password" type="password" placeholder="Mínimo 8 caracteres" value={formData.password} onChange={handleInputChange} />
-            <InputField label="Confirmar Contraseña" icon={Check} name="confirmPassword" type="password" placeholder="Repite tu contraseña" value={formData.confirmPassword} onChange={handleInputChange} />
+            <InputField
+              label="Correo Electrónico"
+              icon={Mail}
+              name="email"
+              type="email"
+              placeholder="ejemplo@empresa.com"
+              value={formData.email}
+              onChange={handleInputChange}
+              error={errors?.email}
+            />
+            <InputPassword 
+              label="Contraseña" 
+              name="password" 
+              placeholder="Mínimo 8 caracteres" 
+              value={formData.password} 
+              onChange={handleInputChange} 
+              error={errors?.password}
+            />
+            <InputPassword 
+              label="Confirmar Contraseña" 
+              name="confirmPassword" 
+              placeholder="Repite tu contraseña" 
+              value={formData.confirmPassword} 
+              onChange={handleInputChange} 
+            />
           </div>
         );
 
@@ -84,8 +197,23 @@ export default function SignUpPage() {
               <h2 className="text-2xl font-bold text-[#1F4363]">¿Quién administra?</h2>
               <p className="text-gray-500 text-sm">Necesitamos saber quién es el responsable.</p>
             </div>
-            <InputField label="Nombre Completo" icon={User} name="fullName" type="text" placeholder="Juan Pérez" value={formData.fullName} onChange={handleInputChange} />
-            <InputField label="DNI / Documento" icon={CreditCard} name="dni" type="text" placeholder="Número de documento" value={formData.dni} onChange={handleInputChange} />
+            <InputField
+              label="Nombre Completo"
+              icon={User}
+              name="fullName"
+              type="text"
+              placeholder="Juan Pérez"
+              value={formData.fullName}
+              onChange={handleInputChange}
+            />
+            <InputField
+              label="Documento (DNI / RUC)"
+              icon={CreditCard}
+              name="dni"
+              type="text"
+              placeholder="Número de documento"
+              value={formData.dni}
+              onChange={handleInputChange} />
             <InputField label="Teléfono / Celular" icon={Phone} name="phone" type="tel" placeholder="+51 999 999 999" value={formData.phone} onChange={handleInputChange} />
           </div>
         );
@@ -100,32 +228,7 @@ export default function SignUpPage() {
               </div>
               
               <label className="text-sm font-bold text-[#333333] ml-1 block mb-2">Selecciona tu Rubro</label>
-              <div className="grid grid-cols-2 gap-3">
-                <SelectableCard 
-                  title="Minimarket" 
-                  icon={ShoppingBag} 
-                  selected={formData.businessType === 'minimarket'} 
-                  onClick={() => handleSelect('businessType', 'minimarket')} 
-                />
-                <SelectableCard 
-                  title="Moda / Ropa" 
-                  icon={User} 
-                  selected={formData.businessType === 'fashion'} 
-                  onClick={() => handleSelect('businessType', 'fashion')} 
-                />
-                <SelectableCard 
-                  title="Restaurante" 
-                  icon={Utensils} 
-                  selected={formData.businessType === 'restaurant'} 
-                  onClick={() => handleSelect('businessType', 'restaurant')} 
-                />
-                <SelectableCard 
-                  title="Farmacia" 
-                  icon={Pill} 
-                  selected={formData.businessType === 'pharmacy'} 
-                  onClick={() => handleSelect('businessType', 'pharmacy')} 
-                />
-              </div>
+              <GridSelectCardRubro/>
             </div>
           </div>
         );
