@@ -4,13 +4,14 @@ import { ArrowRight, Menu, X } from "lucide-react";
 import Button from "@/elements/Button";
 import Link from "next/link";
 import { useAuth } from "@/Context/AuthContext";
+import { usePathname } from "next/navigation";
 
 export default function TopBar() {
-  const { user, isAuthenticated } = useAuth();
-  console.log('User ', user);
-  console.log('Esta autenticado : ', isAuthenticated);
-  
+  const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/dashboard")) return null;
 
   return (
     <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 h-20 flex items-center">

@@ -3,11 +3,13 @@ import React from 'react'
 
 export default function Layout({children}) {
   return (
-    <div className='w-full min-h-screen flex flex-row '>
+    <div className='w-full h-screen flex flex-row overflow-hidden'>
         <SideBarNavigation/>
-        <div className='w-full min-h-screen flex flex-col overflow-y-hidden'>
+        <div className='flex-1 flex flex-col min-w-0 bg-[#F8FAFC]'>
             <TopBarNavigation/>
-            {children}
+            <main className='flex-1 overflow-y-auto p-8'>
+                {children}
+            </main>
         </div>
     </div>
   )
