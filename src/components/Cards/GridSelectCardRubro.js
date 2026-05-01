@@ -4,8 +4,9 @@ import React from 'react'
 
 const URL_FETCH_RUBROS = "http://localhost:3030/api/rubro/"
 
-export default function GridSelectCardRubro({onClick}) {
+export default function GridSelectCardRubro({onClick, formData}) {
     const {data : dataRubros, loading : loadingDataRubros } = useFetch(URL_FETCH_RUBROS);
+    console.log(dataRubros);
     
     if (loadingDataRubros) {
         return (<div>Cargando rubros...</div>)
@@ -19,7 +20,8 @@ export default function GridSelectCardRubro({onClick}) {
                         key={index}
                         title={rubro?.nombre}
                         icon={rubro?.icono}
-                        onClick={onClick}
+                        selected={rubro?.id === formData?.rubro_id}
+                        onClick={()=>onClick(rubro?.id)}
                     />
                 ))}
             </div>

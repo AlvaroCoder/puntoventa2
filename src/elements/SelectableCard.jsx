@@ -1,6 +1,20 @@
+import { Build } from "@mui/icons-material";
+import { ShoppingBag, Store } from "lucide-react";
 import React from "react";
 
 export default function SelectableCard({ selected, onClick, icon: Icon, title, desc }) {
+  function renderizarIcono(icono) {
+    switch (icono) {
+      case 'store':
+        return <Store size={24} />;
+      case 'shopping-bag':
+        return <ShoppingBag size={24} />;
+      case 'build':
+        return <Build size={24} />;
+      default:
+        return <Store size={24} />;
+    }
+  }
   return (
     <div
       onClick={onClick}
@@ -15,7 +29,7 @@ export default function SelectableCard({ selected, onClick, icon: Icon, title, d
           selected ? "bg-[#FF821E] text-white" : "bg-gray-100 text-gray-500"
         }`}
       >
-        <Icon size={24} />
+        {renderizarIcono(Icon)}
       </div>
       <div>
         <h4

@@ -1,10 +1,15 @@
 'use client'
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import Button from "@/elements/Button";
 import Link from "next/link";
+import { useAuth } from "@/Context/AuthContext";
 
 export default function TopBar() {
+  const { user, isAuthenticated } = useAuth();
+  console.log('User ', user);
+  console.log('Esta autenticado : ', isAuthenticated);
+  
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -15,7 +20,7 @@ export default function TopBar() {
            <div className="w-10 h-10 bg-[#FF821E] rounded-xl flex items-center justify-center text-white font-extrabold shadow-lg shadow-orange-500/20">
             360
           </div>
-          <span className="text-2xl font-bold text-[#1F4363] tracking-tight">PuntoVenta</span>
+          <span className="text-2xl font-bold text-[#1F4363] tracking-tight">PUNTOVENTA</span>
           </div>
         </Link>
 
@@ -25,14 +30,29 @@ export default function TopBar() {
           <Link href="/demo" className="hover:text-[#FF821E] transition-colors">Demo</Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
-          <Link
-            href={"/login"}
-            className="font-bold text-[#1F4363] hover:text-[#FF821E] transition-colors">
-            Iniciar Sesión
-          </Link>
-          <Button variant="primary">Prueba Gratis</Button>
-        </div>
+        {
+          isAuthenticated ? 
+            (<div className="hidden md:flex">
+              <Link
+                href={"/dashboard"}
+                className="flex flex-row gap-4 items-center p-3 rounded-xl border-spacing-4 border-[#1F4363] hover:text-[#FF821E] hover:border-[#FF821E] transition-colors border"
+              >
+                <p>Ir a Dashboard</p> <ArrowRight size={20}/>
+              </Link>
+            </div>) :
+            ( <div className="hidden md:flex items-center gap-4">
+                <Link
+                  href={"/login"}
+                  className="font-bold text-[#1F4363] hover:text-[#FF821E] transition-colors">
+                  Iniciar Sesión
+                </Link>
+                <Link
+                  href={"/signup"}
+                >
+                  <Button variant="primary">Registrate</Button>
+                </Link>
+              </div>)
+        }
 
         <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-[#1F4363]">
           {isOpen ? <X /> : <Menu />}
