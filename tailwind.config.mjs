@@ -11,7 +11,9 @@ export default {
   		colors: {
 			azulOscuro : "#2B2D42",
 			rojoEncendido : "#EF233C",
-			grisClaro : "#8D99AE",
+				grisClaro: "#8D99AE",
+				naranjaClaro: "#ffd8b9",
+			naranjaEncendido : "#FF821E",
 			beigeClaro : "#EDF2F4",
 			rojoPasion :"#D90429",
 			azulClaro : "#191A29",

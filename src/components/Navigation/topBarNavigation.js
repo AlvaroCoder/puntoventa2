@@ -16,7 +16,7 @@ const ROUTE_LABELS = {
 
 export default function TopBarNavigation() {
     const [currentTime, setCurrentTime] = useState('');
-    const { user, loading } = useAuth();
+    const { loading } = useAuth();
     const pathname = usePathname();
 
     const pageTitle = ROUTE_LABELS[pathname] ?? 'Dashboard';
@@ -41,7 +41,7 @@ export default function TopBarNavigation() {
             <div>
                 {loading
                     ? <ButtonsLoading />
-                    : <ButtonDropdownProfile username={user?.nombre_completo} />
+                    : <ButtonDropdownProfile />
                 }
             </div>
         </nav>

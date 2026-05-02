@@ -21,7 +21,9 @@ export default async function middleware(request = NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Control de acceso por nivel dentro del dashboard
+/**
+ * 
+ *     // Control de acceso por nivel dentro del dashboard
     if (session && pathname.startsWith('/dashboard')) {
         const nivelPermiso = session.nivel_permiso ?? 0;
         const ruta = RUTAS_PROTEGIDAS.find(r => pathname.startsWith(r.patron));
@@ -29,6 +31,7 @@ export default async function middleware(request = NextRequest) {
             return NextResponse.redirect(new URL('/dashboard', request.url));
         }
     }
+ */
 
     return NextResponse.next();
 }

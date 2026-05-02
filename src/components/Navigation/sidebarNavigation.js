@@ -10,12 +10,12 @@ import { usePathname } from 'next/navigation';
 import { MoneyOff, Store, People, Inventory, PointOfSale } from '@mui/icons-material';
 
 const NAV_ITEMS = [
-    { routeName: "Inicio",       routePath: "/dashboard",              routeIcon: HomeIcon,    minNivel: 0 },
-    { routeName: "Clientes",     routePath: "/dashboard/clientes",     routeIcon: PersonIcon,  minNivel: 1 },
-    { routeName: "Creditos",     routePath: "/dashboard/creditos",     routeIcon: MoneyOff,    minNivel: 1 },
-    { routeName: "Caja",         routePath: "/dashboard/caja",         routeIcon: PointOfSale, minNivel: 2 },
-    { routeName: "Inventario",   routePath: "/dashboard/inventario",   routeIcon: Inventory,   minNivel: 3 },
-    { routeName: "Tiendas",      routePath: "/dashboard/tiendas",      routeIcon: Store,       minNivel: 4 },
+    { routeName: "Inicio", routePath: "/dashboard", routeIcon: HomeIcon,    minNivel: 0 },
+    { routeName: "Clientes", routePath: "/dashboard/clientes", routeIcon: PersonIcon,  minNivel: 1 },
+    { routeName: "Creditos", routePath: "/dashboard/creditos", routeIcon: MoneyOff,    minNivel: 1 },
+    { routeName: "Caja", routePath: "/dashboard/caja", routeIcon: PointOfSale, minNivel: 2 },
+    { routeName: "Inventario", routePath: "/dashboard/inventario", routeIcon: Inventory,   minNivel: 3 },
+    { routeName: "Tiendas", routePath: "/dashboard/tiendas", routeIcon: Store,       minNivel: 4 },
     { routeName: "Trabajadores", routePath: "/dashboard/trabajadores", routeIcon: People,      minNivel: 4 },
 ];
 
