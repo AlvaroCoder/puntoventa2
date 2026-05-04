@@ -74,7 +74,7 @@ export default function SidebarNavigation() {
             <div className="px-2 pb-4">
                 {openSidebar && (
                     <p className="text-white/30 text-xs text-center">
-                        PipoApp © 2026
+                        <a href='www.alvacode.dev' rel='no-rel' target='_blank'>AlvaCode © 2026</a>
                     </p>
                 )}
             </div>
