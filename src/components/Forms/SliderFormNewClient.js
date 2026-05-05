@@ -6,6 +6,16 @@ import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 import { Input } from '../ui/input';
 
+const TIPO_DOCUMENTO = [
+    { value: 1, label: 'DNI' },
+    { value: 2, label: 'RUC' },
+    { value: 3, label: 'C.E.' },
+    { value: 4, label: 'Pasaporte' },
+];
+
+const CATEGORIAS = ['RESPONSABLE', 'REGULAR', 'MOROSO', 'VIP'];
+
+
 export default function SliderFormNewClient({
     open, onClose, empresaId, onSuccess
 }) {
