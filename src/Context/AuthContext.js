@@ -6,7 +6,8 @@ import { getSession } from '@/lib/authentication'
 const AuthContext = createContext({
     user: null,
     isAuthenticated: false,
-    loading : false
+    loading: false,
+    loginUser : ()=>{}
 })
 
 export function AuthProvider({ children }) {
@@ -29,8 +30,12 @@ export function AuthProvider({ children }) {
 
     const isAuthenticated = !!user?.access_token
 
+    const loginUser = (userData) => {
+        setUser(userData);
+    }
+
     return (
-        <AuthContext.Provider value={{ user, loading, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, loading, isAuthenticated, loginUser }}>
             {children}
         </AuthContext.Provider>
     )

@@ -8,8 +8,10 @@ import { login } from '@/lib/authentication';
 import { useRouter } from 'next/navigation';
 import GoogleAuthButton from '@/components/Auth/GoogleAuthButton';
 import { Mail } from 'lucide-react';
+import { useAuth } from '@/Context/AuthContext';
 
 export default function LoginPage() {
+  const { loginUser } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState(null);
@@ -30,6 +32,7 @@ export default function LoginPage() {
       setError(result.message || 'Credenciales inválidas');
       setIsLoading(false);
     } else {
+      loginUser(result.user)
       router.push('/dashboard');
     }
   };

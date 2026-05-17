@@ -3,9 +3,11 @@ import { GoogleLogin } from '@react-oauth/google'
 import { loginWithGoogle } from '@/lib/authentication'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
+import { useAuth } from '@/Context/AuthContext'
 
 export default function GoogleAuthButton() {
     const router = useRouter()
+    const { loginUser } = useAuth()
 
     const handleSuccess = async (credentialResponse) => {
         const result = await loginWithGoogle(credentialResponse.credential)
@@ -13,6 +15,7 @@ export default function GoogleAuthButton() {
             toast.error(result.message || 'Error al iniciar sesión con Google')
             return
         }
+        loginUser(result.user)
         if (result.isNewUser) {
             router.push('/signup?step=complete')
         } else {

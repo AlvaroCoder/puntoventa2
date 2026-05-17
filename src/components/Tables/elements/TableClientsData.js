@@ -1,224 +1,216 @@
+'use client'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import React, { useMemo, useState } from 'react'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Star, Trash } from 'lucide-react';
+import { Trash, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { Skeleton } from '@mui/material';
+import { deleteCliente } from '@/Connections/clientes';
 
-const headers=[
-    {value : "Nombre"},
-    {value : "Apellido"},
-    {value : "Deuda Actual (S/.)"},
-    {value : "Ultimo Pago"},
-    {value : "Puntuacion"},
-    {value : "Estado"},
-    {value : <EditIcon/>}
-]  
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export default function TableClientsData({data=[], handleClientSelected=()=>{}}) {
-    const typesClient=[
-        {name : "Todos", isSelected : true, value : 2, className: "bg-gray-200"},
-        {name : "Activo", isSelected : false, value : 0, className: "bg-green-100"},
-        {name : "Inactivo", isSelected: false, value : 1, className: "bg-red-500"}
-    ];
-    const [variantTypesClient, setVariantTypesClient] = useState(typesClient);
-    const [loading, setLoading] = useState(false);
+const CATEGORIA_BADGE = {
+    RESPONSABLE: 'bg-green-100 text-green-700',
+    REGULAR:     'bg-blue-100 text-blue-700',
+    VIP:         'bg-[#FF821E]/15 text-[#FF821E]',
+    MOROSO:      'bg-red-100 text-red-600',
+    DEUDOR:      'bg-red-100 text-red-600',
+}
 
+const TIPO_DOC_BADGE = {
+    DNI:       'bg-[#1F4363]/10 text-[#1F4363]',
+    RUC:       'bg-purple-100 text-purple-700',
+    'C.E.':    'bg-yellow-100 text-yellow-700',
+    PASAPORTE: 'bg-gray-100 text-gray-500',
+}
 
-    const handleChangeTypesClient=(index)=>{
-        const newDataTypesClient = typesClient.map((item, idx)=>{
-            if (idx === index) {
-              return {
-                ...item,
-                isSelected : true
-              }
-            }
-            return {
-              ...item,
-              isSelected : false
-            }
-          });
-          setVariantTypesClient(newDataTypesClient)
-    }
-    
-    const filterDataTypeClient = useMemo(()=>{
-        const variantFilter =variantTypesClient.filter(i=>i.isSelected);
-        if (variantFilter[0]?.value == 2) {
-            return data
+const HEADERS = [
+    { key: 'nombre_completo',  label: 'Cliente',         sortable: true  },
+    { key: 'tipo_documento',   label: 'Documento',       sortable: false },
+    { key: 'email',            label: 'Email',           sortable: false },
+    { key: 'telefono',         label: 'Teléfono',        sortable: false },
+    { key: 'categoria',        label: 'Categoría',       sortable: true  },
+    { key: 'acciones',         label: '',                sortable: false },
+]
+
+function SortIcon({ field, sortField, sortDir }) {
+    if (field !== sortField) return <ArrowUpDown size={13} className="ml-1 text-gray-300 inline" />
+    if (sortDir === 'asc')   return <ArrowUp     size={13} className="ml-1 text-[#FF821E] inline" />
+    return                          <ArrowDown   size={13} className="ml-1 text-[#FF821E] inline" />
+}
+
+function SkeletonRows() {
+    return Array.from({ length: 6 }).map((_, i) => (
+        <TableRow key={i}>
+            {HEADERS.map((_, j) => (
+                <TableCell key={j}>
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-full" />
+                </TableCell>
+            ))}
+        </TableRow>
+    ))
+}
+
+export default function TableClientsData({
+    data = [],
+    handleClientSelected = () => { },
+    onEdit = () => { },
+    onDelete = () => { } }) {
+    const [sortField, setSortField] = useState('nombre_completo')
+    const [sortDir,   setSortDir]   = useState('asc')
+    const [deleting,  setDeleting]  = useState(null)
+
+    const handleSort = field => {
+        if (sortField === field) {
+            setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortField(field)
+            setSortDir('asc')
         }
-        return data.filter(item=>item?.isactive == variantFilter[0]?.value);
-    },[data, variantTypesClient]);
+    }
 
-    const handleDeleteClient=async(id)=>{
-        // Implement delete client logic here
+    const sortedData = useMemo(() => {
+        return [...data].sort((a, b) => {
+            const valA = (a[sortField] ?? '').toString().toLowerCase()
+            const valB = (b[sortField] ?? '').toString().toLowerCase()
+            const cmp  = valA.localeCompare(valB, 'es')
+            return sortDir === 'asc' ? cmp : -cmp
+        })
+    }, [data, sortField, sortDir])
+
+    const handleDelete = async (id) => {
+        setDeleting(id)
         try {
-            console.log(`Deleting client with ID: ${id}`);
-            setLoading(true);
-            const response = await fetch('http://localhost:3000/api/clients', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id_cliente: id }),
-            });
-            const responseJSON = await response.json();
-            console.log(responseJSON);
-
-        } catch (error) {
-            console.error("Error deleting client:", error);
-            toast.error("Error al eliminar el cliente");
-            
-        }finally{
-            setLoading(false);
+            const res = await deleteCliente(id)
+            if (!res.ok) { toast.error(res.message || 'Error al eliminar el cliente'); return }
+            toast.success('Cliente eliminado')
+            onDelete(id)
+        } catch {
+            toast.error('Error inesperado al eliminar')
+        } finally {
+            setDeleting(null)
         }
     }
-  return (
-    <section className='w-full'>
-        <div className='w-full border-gray-100 border-b-[1px] flex flex-row'>
-            {
-                variantTypesClient?.map((item, idx)=>
-                <p  
-                    key={idx}
-                    onClick={()=>handleChangeTypesClient(idx)}
-                    className={`p-4 border-b-[1px] cursor-pointer ${item?.isSelected ? ' border-b-azulOscuro' : 'border-b-gray-100'}`}
-                >
-                    {item?.name}
-                </p>)
-            }
-        </div>
-        {
-            loading ?
-            <section className='w-full mt-4'>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>
-                                <h1>Nombre</h1>
+
+    return (
+        <section className="w-full">
+            <Table>
+                <TableCaption className="text-xs text-gray-400 pb-3">
+                    {data.length} cliente{data.length !== 1 ? 's' : ''} encontrado{data.length !== 1 ? 's' : ''}
+                </TableCaption>
+
+                <TableHeader>
+                    <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+                        {HEADERS.map(h => (
+                            <TableHead key={h.key}>
+                                {h.sortable ? (
+                                    <button
+                                        onClick={() => handleSort(h.key)}
+                                        className="flex items-center font-semibold text-[#1F4363] text-xs uppercase tracking-wide hover:text-[#FF821E] transition-colors select-none"
+                                    >
+                                        {h.label}
+                                        <SortIcon field={h.key} sortField={sortField} sortDir={sortDir} />
+                                    </button>
+                                ) : (
+                                    <span className="font-semibold text-[#1F4363] text-xs uppercase tracking-wide">
+                                        {h.label}
+                                    </span>
+                                )}
                             </TableHead>
-                            <TableHead>
-                                <h1>Apellido</h1>
-                            </TableHead>
-                            <TableHead>
-                                <h1>Deuda Actual (S/.)</h1>
-                            </TableHead>
-                            <TableHead>
-                                <h1>Ultimo Pago</h1>
-                            </TableHead>
-                            <TableHead>
-                                <h1>Puntuacion</h1>
-                            </TableHead>
-                            <TableHead>
-                                <h1>Estado</h1>
-                            </TableHead>
-                            <TableHead>
-                                <h1><EditIcon/></h1>
-                            </TableHead>
+                        ))}
+                    </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                    {sortedData.length === 0 ? (
+                        <TableRow className="h-48">
+                            <TableCell colSpan={HEADERS.length} className="text-center text-gray-400 text-sm">
+                                No hay clientes para mostrar
+                            </TableCell>
                         </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            Array.from({length: 10}).map((_, idx)=>(
-                                <TableRow key={idx}>
-                                    {
-                                        headers?.map((_, index)=>
-                                        <TableCell key={index}>
-                                            <Skeleton/>
-                                        </TableCell>
-                                        )
-                                    }
-                                </TableRow>
-                                ))
-                        }
-                    </TableBody>
-                </Table>
-            </section>
-            :
-            <section className='w-full mt-4'>
-                <Table>
-                    <TableCaption>
-                    <p>
-                        Lista de los clientes de la tienda
-                    </p>
-                    </TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            {
-                                headers?.map((item, idx)=>
-                                    <TableHead key={idx}>
-                                        <h1 className='text-azulOscuro font-bold'>{item?.value}</h1>
-                                    </TableHead>
-                                )
-                            }
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            filterDataTypeClient.length > 0 ?
-                            (
-                                filterDataTypeClient?.map((cliente)=>(
-                                    <TableRow key={cliente?.id_cliente}>
-                                        <TableCell>
-                                            <p onClick={()=>handleClientSelected(cliente)} className='underline cursor-pointer'>{cliente?.nombre_cliente}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p>{cliente?.apellido_cliente}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p>S/.{cliente?.deuda_actual}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p>{cliente?.fecha_ultimo_pago}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <ul>
-                                                {Array.from({length: cliente?.puntuacion}, (_, i) => (
-                                                    <li key={i} className="inline-block text-yellow-400"><Star/></li>
-                                                ))}
-                                            </ul>
-                                        </TableCell>
-                                        <TableCell>
-                                            <p className={cn('p-2 rounded-lg text-azulOscuro text-center', typesClient?.filter((type)=>type?.value === cliente?.isactive)[0].className)}>{typesClient?.filter((type)=>type?.value === cliente?.isactive)[0]?.name}</p>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button variant="ghost" className="w-8 h-8">
-                                                        <MoreVertIcon/>
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-fit p-2" >
-                                                    <div className='w-fit flex flex-col '>
-                                                        <Button variant="ghost" className="w-full justify-between ">
-                                                            <p>Editar</p><EditIcon/>
-                                                        </Button>
-                                                        <Button 
-                                                            variant="ghost" 
-                                                            className="w-full justify-between"
-                                                            onClick={()=>handleDeleteClient(cliente?.id_cliente)}    
-                                                        >
-                                                            <p>Eliminar</p><Trash/>
-                                                        </Button>
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        </TableCell>
-                                    </TableRow>
-                                )) 
-                            ) : 
+                    ) : (
+                        sortedData.map(cliente => (
                             <TableRow
-                                className="text-center h-48"
+                                key={cliente.id}
+                                className="hover:bg-[#1F4363]/3 transition-colors cursor-pointer"
                             >
-                                <TableCell colSpan={7}><h1>No hay resultados</h1></TableCell>
+                                <TableCell>
+                                    <button
+                                        onClick={() => handleClientSelected(cliente)}
+                                        className="text-left group"
+                                    >
+                                        <p className="font-medium text-[#1F4363] group-hover:text-[#FF821E] transition-colors text-sm">
+                                            {cliente.nombre_completo}
+                                        </p>
+                                    </button>
+                                </TableCell>
+
+                                <TableCell>
+                                    <div className="flex flex-col gap-1">
+                                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full w-fit ${TIPO_DOC_BADGE[cliente.tipo_documento] ?? 'bg-gray-100 text-gray-500'}`}>
+                                            {cliente.tipo_documento}
+                                        </span>
+                                        <span className="text-xs text-gray-500 font-mono">
+                                            {cliente.numero_documento}
+                                        </span>
+                                    </div>
+                                </TableCell>
+
+                                <TableCell>
+                                    <p className="text-sm text-gray-600 truncate max-w-[180px]">
+                                        {cliente.email ?? <span className="text-gray-300">—</span>}
+                                    </p>
+                                </TableCell>
+
+                                <TableCell>
+                                    <p className="text-sm text-gray-600 font-mono">
+                                        {cliente.telefono ?? <span className="text-gray-300">—</span>}
+                                    </p>
+                                </TableCell>
+
+                                <TableCell>
+                                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORIA_BADGE[cliente.categoria] ?? 'bg-gray-100 text-gray-500'}`}>
+                                        {cliente.categoria ?? '—'}
+                                    </span>
+                                </TableCell>
+
+                                <TableCell>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="ghost" className="w-8 h-8 p-0 hover:bg-gray-100">
+                                                <MoreVertIcon style={{ fontSize: 18 }} />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-40 p-1.5 rounded-xl shadow-lg border border-gray-100">
+                                            <div className="flex flex-col gap-0.5">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="w-full justify-between text-sm text-[#1F4363] hover:bg-[#1F4363]/5 rounded-lg px-3 h-9"
+                                                    onClick={() => onEdit(cliente)}
+                                                >
+                                                    <span>Editar</span>
+                                                    <EditIcon style={{ fontSize: 16 }} />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    disabled={deleting === cliente.id}
+                                                    className="w-full justify-between text-sm text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg px-3 h-9"
+                                                    onClick={() => handleDelete(cliente.id)}
+                                                >
+                                                    <span>{deleting === cliente.id ? 'Eliminando...' : 'Eliminar'}</span>
+                                                    <Trash size={14} />
+                                                </Button>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </TableCell>
                             </TableRow>
-                        }
-                    </TableBody>
-                </Table>
-            </section>
-        }
-    </section>
-  )
+                        ))
+                    )}
+                </TableBody>
+            </Table>
+        </section>
+    )
 }

@@ -49,16 +49,17 @@ export async function login(dataUser) {
         nombre_completo: data?.usuario?.nombre_completo,
         access_token: data?.token,
         esAdmin: esDueno,
-        empresa_id: data?.empresa_id ?? null,
-        tienda_id: data?.tienda_id ?? null,
+        empresa_id: data?.usuario?.empresa_id ?? null,
         rol_id: data?.rol_id ?? null,
         nivel_permiso: esDueno ? 999 : (data?.nivel_permiso ?? 0),
     };
     const session = await encrypt(user);
-    (await cookies()).set("session", session, {expires, httpOnly : true});
+    (await cookies()).set("session", session, { expires, httpOnly: true });
+    
     return {
         error : false,
-        message : "Ingreso exitoso"
+        message: "Ingreso exitoso",
+        user
     }
 }
 
@@ -88,7 +89,8 @@ export async function loginWithGoogle(credential) {
     return {
         error: false,
         isNewUser: data?.isNewUser ?? false,
-        message: "Ingreso exitoso"
+        message: "Ingreso exitoso",
+        user,
     };
 }
 

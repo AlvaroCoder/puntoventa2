@@ -1,46 +1,35 @@
 'use client'
 import React, { useEffect, useState, useMemo } from 'react'
 import { toast } from 'react-toastify'
-import { Loader2, X, Download, Upload, ShoppingCart, CreditCard, Search, Plus, ChevronDown } from 'lucide-react'
+import { Loader2, Upload, Search, Plus } from 'lucide-react'
 import { useAuth } from '@/Context/AuthContext'
 import { TableClientsData } from '@/components/Tables/elements'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import SliderFormNewClient from '@/components/Forms/SliderFormNewClient'
+import SliderFormEditClient from '@/components/Forms/SliderFormEditClient'
+import SliderClientData from '@/components/Cards/SliderClientData'
 import ImportExcelModal from '@/components/Modal/ImportExcelModal'
-import ClientHistorialPanel from '@/components/Panel/ClientHistorialPanel'
+import { getClientesByEmpresa } from '@/Connections/clientes'
 
 export default function Page() {
-    const URL_GET_CLIENTS = process.env.NEXT_PUBLIC_URL_GET_CLIENTS
     const { user } = useAuth()
 
-    const [dataClient, setDataClient]     = useState([])
-    const [loading, setLoading]           = useState(true)
+    const [dataClient, setDataClient] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [queryInput, setQueryInput] = useState('')
     const [clientSelected, setClientSelected] = useState(null)
-    const [queryInput, setQueryInput]     = useState('')
-    const [showForm, setShowForm]         = useState(false)
-    const [showImport, setShowImport]     = useState(false)
+    const [clientToEdit, setClientToEdit] = useState(null)
+
+    const [showForm, setShowForm] = useState(false)
+    const [showImport, setShowImport] = useState(false)
 
     useEffect(() => {
         if (!user?.access_token) return
         async function getData() {
-            try {
-                setLoading(true)
-                const res = await fetch(URL_GET_CLIENTS, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type':  'application/json',
-                        'Authorization': `Bearer ${user.access_token}`,
-                    },
-                    mode: 'cors',
-                });
-
-
-                const json = await res.json();
-
-                console.log('JSON : ', json);
-                
-                setDataClient(json?.data ?? json ?? [])
+            try {                
+                const res = await getClientesByEmpresa(user.empresa_id)                
+                setDataClient(res?.data?.data ?? [])
             } catch {
                 toast.error('Error al cargar los clientes')
             } finally {
@@ -48,18 +37,40 @@ export default function Page() {
             }
         }
         getData()
-    }, [user, URL_GET_CLIENTS])
+    }, [user])
 
     const filteredData = useMemo(() =>
-        dataClient.filter(c =>
-            (c?.nombre_cliente ?? c?.nombre_completo ?? '')
-                .toUpperCase().includes(queryInput.toUpperCase()) ||
-            (c?.apellido_cliente ?? '').toUpperCase().includes(queryInput.toUpperCase())
+        (dataClient ?? []).filter(c =>
+            (c?.nombre_completo ?? '').toUpperCase().includes(queryInput.toUpperCase()) ||
+            (c?.numero_documento ?? '').includes(queryInput)
         ),
     [dataClient, queryInput])
 
     const handleAddClient = newClient => {
         setDataClient(prev => [newClient, ...prev])
+        setShowForm(false)
+    }
+
+    const handleEditFromTable = cliente => {
+        setClientSelected(null)
+        setClientToEdit(cliente)
+    }
+
+    const handleEditFromPanel = cliente => {
+        setClientSelected(null)
+        setClientToEdit(cliente)
+    }
+
+    const handleUpdateClient = updatedClient => {
+        setDataClient(prev =>
+            prev.map(c => c.id === updatedClient.id ? updatedClient : c)
+        )
+        setClientToEdit(null)
+    }
+
+    // Eliminar cliente del listado
+    const handleDeleteClient = deletedId => {
+        setDataClient(prev => prev.filter(c => c.id !== deletedId))
     }
 
     return (
@@ -94,13 +105,14 @@ export default function Page() {
             <div className="relative max-w-sm mb-4">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <Input
-                    placeholder="Buscar cliente..."
+                    placeholder="Buscar por nombre o documento..."
                     value={queryInput}
                     onChange={e => setQueryInput(e.target.value)}
                     className="pl-9 focus-visible:ring-[#FF821E]/30 focus-visible:border-[#FF821E]"
                 />
             </div>
 
+            {/* Tabla */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center h-56">
@@ -110,17 +122,29 @@ export default function Page() {
                     <TableClientsData
                         data={filteredData}
                         handleClientSelected={setClientSelected}
+                        onEdit={handleEditFromTable}
+                        onDelete={handleDeleteClient}
                     />
                 )}
             </div>
 
-            {clientSelected && (
-                <ClientHistorialPanel   
-                    client={clientSelected}
-                    onClose={() => setClientSelected(null)}
-                />
-            )}
+            {/* Panel de vista del cliente */}
+            <SliderClientData
+                open={!!clientSelected}
+                onClose={() => setClientSelected(null)}
+                clientData={clientSelected}
+                onEdit={handleEditFromPanel}
+            />
 
+            {/* Formulario de edición */}
+            <SliderFormEditClient
+                open={!!clientToEdit}
+                onClose={() => setClientToEdit(null)}
+                clientData={clientToEdit}
+                onSuccess={handleUpdateClient}
+            />
+
+            {/* Formulario de creación */}
             <SliderFormNewClient
                 open={showForm}
                 onClose={() => setShowForm(false)}
@@ -128,6 +152,7 @@ export default function Page() {
                 onSuccess={handleAddClient}
             />
 
+            {/* Modal importar Excel */}
             <ImportExcelModal
                 open={showImport}
                 onClose={() => setShowImport(false)}
