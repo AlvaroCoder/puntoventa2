@@ -12,7 +12,7 @@ const CATEGORIA_BADGE = {
 }
 
 const TIPO_DOC_BADGE = {
-    DNI:       'bg-[#1F4363]/10 text-[#1F4363]',
+    DNI: 'bg-[#1F4363]/10 text-[#1F4363]',
     RUC:       'bg-purple-100 text-purple-700',
     'C.E.':    'bg-yellow-100 text-yellow-700',
     PASAPORTE: 'bg-gray-100 text-gray-500',
@@ -66,10 +66,8 @@ export default function SliderClientData({ open, onClose, clientData, onEdit }) 
                     </button>
                 </div>
 
-                {/* Contenido */}
                 <div className="flex-1 overflow-y-auto">
 
-                    {/* Perfil del cliente */}
                     <div className="px-6 py-6 flex flex-col items-center text-center border-b border-gray-100">
                         <div className="w-16 h-16 rounded-full bg-[#1F4363] flex items-center justify-center text-white font-bold text-2xl mb-3">
                             {inicial}
@@ -88,7 +86,6 @@ export default function SliderClientData({ open, onClose, clientData, onEdit }) 
                         )}
                     </div>
 
-                    {/* Info de contacto */}
                     <div className="px-6 py-5 flex flex-col gap-4">
                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Información de contacto</p>
 
@@ -97,25 +94,9 @@ export default function SliderClientData({ open, onClose, clientData, onEdit }) 
                         <InfoRow icon={MapPin}  label="Dirección"          value={clientData.direccion} />
                     </div>
 
-                    {/* Info del registro */}
-                    <div className="px-6 pb-5 flex flex-col gap-4 border-t border-gray-50 pt-4">
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Registro</p>
 
-                        <InfoRow icon={CreditCard} label="ID de cliente"    value={`#${clientData.id}`} />
-                        <InfoRow icon={User}       label="Empresa ID"       value={`#${clientData.empresa_id}`} />
-                        <InfoRow
-                            icon={User}
-                            label="Fecha de registro"
-                            value={
-                                clientData.fecha_registro && clientData.fecha_registro !== '0000-00-00'
-                                    ? clientData.fecha_registro
-                                    : null
-                            }
-                        />
-                    </div>
                 </div>
 
-                {/* Footer con acciones */}
                 <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
                     <Button
                         variant="outline"

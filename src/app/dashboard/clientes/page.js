@@ -26,6 +26,8 @@ export default function Page() {
 
     useEffect(() => {
         if (!user?.access_token) return
+        console.log('USUARIO : ', user?.access_token);
+        
         async function getData() {
             try {                
                 const res = await getClientesByEmpresa(user.empresa_id)                
@@ -68,7 +70,6 @@ export default function Page() {
         setClientToEdit(null)
     }
 
-    // Eliminar cliente del listado
     const handleDeleteClient = deletedId => {
         setDataClient(prev => prev.filter(c => c.id !== deletedId))
     }
@@ -76,7 +77,6 @@ export default function Page() {
     return (
         <div className="w-full">
 
-            {/* Encabezado */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <h1 className="font-bold text-[#1F4363] text-2xl">Clientes</h1>
@@ -101,7 +101,6 @@ export default function Page() {
                 </div>
             </div>
 
-            {/* Buscador */}
             <div className="relative max-w-sm mb-4">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <Input
@@ -112,7 +111,6 @@ export default function Page() {
                 />
             </div>
 
-            {/* Tabla */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center h-56">
@@ -128,7 +126,6 @@ export default function Page() {
                 )}
             </div>
 
-            {/* Panel de vista del cliente */}
             <SliderClientData
                 open={!!clientSelected}
                 onClose={() => setClientSelected(null)}
@@ -136,7 +133,6 @@ export default function Page() {
                 onEdit={handleEditFromPanel}
             />
 
-            {/* Formulario de edición */}
             <SliderFormEditClient
                 open={!!clientToEdit}
                 onClose={() => setClientToEdit(null)}
@@ -144,15 +140,12 @@ export default function Page() {
                 onSuccess={handleUpdateClient}
             />
 
-            {/* Formulario de creación */}
             <SliderFormNewClient
                 open={showForm}
                 onClose={() => setShowForm(false)}
-                empresaId={user?.empresa_id}
                 onSuccess={handleAddClient}
             />
 
-            {/* Modal importar Excel */}
             <ImportExcelModal
                 open={showImport}
                 onClose={() => setShowImport(false)}

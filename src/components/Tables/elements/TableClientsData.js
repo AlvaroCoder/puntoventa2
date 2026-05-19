@@ -9,7 +9,6 @@ import { Trash, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { deleteCliente } from '@/Connections/clientes';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const CATEGORIA_BADGE = {
     RESPONSABLE: 'bg-green-100 text-green-700',

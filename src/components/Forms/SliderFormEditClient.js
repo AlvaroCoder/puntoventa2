@@ -13,17 +13,16 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
     const [form, setForm]         = useState({})
     const [loadingSave, setLoadingSave] = useState(false)
 
-    // Sincronizar el form cuando cambia el cliente seleccionado
     useEffect(() => {
         if (clientData) {
             setForm({
                 tipo_documento: clientData.tipo_documento   ?? 'DNI',
                 numero_documento: clientData.numero_documento ?? '',
                 nombre_completo:  clientData.nombre_completo  ?? '',
-                email: clientData.email             ?? '',
-                telefono: clientData.telefono          ?? '',
-                direccion: clientData.direccion         ?? '',
-                categoria: clientData.categoria         ?? 'REGULAR',
+                email: clientData.email ?? '',
+                telefono: clientData.telefono ?? '',
+                direccion: clientData.direccion ?? '',
+                categoria: clientData.categoria ?? 'REGULAR',
             })
         }
     }, [clientData])
@@ -79,11 +78,8 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
                         <X size={18} />
                     </button>
                 </div>
-
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
 
-                    {/* Documento */}
                     <div>
                         <label className="block text-sm font-semibold text-[#1F4363] mb-1.5">
                             Documento <span className="text-red-500">*</span>
@@ -112,7 +108,6 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
                         </div>
                     </div>
 
-                    {/* Nombre completo */}
                     <div>
                         <label className="block text-sm font-semibold text-[#1F4363] mb-1.5">
                             Nombre completo <span className="text-red-500">*</span>
@@ -126,7 +121,6 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
                         />
                     </div>
 
-                    {/* Email */}
                     <div>
                         <label className="block text-sm font-semibold text-[#1F4363] mb-1.5">
                             Correo electrónico
@@ -141,7 +135,6 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
                         />
                     </div>
 
-                    {/* Teléfono */}
                     <div>
                         <label className="block text-sm font-semibold text-[#1F4363] mb-1.5">
                             Teléfono
@@ -155,7 +148,6 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
                         />
                     </div>
 
-                    {/* Dirección */}
                     <div>
                         <label className="block text-sm font-semibold text-[#1F4363] mb-1.5">
                             Dirección
@@ -169,7 +161,6 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
                         />
                     </div>
 
-                    {/* Categoría */}
                     <div>
                         <label className="block text-sm font-semibold text-[#1F4363] mb-1.5">
                             Categoría
@@ -191,7 +182,6 @@ export default function SliderFormEditClient({ open, onClose, clientData, onSucc
 
                 </form>
 
-                {/* Footer */}
                 <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
                     <Button
                         type="button"
