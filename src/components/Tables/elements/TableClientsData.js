@@ -57,9 +57,11 @@ export default function TableClientsData({
     handleClientSelected = () => { },
     onEdit = () => { },
     onDelete = () => { } }) {
-    const [sortField, setSortField] = useState('nombre_completo')
-    const [sortDir,   setSortDir]   = useState('asc')
-    const [deleting,  setDeleting]  = useState(null)
+    const [sortField,    setSortField]    = useState('nombre_completo')
+    const [sortDir,      setSortDir]      = useState('asc')
+    const [deleting,     setDeleting]     = useState(null)
+    const [currentPage,  setCurrentPage]  = useState(1)
+    const PAGE_SIZE = 10
 
     const handleSort = field => {
         if (sortField === field) {
@@ -71,6 +73,7 @@ export default function TableClientsData({
     }
 
     const sortedData = useMemo(() => {
+        setCurrentPage(1)
         return [...data].sort((a, b) => {
             const valA = (a[sortField] ?? '').toString().toLowerCase()
             const valB = (b[sortField] ?? '').toString().toLowerCase()
@@ -78,6 +81,9 @@ export default function TableClientsData({
             return sortDir === 'asc' ? cmp : -cmp
         })
     }, [data, sortField, sortDir])
+
+    const totalPages    = Math.max(1, Math.ceil(sortedData.length / PAGE_SIZE))
+    const paginatedData = sortedData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
     const handleDelete = async (id) => {
         setDeleting(id)
@@ -130,7 +136,7 @@ export default function TableClientsData({
                             </TableCell>
                         </TableRow>
                     ) : (
-                        sortedData.map(cliente => (
+                        paginatedData.map(cliente => (
                             <TableRow
                                 key={cliente.id}
                                 className="hover:bg-[#1F4363]/3 transition-colors cursor-pointer"
@@ -210,6 +216,51 @@ export default function TableClientsData({
                     )}
                 </TableBody>
             </Table>
+
+            {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-400">
+                        Página <span className="font-semibold text-[#1F4363]">{currentPage}</span> de <span className="font-semibold text-[#1F4363]">{totalPages}</span>
+                        <span className="ml-2 text-gray-300">·</span>
+                        <span className="ml-2">{sortedData.length} cliente{sortedData.length !== 1 ? 's' : ''}</span>
+                    </p>
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="px-3 h-8 rounded-lg border border-gray-200 text-sm text-[#1F4363] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                            Anterior
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                            .reduce((acc, p, idx, arr) => {
+                                if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...')
+                                acc.push(p)
+                                return acc
+                            }, [])
+                            .map((item, idx) =>
+                                item === '...'
+                                    ? <span key={`ellipsis-${idx}`} className="px-1 text-gray-400 text-sm">…</span>
+                                    : <button
+                                        key={item}
+                                        onClick={() => setCurrentPage(item)}
+                                        className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${currentPage === item ? 'bg-[#FF821E] text-white' : 'border border-gray-200 text-[#1F4363] hover:bg-gray-50'}`}
+                                    >
+                                        {item}
+                                    </button>
+                            )
+                        }
+                        <button
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            className="px-3 h-8 rounded-lg border border-gray-200 text-sm text-[#1F4363] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                            Siguiente
+                        </button>
+                    </div>
+                </div>
+            )}
         </section>
     )
 }

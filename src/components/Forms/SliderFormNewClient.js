@@ -32,7 +32,7 @@ export default function SliderFormNewClient({ open, onClose, onSuccess }) {
 
     useEffect(() => {
         if (!errores) return
-        const timer = setTimeout(() => setErrores(null), 3000)
+        const timer = setTimeout(() => setErrores(null), 8000)
         return () => clearTimeout(timer)
     }, [errores])
 
@@ -57,11 +57,13 @@ export default function SliderFormNewClient({ open, onClose, onSuccess }) {
 
         setLoadingSave(true)
         try {
-            const payload = {
-                ...form,
-                empresa_id: user?.empresa_id,
-            }
-            const res = await createCliente(payload);            
+            const payload = Object.fromEntries(
+                Object.entries({ ...form, empresa_id: user?.empresa_id })
+                    .filter(([, v]) => v !== '' && v !== null && v !== undefined)
+            )
+            
+            const res = await createCliente(payload)
+            
             if (!res.ok || res.status > 400) {
                 toast(res.message || 'Error al crear el cliente', {
                     type: 'error',
@@ -76,7 +78,9 @@ export default function SliderFormNewClient({ open, onClose, onSuccess }) {
 
                 return
             }
-            toast.success('Cliente creado correctamente')
+            toast.success('Cliente creado correctamente', {
+                position : 'bottom-right'
+            })
             onSuccess(res.data ?? payload)
             setForm(INITIAL)
             onClose()
