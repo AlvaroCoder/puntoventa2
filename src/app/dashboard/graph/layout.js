@@ -2,7 +2,7 @@ import { TopBarNavigation } from '@/components/Navigation'
 import SidebarVisual from '@/components/Navigation/SidebarVisual'
 import React from 'react'
 
-export default function RootLayoutBd({ children }) {
+export default function RootLayoutGraph({ children }) {
     return (
         <div className='w-full h-screen flex flex-row overflow-hidden'>
             <SidebarVisual />

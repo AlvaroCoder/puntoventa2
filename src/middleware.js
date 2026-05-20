@@ -11,7 +11,7 @@ const RUTAS_PROTEGIDAS = [
 
 export default async function middleware(request = NextRequest) {
     const session = await getSession();
-    const pathname = request.nextUrl.pathname;
+    const pathname = request.nextUrl.pathname;    
 
     if (session !== null && pathname.startsWith('/login')) {
         return NextResponse.redirect(new URL('/dashboard', request.url));

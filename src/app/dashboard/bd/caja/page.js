@@ -2,8 +2,13 @@ import React from 'react'
 
 export default function Page() {
   return (
-    <div className='flex-1 py-4 px-8 text-azulOscuro'>
-      <h1 className='font-bold text-2xl'>Caja Chica</h1>
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+           <div>
+              <h1 className="font-bold text-[#1F4363] text-2xl">Movimientos de Caja</h1>
+              <p className="text-sm text-gray-400">Gestiona los movimientos de caja</p>
+          </div>
+      </div>
     </div>
   )
 }
