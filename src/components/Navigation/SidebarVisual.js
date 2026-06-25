@@ -18,8 +18,10 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import PieChartIcon from '@mui/icons-material/PieChart'
 import GroupIcon from '@mui/icons-material/Group'
+import HomeIcon from '@mui/icons-material/Home';
 
 const BD_ITEMS = [
+    {routeName : 'Inicio',  routePath : '/dashboard/bd/home', routeIcon : HomeIcon},
     { routeName: 'Clientes', routePath: '/dashboard/bd/clientes',     routeIcon: PeopleIcon },
     { routeName: 'Créditos', routePath: '/dashboard/bd/creditos',     routeIcon: CreditCardIcon },
     { routeName: 'Caja', routePath: '/dashboard/bd/caja',         routeIcon: PointOfSaleIcon },

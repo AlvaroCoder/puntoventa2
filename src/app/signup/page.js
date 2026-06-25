@@ -184,7 +184,6 @@ export default function SignUpPage() {
       return;
     }
 
-    // Step 4: validate then register
     const isValid = await changeStep("next");
     if (!isValid) return;
 
@@ -229,6 +228,8 @@ export default function SignUpPage() {
       const responseCreateEnterprise = await CREATE_COMPANY(dataToSendEnterprise, token);
 
       if (!responseCreateEnterprise.ok) {
+        console.log('Error : ', await responseCreateEnterprise.json());
+        
         setSubmitError("Usuario creado, pero error al crear empresa. Intenta iniciar sesión.");
         setIsLoading(false);
         return;
