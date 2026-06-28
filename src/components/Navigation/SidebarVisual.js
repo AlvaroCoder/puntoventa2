@@ -19,16 +19,17 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 import PieChartIcon from '@mui/icons-material/PieChart'
 import GroupIcon from '@mui/icons-material/Group'
 import HomeIcon from '@mui/icons-material/Home';
+import { BoxIcon } from 'lucide-react'
 
 const BD_ITEMS = [
     {routeName : 'Inicio',  routePath : '/dashboard/bd/home', routeIcon : HomeIcon},
     { routeName: 'Clientes', routePath: '/dashboard/bd/clientes',     routeIcon: PeopleIcon },
-    { routeName: 'Créditos', routePath: '/dashboard/bd/creditos',     routeIcon: CreditCardIcon },
     { routeName: 'Caja', routePath: '/dashboard/bd/caja',         routeIcon: PointOfSaleIcon },
     { routeName: 'Trabajadores', routePath: '/dashboard/bd/trabajadores', routeIcon: WorkIcon },
     { routeName: 'Proveedores',  routePath: '/dashboard/bd/proveedores',  routeIcon: LocalShippingIcon },
     { routeName: 'Inventario', routePath: '/dashboard/bd/inventario',   routeIcon: InventoryIcon },
-    { routeName: 'Tiendas', routePath: '/dashboard/bd/tiendas',      routeIcon: StoreIcon },
+    { routeName: 'Tiendas', routePath: '/dashboard/bd/tiendas', routeIcon: StoreIcon },
+    {routeName : "Compras", routePath : '/dashboard/bd/logistica', routeIcon : BoxIcon}
 ]
 
 const GRAPH_ITEMS = [

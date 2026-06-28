@@ -23,20 +23,20 @@ import StorageIcon from '@mui/icons-material/Storage'
 import BarChartIcon from '@mui/icons-material/BarChart'
 
 const BD_ROUTES = [
-    { name: 'Clientes',     path: '/dashboard/bd/clientes',     icon: PeopleIcon,       desc: 'Gestiona tu cartera de clientes',        color: '#FF821E' },
-    { name: 'Créditos',     path: '/dashboard/bd/creditos',     icon: CreditCardIcon,   desc: 'Control de créditos y cobros',           color: '#1F4363' },
-    { name: 'Caja',         path: '/dashboard/bd/caja',         icon: PointOfSaleIcon,  desc: 'Movimientos de caja diarios',            color: '#198E7B' },
-    { name: 'Trabajadores', path: '/dashboard/bd/trabajadores', icon: WorkIcon,         desc: 'Administra tu equipo',                   color: '#FF821E' },
-    { name: 'Proveedores',  path: '/dashboard/bd/proveedores',  icon: LocalShippingIcon,desc: 'Gestión de proveedores',                 color: '#1F4363' },
-    { name: 'Inventario',   path: '/dashboard/bd/inventario',   icon: InventoryIcon,    desc: 'Control de stock y productos',           color: '#198E7B' },
-    { name: 'Tiendas',      path: '/dashboard/bd/tiendas',      icon: StoreIcon,        desc: 'Administra tus tiendas',                 color: '#FF821E' },
-]
+    { name: 'Clientes', path: '/dashboard/bd/clientes', icon: PeopleIcon, desc: 'Gestiona tu cartera de clientes', color: '#FF821E' },
+    { name: 'Créditos', path: '/dashboard/bd/creditos', icon: CreditCardIcon, desc: 'Control de créditos y cobros', color: '#1F4363' },
+    { name: 'Caja', path: '/dashboard/bd/caja', icon: PointOfSaleIcon, desc: 'Movimientos de caja diarios', color: '#198E7B' },
+    { name: 'Trabajadores', path: '/dashboard/bd/trabajadores', icon: WorkIcon, desc: 'Administra tu equipo', color: '#FF821E' },
+    { name: 'Proveedores', path: '/dashboard/bd/proveedores', icon: LocalShippingIcon, desc: 'Gestión de proveedores', color: '#1F4363' },
+    { name: 'Inventario', path: '/dashboard/bd/inventario', icon: InventoryIcon, desc: 'Control de stock y productos', color: '#198E7B' },
+    { name: 'Tiendas', path: '/dashboard/bd/tiendas', icon: StoreIcon, desc: 'Administra tus tiendas', color: '#FF821E' },
+];
 
 const GRAPH_ROUTES = [
     { name: 'Ventas',       path: '/dashboard/graph/ventas',     icon: TrendingUpIcon,           desc: 'Análisis de ventas',                 color: '#FF821E' },
     { name: 'Finanzas',     path: '/dashboard/graph/finanzas',   icon: AccountBalanceWalletIcon, desc: 'Reporte financiero',                 color: '#1F4363' },
-    { name: 'Inventario',   path: '/dashboard/graph/inventario', icon: PieChartIcon,             desc: 'Análisis de stock',                  color: '#198E7B' },
-    { name: 'Clientes',     path: '/dashboard/graph/clientes',   icon: GroupIcon,                desc: 'Comportamiento de clientes',         color: '#FF821E' },
+    { name: 'Inventario',   path: '/dashboard/graph/inventario', icon: PieChartIcon, desc: 'Análisis de stock', color: '#198E7B' },
+    { name: 'Clientes',     path: '/dashboard/graph/clientes',   icon: GroupIcon, desc: 'Comportamiento de clientes', color: '#FF821E' },
 ]
 
 const TUTORIAL_STEPS = [
@@ -125,7 +125,6 @@ export default function PaginaHome() {
     return (
         <div className="w-full min-h-full">
 
-            {/* ── Tutorial overlay ── */}
             <AnimatePresence>
                 {showTutorial && (
                     <motion.div
@@ -144,7 +143,6 @@ export default function PaginaHome() {
                                 transition={{ duration: 0.3, ease: 'easeOut' }}
                                 className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative overflow-hidden"
                             >
-                                {/* accent bar */}
                                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF821E] to-[#1F4363] rounded-t-2xl" />
 
                                 <button
@@ -187,10 +185,8 @@ export default function PaginaHome() {
                 )}
             </AnimatePresence>
 
-            {/* ── Page content ── */}
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
 
-                {/* Welcome card */}
                 <motion.div variants={itemVariants}>
                     <div className="bg-gradient-to-br from-[#1F4363] to-[#163250] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
                         <div className="flex items-center gap-4">

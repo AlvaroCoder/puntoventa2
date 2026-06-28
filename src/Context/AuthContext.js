@@ -17,7 +17,9 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         async function loadSession() {
             try {
-                const session = await getSession();                
+                const session = await getSession();    
+                console.log('Session : ', session);
+                
                 setUser(session ?? null)
             } catch {
                 setUser(null)

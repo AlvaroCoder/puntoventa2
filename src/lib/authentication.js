@@ -42,8 +42,9 @@ export async function login(dataUser) {
     const jsonResponse = await response.json();
     const date = new Date();
     const expires = date.setHours(date.getHours()+24);
-    const data = jsonResponse?.data ?? {};
-    const esDueno = data?.tipo === 'dueno';
+    const data = jsonResponse?.data ?? {};    
+    const esDueno = data?.usuario?.tipo === 'dueño';
+    
     const user = {
         email: dataUser?.email,
         nombre_completo: data?.usuario?.nombre_completo,
