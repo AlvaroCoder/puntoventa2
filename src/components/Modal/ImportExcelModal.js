@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { Download, Loader2, Upload } from 'lucide-react';
+import { uploadDataExcelClient } from '@/Connections/clientes';
 
 export default function ImportExcelModal({open, onClose}) {
     const [file, setFile] = useState(null);
@@ -23,7 +24,15 @@ export default function ImportExcelModal({open, onClose}) {
     const handleUpload = async () => {
         if (!file) { toast.warn('Selecciona un archivo primero '); return; }
         setUploading(true);
-        await new Promise(r => setTimeout(r, 1500));
+        const response = await uploadDataExcelClient(file);
+        if (response.error) {
+            setUploading(false);
+            toast.error('Ocurrio un error al subir la informacion ');
+            onClose();
+            setFile(null);
+            return;
+
+        }
         setUploading(false);
         toast.success('Clientes importados correctamente');
         setFile(null);
@@ -33,7 +42,6 @@ export default function ImportExcelModal({open, onClose}) {
   return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden">
-                {/* Header */}
                 <div className="px-6 pt-6 pb-4 border-b border-gray-100">
                     <DialogTitle className="text-[#1F4363] font-bold text-lg">Importar Clientes</DialogTitle>
                     <DialogDescription className="text-sm text-gray-400 mt-0.5">
@@ -42,7 +50,6 @@ export default function ImportExcelModal({open, onClose}) {
                 </div>
 
                 <div className="px-6 py-5 flex flex-col gap-4">
-                    {/* Descargar plantilla */}
                     <div className="flex items-center justify-between bg-[#1F4363]/5 rounded-xl px-4 py-3">
                         <div>
                             <p className="text-sm font-semibold text-[#1F4363]">Plantilla de ejemplo</p>
@@ -56,7 +63,6 @@ export default function ImportExcelModal({open, onClose}) {
                         </a>
                     </div>
 
-                    {/* Drop zone */}
                     <div
                         onDragOver={e => { e.preventDefault(); setDragging(true) }}
                         onDragLeave={() => setDragging(false)}

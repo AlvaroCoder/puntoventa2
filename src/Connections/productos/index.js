@@ -28,12 +28,10 @@ export async function deleteProducto(id) {
     return fetchWithAuth(`${BASE_PRODUCTO}/${id}`, { method: 'DELETE' })
 }
 
-/** Obtiene todas las categorías */
 export async function getCategorias() {
     return fetchWithAuth(BASE_CATEGORIA)
 }
 
-/** Obtiene el inventario de una tienda */
 export async function getInventarioByTienda(tiendaId) {
     return fetchWithAuth(`${BASE_INVENTARIO}/tienda/${tiendaId}`)
 }
