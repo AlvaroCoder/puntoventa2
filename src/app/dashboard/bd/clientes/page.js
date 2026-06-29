@@ -26,7 +26,6 @@ export default function Page() {
 
     useEffect(() => {
         if (!user?.access_token) return
-        console.log('USUARIO : ', user?.access_token);
         
         async function getData() {
             try {                

@@ -5,16 +5,16 @@ import { Button } from '@/components/ui/button'
 
 const CATEGORIA_BADGE = {
     RESPONSABLE: 'bg-green-100 text-green-700',
-    REGULAR:     'bg-blue-100 text-blue-700',
-    VIP:         'bg-[#FF821E]/15 text-[#FF821E]',
-    MOROSO:      'bg-red-100 text-red-600',
-    DEUDOR:      'bg-red-100 text-red-600',
+    REGULAR: 'bg-blue-100 text-blue-700',
+    VIP: 'bg-[#FF821E]/15 text-[#FF821E]',
+    MOROSO: 'bg-red-100 text-red-600',
+    DEUDOR: 'bg-red-100 text-red-600',
 }
 
 const TIPO_DOC_BADGE = {
     DNI: 'bg-[#1F4363]/10 text-[#1F4363]',
-    RUC:       'bg-purple-100 text-purple-700',
-    'C.E.':    'bg-yellow-100 text-yellow-700',
+    RUC: 'bg-purple-100 text-purple-700',
+    'C.E.': 'bg-yellow-100 text-yellow-700',
     PASAPORTE: 'bg-gray-100 text-gray-500',
 }
 
@@ -36,7 +36,7 @@ function InfoRow({ icon: Icon, label, value }) {
 
 export default function SliderClientData({ open, onClose, clientData, onEdit }) {
     if (!clientData) return null
-
+    
     const nombre  = clientData.nombre_completo ?? '—'
     const inicial = nombre[0]?.toUpperCase() ?? '?'
     const categoriaClass = CATEGORIA_BADGE[clientData.categoria] ?? 'bg-gray-100 text-gray-500'
@@ -93,7 +93,17 @@ export default function SliderClientData({ open, onClose, clientData, onEdit }) 
                         <InfoRow icon={Phone}   label="Teléfono"           value={clientData.telefono} />
                         <InfoRow icon={MapPin}  label="Dirección"          value={clientData.direccion} />
                     </div>
+                   <div className="px-6 py-5 flex flex-col gap-4">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Historial de compras </p>
 
+                       
+                        <p>Aun no compra en la tienda</p>
+                        <p>Tiene 23 puntos acumulados</p>
+                    </div>
+                    <div className="px-6 py-5 flex flex-col gap-4">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Historial de créditos </p>
+                        
+                    </div>
 
                 </div>
 

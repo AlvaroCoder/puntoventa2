@@ -22,13 +22,13 @@ import HomeIcon from '@mui/icons-material/Home';
 import { BoxIcon } from 'lucide-react'
 
 const BD_ITEMS = [
-    {routeName : 'Inicio',  routePath : '/dashboard/bd/home', routeIcon : HomeIcon},
+    { routeName: 'Inicio', routePath: '/dashboard/bd/home', routeIcon: HomeIcon },
+    { routeName: 'Tiendas', routePath: '/dashboard/bd/tiendas', routeIcon: StoreIcon },
+    { routeName: 'Caja', routePath: '/dashboard/bd/caja', routeIcon: PointOfSaleIcon },
+    { routeName: 'Inventario', routePath: '/dashboard/bd/inventario',   routeIcon: InventoryIcon },
     { routeName: 'Clientes', routePath: '/dashboard/bd/clientes',     routeIcon: PeopleIcon },
-    { routeName: 'Caja', routePath: '/dashboard/bd/caja',         routeIcon: PointOfSaleIcon },
     { routeName: 'Trabajadores', routePath: '/dashboard/bd/trabajadores', routeIcon: WorkIcon },
     { routeName: 'Proveedores',  routePath: '/dashboard/bd/proveedores',  routeIcon: LocalShippingIcon },
-    { routeName: 'Inventario', routePath: '/dashboard/bd/inventario',   routeIcon: InventoryIcon },
-    { routeName: 'Tiendas', routePath: '/dashboard/bd/tiendas', routeIcon: StoreIcon },
     {routeName : "Compras", routePath : '/dashboard/bd/logistica', routeIcon : BoxIcon}
 ]
 

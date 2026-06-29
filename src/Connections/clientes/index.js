@@ -1,7 +1,8 @@
 import { fetchWithAuth } from '@/lib/fetchwithAuth'
 import { getSession } from '@/lib/authentication'
 
-const BASE = '/api/cliente'
+const BASE = '/api/cliente';
+const BASE_CREDITO = '/api/credito';
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3030'
 
 export async function getClientesByEmpresa(empresaId) {
@@ -42,6 +43,10 @@ export async function uploadDataExcelClient(excelClient) {
         message: json?.message ?? '',
         error:   !response.ok,
     }
+}
+
+export async function getHistorialCreditByIdClient(idClient) {
+    return fetchWithAuth(`${BASE_CREDITO}/cliente/${idClient}`)
 }
 
 export async function createCliente(data = {}) {
