@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Link from 'next/link'
 import { useAuth } from '@/Context/AuthContext'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 
@@ -18,9 +17,8 @@ import PieChartIcon from '@mui/icons-material/PieChart'
 import GroupIcon from '@mui/icons-material/Group'
 import NavigateNextIcon from '@mui/icons-material/NavigateNext'
 import CloseIcon from '@mui/icons-material/Close'
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
-import StorageIcon from '@mui/icons-material/Storage'
-import BarChartIcon from '@mui/icons-material/BarChart'
+import PanelRouteHome from '@/components/Panel/PanelRouteHome'
+import WelcomPanel from '@/components/Panel/WelcomePanel'
 
 const BD_ROUTES = [
     { name: 'Clientes', path: '/dashboard/bd/clientes', icon: PeopleIcon, desc: 'Gestiona tu cartera de clientes', color: '#FF821E' },
@@ -33,10 +31,10 @@ const BD_ROUTES = [
 ];
 
 const GRAPH_ROUTES = [
-    { name: 'Ventas',       path: '/dashboard/graph/ventas',     icon: TrendingUpIcon,           desc: 'Análisis de ventas',                 color: '#FF821E' },
-    { name: 'Finanzas',     path: '/dashboard/graph/finanzas',   icon: AccountBalanceWalletIcon, desc: 'Reporte financiero',                 color: '#1F4363' },
-    { name: 'Inventario',   path: '/dashboard/graph/inventario', icon: PieChartIcon, desc: 'Análisis de stock', color: '#198E7B' },
-    { name: 'Clientes',     path: '/dashboard/graph/clientes',   icon: GroupIcon, desc: 'Comportamiento de clientes', color: '#FF821E' },
+    { name: 'Ventas', path: '/dashboard/graph/ventas',     icon: TrendingUpIcon, desc: 'Análisis de ventas', color: '#FF821E' },
+    { name: 'Finanzas', path: '/dashboard/graph/finanzas',   icon: AccountBalanceWalletIcon, desc: 'Reporte financiero', color: '#1F4363' },
+    { name: 'Inventario', path: '/dashboard/graph/inventario', icon: PieChartIcon, desc: 'Análisis de stock', color: '#198E7B' },
+    { name: 'Clientes', path: '/dashboard/graph/clientes',   icon: GroupIcon, desc: 'Comportamiento de clientes', color: '#FF821E' },
 ]
 
 const TUTORIAL_STEPS = [
@@ -77,9 +75,6 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
 }
 
-function getInitials(name = '') {
-    return name.split(' ').map(n => n[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'U'
-}
 
 export default function PaginaHome() {
     const { user, loading } = useAuth()
@@ -186,137 +181,19 @@ export default function PaginaHome() {
             </AnimatePresence>
 
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+                <WelcomPanel
+                    itemVariants={itemVariants}
+                    setTutorialStep={setTutorialStep}
+                    setShowTutorial={setShowTutorial}
+                    loading={loading}
+                    user={user}
+                    tiendaLoading={tiendaLoading}
+                    tiendas={tiendas}
+                />
 
-                <motion.div variants={itemVariants}>
-                    <div className="bg-gradient-to-br from-[#1F4363] to-[#163250] rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-md">
-                        <div className="flex items-center gap-4">
-                            <motion.div
-                                initial={{ scale: 0.6, opacity: 0 }}
-                                animate={{ scale: 1,   opacity: 1 }}
-                                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                                className="w-14 h-14 rounded-2xl bg-[#FF821E] flex items-center justify-center text-white font-extrabold text-lg shadow-lg shrink-0"
-                            >
-                                {loading ? '·' : getInitials(user?.nombre_completo)}
-                            </motion.div>
-                            <div>
-                                <p className="text-white/50 text-xs font-medium uppercase tracking-wider">Bienvenido de vuelta</p>
-                                <h1 className="text-white font-bold text-xl leading-tight">
-                                    {loading ? 'Cargando...' : (user?.nombre_completo ?? user?.email ?? 'Usuario')}
-                                </h1>
-                                <span className="inline-block mt-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-white/10 text-white/70">
-                                    {user?.esAdmin ? 'Administrador' : 'Trabajador'}
-                                </span>
-                            </div>
-                        </div>
+                <PanelRouteHome itemVariants={itemVariants} BD_ROUTES={BD_ROUTES} />
 
-                        <div className="flex items-center gap-3 sm:gap-4">
-                            {/* Tienda chip */}
-                            <div className="flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3 shrink-0">
-                                <StoreIcon style={{ fontSize: 22, color: '#FF821E' }} />
-                                <div>
-                                    <p className="text-white/50 text-xs">Tu tienda</p>
-                                    {tiendaLoading ? (
-                                        <p className="text-white font-semibold text-sm">Cargando...</p>
-                                    ) : tiendas.length > 0 ? (
-                                        <>
-                                            <p className="text-white font-semibold text-sm">{tiendas[0]?.nombre}</p>
-                                            {tiendas.length > 1 && (
-                                                <p className="text-white/40 text-xs">{tiendas.length} tiendas</p>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <p className="text-white/50 font-semibold text-sm">Sin tienda</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Tutorial trigger */}
-                            <button
-                                onClick={() => { setTutorialStep(0); setShowTutorial(true) }}
-                                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-3 py-2 rounded-xl transition-colors shrink-0"
-                            >
-                                <LightbulbIcon style={{ fontSize: 16, color: '#FF821E' }} />
-                                <span className="hidden sm:inline">Tutorial</span>
-                            </button>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* ── Base de datos ── */}
-                <motion.div variants={itemVariants}>
-                    <div className="flex items-center gap-2 mb-3">
-                        <StorageIcon style={{ fontSize: 18, color: '#1F4363' }} />
-                        <h2 className="font-bold text-[#1F4363] text-sm uppercase tracking-wider">Base de Datos</h2>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {BD_ROUTES.map((route, idx) => {
-                            const Icon = route.icon
-                            return (
-                                <motion.div
-                                    key={route.path}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.06 + 0.25 }}
-                                    whileHover={{ y: -4, transition: { duration: 0.15 } }}
-                                    whileTap={{ scale: 0.97 }}
-                                >
-                                    <Link href={route.path}>
-                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 cursor-pointer hover:border-[#FF821E]/30 hover:shadow-md transition-all group h-full">
-                                            <div
-                                                className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                                                style={{ backgroundColor: `${route.color}18` }}
-                                            >
-                                                <Icon style={{ fontSize: 22, color: route.color }} />
-                                            </div>
-                                            <p className="font-semibold text-[#1F4363] text-sm group-hover:text-[#FF821E] transition-colors">
-                                                {route.name}
-                                            </p>
-                                            <p className="text-gray-400 text-xs mt-0.5 leading-snug">{route.desc}</p>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            )
-                        })}
-                    </div>
-                </motion.div>
-
-                {/* ── Análisis ── */}
-                <motion.div variants={itemVariants}>
-                    <div className="flex items-center gap-2 mb-3">
-                        <BarChartIcon style={{ fontSize: 18, color: '#1F4363' }} />
-                        <h2 className="font-bold text-[#1F4363] text-sm uppercase tracking-wider">Análisis</h2>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {GRAPH_ROUTES.map((route, idx) => {
-                            const Icon = route.icon
-                            return (
-                                <motion.div
-                                    key={route.path}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.06 + 0.55 }}
-                                    whileHover={{ y: -4, transition: { duration: 0.15 } }}
-                                    whileTap={{ scale: 0.97 }}
-                                >
-                                    <Link href={route.path}>
-                                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 cursor-pointer hover:border-[#198E7B]/30 hover:shadow-md transition-all group h-full">
-                                            <div
-                                                className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                                                style={{ backgroundColor: `${route.color}18` }}
-                                            >
-                                                <Icon style={{ fontSize: 22, color: route.color }} />
-                                            </div>
-                                            <p className="font-semibold text-[#1F4363] text-sm group-hover:text-[#198E7B] transition-colors">
-                                                {route.name}
-                                            </p>
-                                            <p className="text-gray-400 text-xs mt-0.5 leading-snug">{route.desc}</p>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            )
-                        })}
-                    </div>
-                </motion.div>
+                <PanelRouteHome itemVariants={itemVariants} BD_ROUTES={GRAPH_ROUTES} isGraph={true} />
 
             </motion.div>
         </div>
