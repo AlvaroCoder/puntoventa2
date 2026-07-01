@@ -101,7 +101,7 @@ export default function PaginaHome() {
     useEffect(() => {
         const seen = localStorage.getItem('pipo_tutorial_seen')
         if (!seen) setShowTutorial(true)
-    }, [])
+    }, []);
 
     const handleCloseTutorial = () => {
         localStorage.setItem('pipo_tutorial_seen', 'true')
@@ -190,9 +190,7 @@ export default function PaginaHome() {
                     tiendaLoading={tiendaLoading}
                     tiendas={tiendas}
                 />
-
                 <PanelRouteHome itemVariants={itemVariants} BD_ROUTES={BD_ROUTES} />
-
                 <PanelRouteHome itemVariants={itemVariants} BD_ROUTES={GRAPH_ROUTES} isGraph={true} />
 
             </motion.div>

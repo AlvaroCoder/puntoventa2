@@ -14,7 +14,7 @@ import AddIcon from '@mui/icons-material/Add'
 export default function PageTiendas() {
     const { user } = useAuth()
 
-    const [tiendas, setTiendas]       = useState([])
+    const [tiendas, setTiendas] = useState([])
     const [loading, setLoading]       = useState(true)
     const [query, setQuery]           = useState('')
     const [showForm, setShowForm]     = useState(false)
@@ -127,7 +127,6 @@ export default function PageTiendas() {
                 />
             </motion.div>
 
-            {/* ── Drawer formulario ── */}
             <SliderFormTienda
                 open={showForm}
                 onClose={() => { setShowForm(false); setTiendaEdit(null) }}
