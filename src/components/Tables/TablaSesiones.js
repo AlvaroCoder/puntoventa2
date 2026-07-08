@@ -5,8 +5,7 @@ import HistoryIcon from '@mui/icons-material/History'
 const fmt = v =>
     new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
 
-const fmtDate = d =>
-    d
+const fmtDate = d => d
         ? new Date(d).toLocaleString('es-PE', {
             day: '2-digit', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit',

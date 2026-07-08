@@ -51,30 +51,31 @@ const extractOne = res => {
 export default function PageCaja() {
     const { user } = useAuth()
 
-    const [tiendas,     setTiendas]     = useState([])
-    const [tiendaId,    setTiendaId]    = useState('')
-    const [caja,        setCaja]        = useState(null)
-    const [sesion,      setSesion]      = useState(null)
-    const [sesiones,    setSesiones]    = useState([])
+    const [tiendas, setTiendas] = useState([])
+    const [tiendaId, setTiendaId] = useState('')
+    const [caja, setCaja] = useState(null)
+    const [sesion, setSesion] = useState(null)
+    const [sesiones, setSesiones] = useState([])
     const [movimientos, setMovimientos] = useState([])
 
     const [loadingTiendas,  setLoadingTiendas]  = useState(true)
-    const [loadingCaja,     setLoadingCaja]     = useState(false)
-    const [loadingMovs,     setLoadingMovs]     = useState(false)
+    const [loadingCaja, setLoadingCaja] = useState(false)
+    const [loadingMovs, setLoadingMovs] = useState(false)
     const [loadingSesiones, setLoadingSesiones] = useState(false)
 
     const [tab, setTab] = useState('movimientos')
 
-    const [dlgCaja,      setDlgCaja]      = useState(false)
-    const [dlgAbrir,     setDlgAbrir]     = useState(false)
-    const [dlgCerrar,    setDlgCerrar]    = useState(false)
+    const [dlgCaja, setDlgCaja]      = useState(false)
+    const [dlgAbrir, setDlgAbrir]     = useState(false)
+    const [dlgCerrar, setDlgCerrar]    = useState(false)
     const [dlgMovimiento, setDlgMovimiento] = useState(false)
 
     useEffect(() => {
         if (!user?.empresa_id) return
         async function load() {
             try {
-                const res = await getTiendasByEmpresa(user.empresa_id)
+                const res = await getTiendasByEmpresa(user.empresa_id);
+                
                 const list = extractList(res)
                 setTiendas(list)
                 if (list.length === 1) setTiendaId(String(list[0].id))
@@ -99,9 +100,10 @@ export default function PageCaja() {
             const cajaObj = extractOne(res)
             setCaja(cajaObj)
 
-            if (cajaObj?.id) {
-                const resSesion = await getSesionActual(cajaObj.id)
-                setSesion(extractOne(resSesion))
+            if (cajaObj?.id) {                
+                const resSesion = await getSesionActual(cajaObj.id);
+                setSesion(extractOne(resSesion));
+                
             }
         } catch {
             toast.error('Error al cargar la caja')
@@ -119,13 +121,13 @@ export default function PageCaja() {
             getMovimientosByCaja(caja.id)
                 .then(res => setMovimientos(extractList(res)))
                 .catch(() => toast.error('Error al cargar movimientos'))
-                .finally(() => setLoadingMovs(false))
+                .finally(() => setLoadingMovs(false));
         } else {
             setLoadingSesiones(true)
             getSesionesByCaja(caja.id)
                 .then(res => setSesiones(extractList(res)))
                 .catch(() => toast.error('Error al cargar sesiones'))
-                .finally(() => setLoadingSesiones(false))
+                .finally(() => setLoadingSesiones(false));
         }
     }, [caja?.id, tab])
 
@@ -136,9 +138,10 @@ export default function PageCaja() {
             .then(res => setMovimientos(extractList(res)))
             .catch(() => {})
             .finally(() => setLoadingMovs(false))
+        
     }, [caja?.id])
 
-    const cajaAbierta = !!sesion && !sesion.fecha_cierre
+    const cajaAbierta = !!sesion && !sesion.fecha_cierre;
 
     return (
         <div className="w-full">
@@ -177,7 +180,6 @@ export default function PageCaja() {
                 )}
             </div>
 
-            {/* Contenido según estado */}
             {!tiendaId ? (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-20 text-center">
                     <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
@@ -194,7 +196,6 @@ export default function PageCaja() {
                 </div>
 
             ) : !caja ? (
-                /* Sin caja → invitar a crear */
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
