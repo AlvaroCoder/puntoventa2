@@ -13,25 +13,42 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-export default function DialogMovimiento({ open, onClose, cajaId, onSuccess }) {
-    const [form, setForm] = useState({ tipo: 'entrada', monto: '', descripcion: '' })
+export default function DialogMovimiento({ open,trabajadorId=1, onClose,cajaId, cajaSesionId, onSuccess }) {
+  
+  const [form, setForm] = useState({
+      trabajadorId ,
+      tipoMovimiento: "ingreso",
+      cajaSesionId,
+      monto: "",
+      concepto: "",
+    });
     const [saving, setSaving] = useState(false)
 
     useEffect(() => {
-        if (open) setForm({ tipo: 'entrada', monto: '', descripcion: '' })
+      if (open) setForm({
+          trabajadorId,
+          tipoMovimiento: "ingreso",
+          cajaSesionId,
+          monto: "",
+          concepto: "",
+        });
     }, [open])
     
     const handleRegistrar = async () => {
         if (!form.monto || parseFloat(form.monto) <= 0)
             return toast.error('Ingresa un monto válido')
-        if (!form.descripcion.trim())
-            return toast.error('La descripción es requerida')
+        if (!form.concepto.trim())
+            return toast.error('El concepto es requerido')
         setSaving(true)
-        try {
-            const res = await createMovimiento(cajaId, {
-                ...form,
-                monto: parseFloat(form.monto),
-            })
+      try {
+          const objToSend = {
+            ...form,
+            monto: parseFloat(form.monto),
+            tipoMovimiento: form?.tipoMovimiento?.toUpperCase(),
+          };
+        
+            const res = await createMovimiento(cajaId, objToSend);
+          
             if (res.ok) {
                 toast.success('Movimiento registrado')
                 onSuccess()
@@ -39,12 +56,17 @@ export default function DialogMovimiento({ open, onClose, cajaId, onSuccess }) {
             } else {
                 toast.error(res.message || 'Error al registrar el movimiento')
             }
-        } finally {
+        }
+        catch (error) {
+            console.error(error)
+            toast.error('Error al registrar el movimiento')
+        }
+        finally {
             setSaving(false)
         }
     }
 
-    const isEntrada = form.tipo === 'entrada'
+    const isEntrada = form.tipoMovimiento === "ingreso";
 
     return (
       <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -59,15 +81,17 @@ export default function DialogMovimiento({ open, onClose, cajaId, onSuccess }) {
               </label>
               <div className="flex gap-2">
                 {[
-                  { key: "entrada", label: "↑ Entrada" },
-                  { key: "salida", label: "↓ Salida" },
+                  { key: "ingreso", label: "↑ Entrada" },
+                  { key: "egreso", label: "↓ Salida" },
                 ].map(({ key, label }) => (
                   <button
                     key={key}
-                    onClick={() => setForm((p) => ({ ...p, tipo: key }))}
+                    onClick={() =>
+                      setForm((p) => ({ ...p, tipoMovimiento: key }))
+                    }
                     className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all border-2 ${
-                      form.tipo === key
-                        ? key === "entrada"
+                      form.tipoMovimiento === key
+                        ? key === "ingreso"
                           ? "bg-green-50 border-green-500 text-green-700"
                           : "bg-red-50 border-red-400 text-red-600"
                         : "bg-gray-50 border-gray-200 text-gray-400 hover:border-gray-300"
@@ -103,9 +127,9 @@ export default function DialogMovimiento({ open, onClose, cajaId, onSuccess }) {
                 Descripción *
               </label>
               <Input
-                value={form.descripcion}
+                value={form.concepto}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, descripcion: e.target.value }))
+                  setForm((p) => ({ ...p, concepto: e.target.value }))
                 }
                 placeholder="Ej: Pago proveedor"
                 className={`${

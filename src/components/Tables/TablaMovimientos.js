@@ -5,13 +5,31 @@ import SwapVertIcon from '@mui/icons-material/SwapVert'
 const fmt = v =>
     new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
 
-const fmtDate = d =>
+const arrayToDate = (arr) => {
+    if (!Array.isArray(arr) || arr.length < 3) return null;
+
+    const [
+        year,
+        month,
+        day,
+        hour = 0,
+        minute = 0,
+        second = 0
+    ] = arr;
+
+    return new Date(year, month - 1, day, hour, minute, second);
+};
+
+const fmtDate = (d) =>
     d
-        ? new Date(d).toLocaleString('es-PE', {
-            day: '2-digit', month: 'short', year: 'numeric',
-            hour: '2-digit', minute: '2-digit',
-        })
-        : '—';
+        ? d.toLocaleString("es-PE", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+          })
+        : "—";
 
 
 export default function TablaMovimientos({
@@ -68,7 +86,7 @@ export default function TablaMovimientos({
                         {data.map((m, i) => (
                             <tr key={m.id ?? i} className="hover:bg-gray-50/60 transition-colors">
                                 <td className="px-4 py-3.5">
-                                    {m.tipo === 'entrada' ? (
+                                    {m.tipoMovimiento === 'INGRESO' ? (
                                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
                                             ↑ Entrada
                                         </span>
@@ -82,10 +100,10 @@ export default function TablaMovimientos({
                                     {fmt(m.monto)}
                                 </td>
                                 <td className="px-4 py-3.5 text-gray-600 max-w-[260px] truncate">
-                                    {m.descripcion ?? <span className="text-gray-300">—</span>}
+                                    {m.concepto ?? <span className="text-gray-300">—</span>}
                                 </td>
                                 <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">
-                                    {fmtDate(m.created_at ?? m.fecha)}
+                                    {fmtDate(arrayToDate(m?.fechaHora))}
                                 </td>
                             </tr>
                         ))}

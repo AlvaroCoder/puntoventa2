@@ -120,9 +120,11 @@ export default function PageCaja() {
     useEffect(() => {
         if (!caja?.id) return
         if (tab === 'movimientos') {
+            
+            const sesionIdActivo = sesion?.id;
             setLoadingMovs(true)
-            getMovimientosByCaja(caja.id)
-                .then(res => setMovimientos(extractList(res)))
+            getMovimientosByCaja(sesionIdActivo)
+                .then(res =>  setMovimientos(extractList(res))  )
                 .catch(() => toast.error('Error al cargar movimientos'))
                 .finally(() => setLoadingMovs(false));
         } else {
@@ -132,17 +134,18 @@ export default function PageCaja() {
                 .catch(() => toast.error('Error al cargar sesiones'))
                 .finally(() => setLoadingSesiones(false));
         }
-    }, [caja?.id, tab])
+    }, [caja?.id, tab, sesion])
 
     const reloadMovimientos = useCallback(() => {
-        if (!caja?.id) return
+        const sesionIdActivo = sesion?.id;
+
         setLoadingMovs(true)
-        getMovimientosByCaja(caja.id)
+        getMovimientosByCaja(sesionIdActivo)
             .then(res => setMovimientos(extractList(res)))
             .catch(() => {})
             .finally(() => setLoadingMovs(false))
         
-    }, [caja?.id])
+    }, [sesion])
     
     const cajaAbierta = sesion?.estado === "ABIERTA" 
 
@@ -350,8 +353,9 @@ export default function PageCaja() {
             />
             <DialogMovimiento
                 open={dlgMovimiento}
-                onClose={() => setDlgMovimiento(false)}
                 cajaId={caja?.id}
+                onClose={() => setDlgMovimiento(false)}
+                cajaSesionId={sesion?.id}
                 onSuccess={reloadMovimientos}
             />
         </div>
