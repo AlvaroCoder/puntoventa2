@@ -7,7 +7,8 @@ import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import {
     getCajaByTienda,
     getSesionActual, getSesionesByCaja,
-    getMovimientosByCaja, 
+    getMovimientosByCaja,
+    getSesionesActivas, 
 } from '@/Connections/caja'
 import { Button } from '@/components/ui/button'
 
@@ -74,8 +75,7 @@ export default function PageCaja() {
         if (!user?.empresa_id) return
         async function load() {
             try {
-                const res = await getTiendasByEmpresa(user.empresa_id);
-                
+                const res = await getTiendasByEmpresa(user.empresa_id);                
                 const list = extractList(res)
                 setTiendas(list)
                 if (list.length === 1) setTiendaId(String(list[0].id))
@@ -96,14 +96,16 @@ export default function PageCaja() {
         setMovimientos([])
         setSesiones([])
         try {
-            const res = await getCajaByTienda(tiendaId)
+            const res = await getCajaByTienda(tiendaId);
+
             const cajaObj = extractOne(res)
             setCaja(cajaObj)
-
             if (cajaObj?.id) {                
-                const resSesion = await getSesionActual(cajaObj.id);
-                setSesion(extractOne(resSesion));
-                
+                const cajaId = cajaObj.id;
+                const resSesion = await getSesionesActivas(tiendaId);
+                const sesion = resSesion.data;
+                const sesionActual = sesion?.filter((item)=>item?.cajaId == cajaId)[0] ?? null;
+                setSesion(sesionActual);
             }
         } catch {
             toast.error('Error al cargar la caja')
@@ -112,6 +114,7 @@ export default function PageCaja() {
         }
     }, [tiendaId])
 
+    // Se precarga el estado de la caja
     useEffect(() => { loadCaja() }, [loadCaja])
 
     useEffect(() => {
@@ -140,8 +143,8 @@ export default function PageCaja() {
             .finally(() => setLoadingMovs(false))
         
     }, [caja?.id])
-
-    const cajaAbierta = !!sesion && !sesion.fecha_cierre;
+    
+    const cajaAbierta = sesion?.estado === "ABIERTA" 
 
     return (
         <div className="w-full">
@@ -256,7 +259,6 @@ export default function PageCaja() {
                                 </div>
                             </div>
 
-                            {/* Acciones */}
                             <div className="flex flex-wrap items-center gap-2">
                                 {cajaAbierta ? (
                                     <>
@@ -264,7 +266,7 @@ export default function PageCaja() {
                                             <div className="text-right pr-3 border-r border-gray-200">
                                                 <p className="text-xs text-gray-400">Apertura</p>
                                                 <p className="font-bold text-[#1F4363] text-base">
-                                                    {fmt(sesion.monto_apertura)}
+                                                    {fmt(sesion.montoApertura)}
                                                 </p>
                                             </div>
                                         )}
@@ -333,6 +335,7 @@ export default function PageCaja() {
                 onSuccess={loadCaja}
             />
             <DialogAbrirCaja
+                tiendaId={tiendaId}
                 open={dlgAbrir}
                 onClose={() => setDlgAbrir(false)}
                 cajaId={caja?.id}

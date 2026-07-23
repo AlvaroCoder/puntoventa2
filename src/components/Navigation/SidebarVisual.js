@@ -71,31 +71,6 @@ export default function SidebarVisual() {
                     )}
                 </div>
 
-                <div className={`flex mt-4 mx-2 rounded-xl overflow-hidden border border-white/10 ${!open && 'flex-col'}`}>
-                    <Link
-                        href="/dashboard/bd/clientes"
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold transition-colors
-                            ${mode === 'bd'
-                                ? 'bg-[#FF821E] text-white'
-                                : 'text-white/50 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <StorageIcon style={{ fontSize: 16 }} />
-                        {open && <span>Datos</span>}
-                    </Link>
-                    <Link
-                        href="/dashboard/graph/ventas"
-                        className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold transition-colors
-                            ${mode === 'graph'
-                                ? 'bg-[#FF821E] text-white'
-                                : 'text-white/50 hover:text-white hover:bg-white/10'
-                            }`}
-                    >
-                        <BarChartIcon style={{ fontSize: 16 }} />
-                        {open && <span>Análisis</span>}
-                    </Link>
-                </div>
-
                 {open && (
                     <p className="px-4 pt-5 pb-1 text-[10px] font-bold tracking-widest uppercase text-white/30">
                         {mode === 'bd' ? 'Base de Datos' : 'Visualizaciones'}
@@ -130,7 +105,6 @@ export default function SidebarVisual() {
                 </ul>
             </div>
 
-            {/* Footer */}
             <div className="px-2 pb-4 flex flex-col gap-2">
                 {open && (
                     <p className="text-white/20 text-xs text-center">

@@ -15,21 +15,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function DialogAbrirCaja({ open, onClose, cajaId, onSuccess }) {
-    const [form, setForm] = useState({ monto_apertura: '', observaciones: '' })
+export default function DialogAbrirCaja({ tiendaId, open, onClose, cajaId, onSuccess }) {
+    const [form, setForm] = useState({ tiendaId, montoApertura: "", observaciones: "" });
     const [saving, setSaving] = useState(false);
     useEffect(() => {
-        if (open) setForm({ monto_apertura: '', observaciones: '' })
+        if (open) setForm({ tiendaId, montoApertura: '', observaciones: '' })
     }, [open]);
 
     const handleAbrir = async () => {
-        if (!form.monto_apertura) return toast.error('El monto de apertura es requerido')
+        if (!form.montoApertura) return toast.error('El monto de apertura es requerido')
         setSaving(true)
-        try {
+      try {
+          console.log("CAJA ID : "+cajaId);
+          
             const res = await abrirCaja(cajaId, {
-                ...form,
-                monto_apertura: parseFloat(form.monto_apertura),
-            })
+              ...form,
+              montoApertura: parseFloat(form.montoApertura),
+            });
             if (res.ok) {
                 toast.success('Caja abierta correctamente')
                 onSuccess()
@@ -56,9 +58,9 @@ export default function DialogAbrirCaja({ open, onClose, cajaId, onSuccess }) {
                 type="number"
                 min="0"
                 step="0.01"
-                value={form.monto_apertura}
+                value={form.montoApertura}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, monto_apertura: e.target.value }))
+                  setForm((p) => ({ ...p, montoApertura: e.target.value }))
                 }
                 placeholder="0.00"
                 className="focus-visible:ring-green-500/30 focus-visible:border-green-500"
