@@ -22,19 +22,20 @@ const BD_ITEMS = [
     { routeName: 'Inicio', routePath: '/dashboard/bd/home', routeIcon: HomeIcon },
     { routeName: 'Tiendas', routePath: '/dashboard/bd/tiendas', routeIcon: StoreIcon },
     { routeName: 'Caja', routePath: '/dashboard/bd/caja', routeIcon: PointOfSaleIcon },
-    { routeName: 'Inventario', routePath: '/dashboard/bd/inventario',   routeIcon: InventoryIcon },
-    { routeName: 'Clientes', routePath: '/dashboard/bd/clientes',     routeIcon: PeopleIcon },
+    { routeName: 'Ventas', routePath: '/dashboard/bd/ventas', routeIcon: TrendingUpIcon },
+    { routeName: 'Inventario', routePath: '/dashboard/bd/inventario', routeIcon: InventoryIcon },
+    { routeName: 'Clientes', routePath: '/dashboard/bd/clientes', routeIcon: PeopleIcon },
     { routeName: 'Trabajadores', routePath: '/dashboard/bd/trabajadores', routeIcon: WorkIcon },
-    { routeName: 'Proveedores',  routePath: '/dashboard/bd/proveedores',  routeIcon: LocalShippingIcon },
-    {routeName : "Compras", routePath : '/dashboard/bd/logistica', routeIcon : BoxIcon}
-]
+    { routeName: 'Proveedores', routePath: '/dashboard/bd/proveedores', routeIcon: LocalShippingIcon },
+    { routeName: "Compras", routePath: '/dashboard/bd/logistica', routeIcon: BoxIcon },
+];
 
 const GRAPH_ITEMS = [
-    { routeName: 'Ventas', routePath: '/dashboard/graph/ventas',     routeIcon: TrendingUpIcon },
-    { routeName: 'Finanzas', routePath: '/dashboard/graph/finanzas',   routeIcon: AccountBalanceWalletIcon },
+    { routeName: 'Ventas', routePath: '/dashboard/graph/ventas', routeIcon: TrendingUpIcon },
+    { routeName: 'Finanzas', routePath: '/dashboard/graph/finanzas', routeIcon: AccountBalanceWalletIcon },
     { routeName: 'Inventario', routePath: '/dashboard/graph/inventario', routeIcon: PieChartIcon },
-    { routeName: 'Clientes', routePath: '/dashboard/graph/clientes',   routeIcon: GroupIcon },
-]
+    { routeName: 'Clientes', routePath: '/dashboard/graph/clientes', routeIcon: GroupIcon },
+];
 
 export default function SidebarVisual() {
     const [open, setOpen] = useState(true)

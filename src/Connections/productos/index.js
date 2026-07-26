@@ -1,12 +1,17 @@
 import { fetchWithAuth } from '@/lib/fetchwithAuth'
+import { PRODUCTO_ENDPOINTS, INVENTARIO_ENDPOINTS, VARIANTES_ENDPOINTS } from '../EndpointsRouter'
 
 const BASE_PRODUCTO  = '/api/producto'
 const BASE_CATEGORIA = '/api/categoria'
-const BASE_INVENTARIO = '/api/inventario'
+
+const ENDPOINTS_PRODUCTO = PRODUCTO_ENDPOINTS;
+const ENDPOINTS_INVENTARIO = INVENTARIO_ENDPOINTS;
+const ENDPOINTS_VARIANTES = VARIANTES_ENDPOINTS;
 
 export async function getProductosByEmpresa(empresaId) {
-    return fetchWithAuth(`${BASE_PRODUCTO}/empresa/${empresaId}`)
+    return fetchWithAuth(ENDPOINTS_PRODUCTO.getAllProductosByIdEmpresa(empresaId))
 }
+
 
 export async function getProductoById(id) {
     return fetchWithAuth(`${BASE_PRODUCTO}/${id}`)
@@ -17,7 +22,11 @@ export async function getProductosBajoStock(empresaId) {
 }
 
 export async function createProducto(data = {}) {
-    return fetchWithAuth(BASE_PRODUCTO, { method: 'POST', body: data })
+    return fetchWithAuth(ENDPOINTS_PRODUCTO.createProducto(), {method:'POST', body : data})
+}
+
+export async function createVariante(data={}) {
+    return fetchWithAuth(ENDPOINTS_VARIANTES.createVariante(), { method: 'POST', body : data})
 }
 
 export async function updateProducto(id, data = {}) {
@@ -29,9 +38,9 @@ export async function deleteProducto(id) {
 }
 
 export async function getCategorias() {
-    return fetchWithAuth(BASE_CATEGORIA)
+    return fetchWithAuth(BASE_CATEGORIA, {}, 'express')
 }
 
 export async function getInventarioByTienda(tiendaId) {
-    return fetchWithAuth(`${BASE_INVENTARIO}/tienda/${tiendaId}`)
+    return fetchWithAuth(ENDPOINTS_INVENTARIO.getStockByTienda(tiendaId))
 }

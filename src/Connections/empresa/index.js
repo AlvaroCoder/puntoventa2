@@ -1,8 +1,8 @@
 import { fetchWithAuth } from '@/lib/fetchwithAuth';
-
-const BASE = '/api/empresas';
+import { EMPRESA_ENDPOINTS } from '@/Connections/EndpointRouterExpress';
+const ENDPOINTS = EMPRESA_ENDPOINTS;
 
 export async function getMyEmpresa() {
-    return fetchWithAuth(`${BASE}/mi-empresa`);
+    return fetchWithAuth(ENDPOINTS.getMyEmpresa());
 };
 

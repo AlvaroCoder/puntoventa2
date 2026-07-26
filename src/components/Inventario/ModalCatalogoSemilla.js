@@ -22,17 +22,16 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
             setLoading(true)
             try {
                 const res = await getProductosSemillaByRubro(rubroId)
-                const raw = res?.data?.data ?? res?.data ?? []
 
-                // Agrupar por categoría
+                const raw = res?.data?.data ?? res?.data ?? []
                 const grouped = {}
                 raw.forEach(p => {
-                    const cat = p.categoria ?? p.categoria_nombre ?? p.tipo ?? 'General'
+                    const cat = p.categoria?.nombre;
                     if (!grouped[cat]) grouped[cat] = []
                     grouped[cat].push(p)
                 })
 
-                const cats = Object.entries(grouped).map(([nombre, productos]) => ({ nombre, productos }))
+                const cats = Object.entries(grouped).map(([nombre, productos]) => ({ nombre, productos }));
                 setCategorias(cats)
                 if (cats.length > 0) setCatActiva(cats[0].nombre)
             } catch {
@@ -42,7 +41,7 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
             }
         }
         loadSemilla()
-    }, [open, empresa])
+    }, [open, empresa]);
 
     const productosActivos = useMemo(
         () => categorias.find(c => c.nombre === catActiva)?.productos ?? [],
@@ -98,7 +97,6 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className="max-w-2xl rounded-2xl p-0 overflow-hidden flex flex-col" style={{ maxHeight: '88vh' }}>
 
-                {/* Header */}
                 <div className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
                     <DialogTitle className="text-[#1F4363] font-bold text-lg">Catálogo Semilla</DialogTitle>
                     <DialogDescription className="text-sm text-gray-400 mt-0.5">
@@ -106,7 +104,6 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
                     </DialogDescription>
                 </div>
 
-                {/* Body */}
                 {loading ? (
                     <div className="flex-1 flex items-center justify-center py-20">
                         <Loader2 className="animate-spin text-[#1F4363]" size={32} />
@@ -125,15 +122,13 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
                 ) : (
                     <div className="flex flex-1 overflow-hidden min-h-0">
 
-                        {/* Árbol de categorías */}
                         <div className="w-52 shrink-0 border-r border-gray-100 overflow-y-auto bg-gray-50/40 py-2">
-                            {categorias.map(cat => {
+                            {categorias.map((cat, key) => {
                                 const selCount = cat.productos.filter(p => seleccionados.has(p.id)).length
                                 const allCatSel = selCount === cat.productos.length
-
                                 return (
                                     <div
-                                        key={cat.nombre}
+                                        key={key}
                                         onClick={() => setCatActiva(cat.nombre)}
                                         className={`flex items-center gap-2.5 px-4 py-2.5 cursor-pointer transition-colors ${
                                             catActiva === cat.nombre
@@ -161,9 +156,7 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
                             })}
                         </div>
 
-                        {/* Lista de productos */}
                         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-                            {/* Header de columna */}
                             <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-2.5 flex items-center gap-2 shrink-0">
                                 <input
                                     type="checkbox"
@@ -177,52 +170,52 @@ export default function ModalCatalogoSemilla({ open, onClose, empresa, onImportS
                             </div>
 
                             <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-                                {productosActivos.map(prod => (
-                                    <div
-                                        key={prod.id}
-                                        onClick={() => toggleProducto(prod.id)}
-                                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 ${seleccionados.has(prod.id) ? 'bg-[#FF821E]/5' : ''}`}
+                                {productosActivos.map((prod) => {
+                                      
+                                    return (<div
+                                        key={prod?.id}
+                                        onClick={() => toggleProducto(prod?.id)}
+                                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50 ${seleccionados.has(prod?.id) ? 'bg-[#FF821E]/5' : ''}`}
                                     >
                                         <input
                                             type="checkbox"
-                                            checked={seleccionados.has(prod.id)}
-                                            onChange={() => toggleProducto(prod.id)}
+                                            checked={seleccionados.has(prod?.id)}
+                                            onChange={() => toggleProducto(prod?.id)}
                                             onClick={e => e.stopPropagation()}
                                             className="accent-[#FF821E] w-4 h-4 shrink-0 cursor-pointer"
                                         />
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-semibold text-[#1F4363] truncate">
-                                                {prod.nombre}
+                                                {prod?.nombre}
                                             </p>
                                             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                                {prod.marca && (
-                                                    <span className="text-xs text-gray-400">{prod.marca}</span>
+                                               {prod?.marca && (
+                                                    <span className="text-xs text-gray-400">{prod?.marca?.nombre}</span>
                                                 )}
-                                                {prod.variantes != null && (
+                                                {prod?.variantes != null && (
                                                     <span className="text-[10px] bg-[#FF821E]/10 text-[#FF821E] font-semibold px-1.5 py-0.5 rounded-full">
-                                                        {prod.variantes} variantes
+                                                        {prod?.variantes} variantes
                                                     </span>
                                                 )}
-                                                {prod.unidad && (
+                                                {prod?.unidad && (
                                                     <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">
-                                                        {prod.unidad}
+                                                        {prod?.unidad}
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
-                                        {prod.precio_referencial && (
+                                        {prod?.precio_referencial && (
                                             <span className="text-xs text-gray-400 shrink-0">
-                                                S/ {parseFloat(prod.precio_referencial).toFixed(2)}
+                                                S/ {parseFloat(prod?.precio_referencial).toFixed(2)}
                                             </span>
                                         )}
-                                    </div>
-                                ))}
+                                    </div>)
+                                })}
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Footer */}
                 <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between shrink-0">
                     <p className="text-sm text-gray-500">
                         <span className="font-bold text-[#1F4363]">{seleccionados.size}</span> productos seleccionados

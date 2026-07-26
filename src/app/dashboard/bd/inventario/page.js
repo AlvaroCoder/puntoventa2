@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { useAuth } from '@/Context/AuthContext'
-import { getProductosByEmpresa, getCategorias, deleteProducto } from '@/Connections/productos'
+import { getProductosByEmpresa, getCategorias, deleteProducto, getInventarioByTienda } from '@/Connections/productos'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import { getMyEmpresa } from '@/Connections/empresa'
 import { Button } from '@/components/ui/button'
@@ -32,6 +32,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'
 import SyncAltIcon from '@mui/icons-material/SyncAlt'
 import { ChevronDown } from 'lucide-react'
+import Image from 'next/image'
 
 const STOCK_FILTERS = [
     { key: 'todos',  label: 'Todos' },
@@ -88,13 +89,11 @@ export default function PageInventarioGraph() {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize]= useState(10)
 
-    // ── Modals ──
     const [showDrawer, setShowDrawer]   = useState(false)
     const [productoEdit, setProductoEdit] = useState(null)
     const [showImport, setShowImport]   = useState(false)
     const [showSemilla, setShowSemilla] = useState(false)
 
-    // ── Fetch ──
     useEffect(() => {
         if (!user?.empresa_id) return
         async function loadAll() {
@@ -106,7 +105,8 @@ export default function PageInventarioGraph() {
                     getCategorias(),
                     getMyEmpresa(),
                 ])
-                setProductos(prodRes?.data?.data  ?? prodRes?.data  ?? [])
+                
+                setProductos(prodRes?.data?.content  ?? prodRes?.content  ?? [])
                 setTiendas(tiendasRes?.data?.data  ?? tiendasRes?.data ?? [])
                 setCategorias(catsRes?.data?.data  ?? catsRes?.data  ?? [])
                 setEmpresa(empresaRes?.data ?? null)
@@ -122,24 +122,16 @@ export default function PageInventarioGraph() {
     // ── KPIs ──
     const kpis = useMemo(() => {
         const total     = productos.length
-        // const bajStock  = productos?.filter(p => {
-           // const inv = p?.inventario ?? []
-            //return inv.some(i => i.stock_disponible > 0 && i.stock_disponible <= (i.stock_minimo ?? 0))
-        // })?.length
+
         const bajStock = []
-        /**
-         * const sinStock  = productos?.filter(p => {
-            const inv = p?.inventario ?? []
-            return inv.length === 0 || inv.every(i => !i.stock_disponible || i.stock_disponible === 0)
-        }).length
-         */
+
         const sinStock = []
         return { total, bajStock, sinStock, entradas: 0 }
     }, [productos])
 
     // ── Filter + Sort ──
     const filtered = useMemo(() => {
-        let list = []
+        let list = productos;
 
         if (tiendaFiltro !== 'todas')
             list = list.filter(p => (p.inventario ?? []).some(i => String(i.tienda_id) === String(tiendaFiltro)))
@@ -173,11 +165,12 @@ export default function PageInventarioGraph() {
             return sortDir === 'asc' ? (va < vb ? -1 : va > vb ? 1 : 0) : (va > vb ? -1 : va < vb ? 1 : 0)
         })
         return list
-    }, [productos, tiendaFiltro, catFiltro, query, stockFiltro, sortCol, sortDir])
+    }, [tiendaFiltro, catFiltro, query, stockFiltro, sortCol, sortDir, productos])
+
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
-    const paginated  = filtered.slice((page - 1) * pageSize, page * pageSize)
-    const colCount   = 5 + Math.min(tiendas.length, 2) + 2 // img + codigo + nombre + cat + stock cols + minimo + precio + acciones
+    const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
+    const colCount   = 5 + Math.min(tiendas.length, 2) + 2 
 
     const handleSort = col => {
         if (sortCol === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -213,7 +206,6 @@ export default function PageInventarioGraph() {
     return (
         <div className="w-full">
 
-            {/* ── Header ── */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <div>
                     <h1 className="font-bold text-[#1F4363] text-2xl">Inventario</h1>
@@ -241,7 +233,6 @@ export default function PageInventarioGraph() {
                         className="space-y-4"
                     >
 
-                        {/* Banner sin tiendas */}
                         {!loading && tiendas.length === 0 && (
                             <motion.div
                                 initial={{ opacity: 0, y: -8 }}
@@ -258,7 +249,6 @@ export default function PageInventarioGraph() {
                             </motion.div>
                         )}
 
-                        {/* ── KPIs ── */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                             {[
                                 { label: 'Total productos',       value: kpis.total,    Icon: InventoryIcon,      color: '#1F4363', bg: '#1F436315' },
@@ -286,9 +276,7 @@ export default function PageInventarioGraph() {
                             ))}
                         </div>
 
-                        {/* ── Filtros ── */}
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 flex-wrap items-start sm:items-center">
-                            {/* Tienda */}
                             <div className="relative shrink-0">
                                 <StoreIcon style={{ fontSize: 15, color: '#8D99AE' }} className="absolute left-2.5 top-2.5 pointer-events-none" />
                                 <select
@@ -327,7 +315,6 @@ export default function PageInventarioGraph() {
                                 />
                             </div>
 
-                            {/* Pills de stock */}
                             <div className="flex items-center gap-1 flex-wrap">
                                 {STOCK_FILTERS.map(f => (
                                     <button
@@ -341,7 +328,6 @@ export default function PageInventarioGraph() {
                             </div>
                         </div>
 
-                        {/* ── Acciones de carga ── */}
                         <div className="flex gap-2 flex-wrap">
                             <Button
                                 variant="outline"
@@ -370,7 +356,6 @@ export default function PageInventarioGraph() {
                             </Link>
                         </div>
 
-                        {/* ── Tabla ── */}
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
@@ -393,12 +378,8 @@ export default function PageInventarioGraph() {
                                                     </span>
                                                 </th>
                                             ))}
-                                            {tiendas.slice(0, 2).map(t => (
-                                                <th key={t.id} className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider truncate max-w-[120px]">
-                                                    {t.nombre}
-                                                </th>
-                                            ))}
-                                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Stock Mín.</th>
+                                        
+                                            <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Stock</th>
                                             <th
                                                 onClick={() => handleSort('precio_venta')}
                                                 className="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer select-none hover:text-[#1F4363] transition-colors"
@@ -425,15 +406,16 @@ export default function PageInventarioGraph() {
                                         ) : (
                                             paginated.map(producto => {
                                                 const inv = producto.inventario ?? []
-                                                const catNombre = categorias.find(c => c.id === producto.categoria_id)?.nombre ?? '—'
+                                                const catNombre = categorias.find(c => c.id === producto.categoriaId)?.nombre ?? '—'
                                                 return (
                                                     <tr key={producto.id} className="hover:bg-gray-50/60 transition-colors group">
-                                                        {/* Imagen */}
                                                         <td className="px-4 py-3">
-                                                            {producto.imagen_url ? (
-                                                                <img
-                                                                    src={producto.imagen_url}
+                                                            {producto.imagenUrl ? (
+                                                                <Image
+                                                                    src={producto.imagenUrl}
                                                                     alt={producto.nombre}
+                                                                    width={50}
+                                                                    height={50}
                                                                     className="w-10 h-10 rounded-xl object-cover border border-gray-100"
                                                                 />
                                                             ) : (
@@ -445,22 +427,14 @@ export default function PageInventarioGraph() {
                                                         <td className="px-4 py-3 text-xs text-gray-500 font-mono">{producto.codigo ?? '—'}</td>
                                                         <td className="px-4 py-3">
                                                             <p className="font-semibold text-[#1F4363] truncate max-w-[200px]">{producto.nombre}</p>
-                                                            {producto.codigo_barras && (
-                                                                <p className="text-xs text-gray-400">{producto.codigo_barras}</p>
+                                                            {producto.codigoBarras && (
+                                                                <p className="text-xs text-gray-400">{producto.codigoBarras}</p>
                                                             )}
                                                         </td>
                                                         <td className="px-4 py-3 text-xs text-gray-500">{catNombre}</td>
-                                                        {tiendas.slice(0, 2).map(t => {
-                                                            const stockT = inv.find(i => String(i.tienda_id) === String(t.id))
-                                                            return (
-                                                                <td key={t.id} className="px-4 py-3">
-                                                                    <StockBadge stock={stockT?.stock_disponible} minimo={stockT?.stock_minimo ?? 0} />
-                                                                </td>
-                                                            )
-                                                        })}
-                                                        <td className="px-4 py-3 text-xs text-gray-500">{inv[0]?.stock_minimo ?? '—'}</td>
+                                                        <td className="px-4 py-3 text-xs text-gray-500">{producto.stockTotal ?? '—'}</td>
                                                         <td className="px-4 py-3 text-sm font-semibold text-[#1F4363]">
-                                                            S/ {parseFloat(producto.precio_venta ?? 0).toFixed(2)}
+                                                            S/ {parseFloat(producto.precioVenta ?? 0).toFixed(2)}
                                                         </td>
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center justify-end gap-1">
@@ -488,7 +462,6 @@ export default function PageInventarioGraph() {
                                 </table>
                             </div>
 
-                            {/* ── Paginación ── */}
                             {!loading && filtered.length > 0 && (
                                 <div className="px-4 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                                     <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -536,7 +509,6 @@ export default function PageInventarioGraph() {
                     </motion.div>
             </AnimatePresence>
 
-            {/* ── Drawer / Modals ── */}
             <DrawerProducto
                 open={showDrawer}
                 onClose={() => { setShowDrawer(false); setProductoEdit(null) }}

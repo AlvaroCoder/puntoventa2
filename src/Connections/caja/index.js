@@ -35,8 +35,8 @@ export async function abrirCaja(cajaId, data = {}) {
     return fetchWithAuth(ENDPOINTS.abrirCaja(cajaId), { method: 'POST', body: data }, 'spring')
 }
 
-export async function cerrarCaja(cajaId, data = {}) {
-    return fetchWithAuth(ENDPOINTS.cerrarCaja(cajaId), { method: 'POST', body: data }, 'spring')
+export async function cerrarCaja(sesionId, data = {}) {
+    return fetchWithAuth(ENDPOINTS.cerrarCaja(sesionId), { method: 'PUT', body: data }, 'spring')
 }
 
 export async function getMovimientosByCaja(cajaId) {

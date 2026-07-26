@@ -6,7 +6,7 @@ import { useAuth } from '@/Context/AuthContext'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import {
     getCajaByTienda,
-    getSesionActual, getSesionesByCaja,
+     getSesionesByCaja,
     getMovimientosByCaja,
     getSesionesActivas, 
 } from '@/Connections/caja'
@@ -26,17 +26,10 @@ import DialogCerrarCaja from '@/elements/DialogCerrarCaja';
 import DialogMovimiento from '@/elements/DialogMovimiento';
 import TablaMovimientos from '@/components/Tables/TablaMovimientos';
 import TablaSesiones from '@/components/Tables/TablaSesiones'
+import { fmtDate } from '@/lib/utils'
 
 const fmt = v =>
     new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
-
-const fmtDate = d =>
-    d
-        ? new Date(d).toLocaleString('es-PE', {
-            day: '2-digit', month: 'short', year: 'numeric',
-            hour: '2-digit', minute: '2-digit',
-        })
-        : '—';
 
 const extractList = res =>
     res?.data?.data?.data ?? res?.data?.data ?? res?.data ?? []
@@ -120,7 +113,6 @@ export default function PageCaja() {
     useEffect(() => {
         if (!caja?.id) return
         if (tab === 'movimientos') {
-            
             const sesionIdActivo = sesion?.id;
             setLoadingMovs(true)
             getMovimientosByCaja(sesionIdActivo)
@@ -129,7 +121,7 @@ export default function PageCaja() {
                 .finally(() => setLoadingMovs(false));
         } else {
             setLoadingSesiones(true)
-            getSesionesByCaja(caja.id)
+            getSesionesByCaja(caja?.id)
                 .then(res => setSesiones(extractList(res)))
                 .catch(() => toast.error('Error al cargar sesiones'))
                 .finally(() => setLoadingSesiones(false));
@@ -347,7 +339,6 @@ export default function PageCaja() {
             <DialogCerrarCaja
                 open={dlgCerrar}
                 onClose={() => setDlgCerrar(false)}
-                cajaId={caja?.id}
                 sesion={sesion}
                 onSuccess={loadCaja}
             />

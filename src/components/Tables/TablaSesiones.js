@@ -1,6 +1,7 @@
 import React from 'react'
 import SkeletonRow from './elements/SkeletonRow'
 import HistoryIcon from '@mui/icons-material/History'
+import { arrayToDate } from '@/lib/utils';
 
 const fmt = v =>
     new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
@@ -16,6 +17,7 @@ export default function TablaSesiones({
     data = [],
     loading = false,
 }) {
+    const headers = ['Estado', 'Fecha Apertura', 'Fecha Cierre', 'Monto apertura', 'Monto cierre'];
     if (loading) {
         return (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -64,7 +66,7 @@ export default function TablaSesiones({
                         {data.map((s, i) => (
                             <tr key={s.id ?? i} className="hover:bg-gray-50/60 transition-colors">
                                 <td className="px-4 py-3.5">
-                                    {s.fecha_cierre ? (
+                                    {s.fechaCierre ? (
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
                                             Cerrada
                                         </span>
@@ -75,17 +77,17 @@ export default function TablaSesiones({
                                     )}
                                 </td>
                                 <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">
-                                    {fmtDate(s.fecha_apertura)}
+                                    {fmtDate(arrayToDate(s.fechaApertura))}
                                 </td>
                                 <td className="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">
-                                    {fmtDate(s.fecha_cierre)}
+                                    {fmtDate(arrayToDate(s.fechaCierre))}
                                 </td>
                                 <td className="px-4 py-3.5 font-semibold text-[#1F4363]">
-                                    {fmt(s.monto_apertura)}
+                                    {fmt(s.montoApertura)}
                                 </td>
                                 <td className="px-4 py-3.5 text-gray-600">
-                                    {s.monto_cierre != null
-                                        ? fmt(s.monto_cierre)
+                                    {s.montoCierreReal != null
+                                        ? fmt(s.montoCierreReal)
                                         : <span className="text-gray-300">—</span>
                                     }
                                 </td>

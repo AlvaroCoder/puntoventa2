@@ -14,7 +14,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-export default function DialogCerrarCaja({ open, onClose, cajaId, sesion, onSuccess }) {
+import { arrayToDate } from "@/lib/utils";
+export default function DialogCerrarCaja({ open, onClose, sesion, onSuccess }) {
   const fmtDate = (d) =>
     d
       ? new Date(d).toLocaleString("es-PE", {
@@ -31,20 +32,24 @@ export default function DialogCerrarCaja({ open, onClose, cajaId, sesion, onSucc
       currency: "PEN",
     }).format(v ?? 0);
   
-    const [form, setForm] = useState({ monto_cierre: '', observaciones: '' })
+  const [form, setForm] = useState({
+      trabajadorId : 1,
+      montoCierreReal: "",
+      observaciones: "",
+    });
     const [saving, setSaving] = useState(false);
     useEffect(() => {
-        if (open) setForm({ monto_cierre: '', observaciones: '' })
+        if (open) setForm({ trabajadorId: 1, montoCierreReal: "", observaciones: "" });
     }, [open])
 
     const handleCerrar = async () => {
-        if (!form.monto_cierre) return toast.error('El monto de cierre es requerido')
+        if (!form.montoCierreReal) return toast.error('El monto de cierre es requerido')
         setSaving(true)
         try {
-            const res = await cerrarCaja(cajaId, {
-                ...form,
-                monto_cierre: parseFloat(form.monto_cierre),
-            })
+            const res = await cerrarCaja(sesion?.id, {
+              ...form,
+              montoCierreReal: parseFloat(form.montoCierreReal),
+            });
             if (res.ok) {
                 toast.success('Caja cerrada correctamente')
                 onSuccess()
@@ -65,10 +70,10 @@ export default function DialogCerrarCaja({ open, onClose, cajaId, sesion, onSucc
           {sesion && (
             <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm">
               <p className="text-amber-700 font-semibold">
-                Sesión abierta desde: {fmtDate(sesion.fecha_apertura)}
+                Sesión abierta desde: {fmtDate(arrayToDate(sesion.fechaApertura))}
               </p>
               <p className="text-amber-600 mt-0.5">
-                Monto apertura: {fmt(sesion.monto_apertura)}
+                Monto apertura: {fmt(sesion.montoApertura)}
               </p>
             </div>
           )}
@@ -81,9 +86,9 @@ export default function DialogCerrarCaja({ open, onClose, cajaId, sesion, onSucc
                 type="number"
                 min="0"
                 step="0.01"
-                value={form.monto_cierre}
+                value={form.montoCierreReal}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, monto_cierre: e.target.value }))
+                  setForm((p) => ({ ...p, montoCierreReal: e.target.value }))
                 }
                 placeholder="0.00"
                 className="focus-visible:ring-red-400/30 focus-visible:border-red-400"
