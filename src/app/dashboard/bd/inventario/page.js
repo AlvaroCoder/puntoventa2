@@ -19,8 +19,6 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import ReportProblemIcon from '@mui/icons-material/ReportProblem'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import AddIcon from '@mui/icons-material/Add'
-import TableRowsIcon from '@mui/icons-material/TableRows'
-import BarChartIcon from '@mui/icons-material/BarChart'
 import SearchIcon from '@mui/icons-material/Search'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -41,16 +39,7 @@ const STOCK_FILTERS = [
     { key: 'sin',    label: 'Sin stock' },
 ]
 
-const PAGE_SIZE_OPTIONS = [10, 25, 50]
-
-function StockBadge({ stock, minimo }) {
-    if (stock === 0 || stock == null)
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">Sin stock</span>
-    if (stock <= minimo)
-        return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">{stock}</span>
-    return <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">{stock}</span>
-}
-
+const PAGE_SIZE_OPTIONS = [10, 25, 50];
 function SkeletonRow({ cols }) {
     return (
         <tr className="border-b border-gray-50">
@@ -119,7 +108,6 @@ export default function PageInventarioGraph() {
         loadAll()
     }, [user])
 
-    // ── KPIs ──
     const kpis = useMemo(() => {
         const total     = productos.length
 
@@ -129,7 +117,6 @@ export default function PageInventarioGraph() {
         return { total, bajStock, sinStock, entradas: 0 }
     }, [productos])
 
-    // ── Filter + Sort ──
     const filtered = useMemo(() => {
         let list = productos;
 
@@ -214,7 +201,7 @@ export default function PageInventarioGraph() {
                 <div className="flex items-center gap-2 flex-wrap">
  
                     <Button
-                        onClick={() => { setProductoEdit(null); setShowDrawer(true) }}
+                        onClick={() => { router.push("/dashboard/bd/inventario/create") }}
                         className="flex items-center gap-2 bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
                     >
                         <AddIcon style={{ fontSize: 18 }} />

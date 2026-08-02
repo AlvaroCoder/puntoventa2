@@ -11,7 +11,9 @@ const ENDPOINTS_VARIANTES = VARIANTES_ENDPOINTS;
 export async function getProductosByEmpresa(empresaId) {
     return fetchWithAuth(ENDPOINTS_PRODUCTO.getAllProductosByIdEmpresa(empresaId))
 }
-
+export async function getCategoriasByUser() { 
+	return fetchWithAuth(ENDPOINTS_PRODUCTO.getllCategoriesByUser())
+}
 
 export async function getProductoById(id) {
     return fetchWithAuth(`${BASE_PRODUCTO}/${id}`)
@@ -38,7 +40,7 @@ export async function deleteProducto(id) {
 }
 
 export async function getCategorias() {
-    return fetchWithAuth(BASE_CATEGORIA, {}, 'express')
+    return fetchWithAuth(ENDPOINTS_PRODUCTO.getllCategoriesByUser())
 }
 
 export async function getInventarioByTienda(tiendaId) {

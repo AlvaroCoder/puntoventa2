@@ -1,10 +1,12 @@
 const BASE_URL_SPRING = process.env.NEXT_PUBLIC_BASE_URL_2 ?? 'http://localhost:8085'
+const BASE_URL_EXPRESS = process.env.NEXT_PUBLIC_BASE_URL_1 ?? 'http://localhost:3030'
 
 const BASE_CAJA = BASE_URL_SPRING + '/api/cajas';
 const BASE_INVENTARIO = BASE_URL_SPRING + '/api/inventario';
 const BASE_PRODUCTO = BASE_URL_SPRING + '/api/productos';
 const BASE_VARIANTES = BASE_URL_SPRING + '/api/variantes';
-
+const BASE_CATEGORIA = BASE_URL_EXPRESS + '/api/categoria';
+const BASE_IMAGES = BASE_URL_SPRING + '/api/imagenes';
 export const CAJA_ENDPOINTS = {
     getAllCajasByTienda: (tiendaId) => `${BASE_CAJA}?tiendaId=${tiendaId}`,
     getCajaByTienda : (tiendaId, idCaja) => `${BASE_CAJA}/${idCaja}?tiendaId=${tiendaId}`,
@@ -29,9 +31,14 @@ export const INVENTARIO_ENDPOINTS = {
 
 export const PRODUCTO_ENDPOINTS = {
     createProducto: () => `${BASE_PRODUCTO}`,
-    getAllProductosByIdEmpresa : (empresaId)=>`${BASE_PRODUCTO}/empresa/${empresaId}` 
+    getAllProductosByIdEmpresa : (empresaId)=>`${BASE_PRODUCTO}/empresa/${empresaId}` ,
+    getllCategoriesByUser : ()=>`${BASE_CATEGORIA}`,
 }
 
 export const VARIANTES_ENDPOINTS = {
     createVariante : ()=>`${BASE_VARIANTES}`
+}
+
+export const IMAGES_ENDPOINTS = {
+    uploadImage : ()=>`${BASE_IMAGES}/subir`
 }
