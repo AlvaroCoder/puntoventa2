@@ -11,11 +11,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
     X, Plus, Trash2, ChevronDown, Loader2,
-    ArrowLeft, CheckCircle2, ImagePlus, Package,
+    ArrowLeft, CheckCircle2, ImagePlus,
 } from 'lucide-react'
 import StoreIcon from '@mui/icons-material/Store'
 import Image from 'next/image'
 import PreviewCard from '@/components/Cards/PreviewCard'
+import ProductCard from '@/components/Cards/ProductCard'
+import SectionTitle from '@/components/Titles/SectionTitle'
 
 
 const tipoProductos = [
@@ -71,8 +73,7 @@ function genCodigo() {
     return `PRD-${String(Math.floor(Math.random() * 9000) + 1000)}`
 }
 
-const extractList = res =>
-    res?.data?.data?.data ?? res?.data?.data ?? res?.data ?? []
+const extractList = res =>res?.data?.data?.data ?? res?.data?.data ?? res?.data ?? []
 
 async function submitProduct(form, variantes, varianteTiendaGlobal, empresaId, imagenFile = null) {
     let imagenUrl = null
@@ -131,61 +132,6 @@ async function submitProduct(form, variantes, varianteTiendaGlobal, empresaId, i
     return resProducto
 }
 
-
-function SectionTitle({ children }) {
-    return (
-        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 pb-1.5 border-b border-gray-100">
-            {children}
-        </h3>
-    )
-}
-
-function ProductCard({ item, idx, onRemove }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm"
-        >
-            <div className="flex gap-3 p-3">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden">
-                    {item.imagenPreview
-                        ? <Image src={item.imagenPreview} className="w-full h-full object-cover" width={56} height={56} alt={item.form.nombre} />
-                        : <Package size={18} className="text-gray-300" />
-                    }
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-[#1F4363] text-sm truncate">
-                        {item.form.nombre || 'Sin nombre'}
-                    </p>
-                    <p className="text-[10px] text-gray-400 truncate">
-                        {item.form.tipoPreset?.nombre ?? item.form.tipoProducto}
-                    </p>
-                    <div className="flex items-center gap-1.5 mt-1">
-                        <span className="text-xs font-bold text-[#FF821E]">S/ {item.form.precioVenta}</span>
-                        <span className="text-[10px] text-gray-200">·</span>
-                        <span className="text-[10px] text-gray-400">
-                            {item.variantes.filter(v => v.talla || v.color).length || 1} var.
-                        </span>
-                    </div>
-                </div>
-                <div className="flex flex-col items-end justify-between shrink-0">
-                    <button
-                        onClick={onRemove}
-                        className="text-red-300 hover:text-red-500 transition-colors"
-                    >
-                        <X size={13} />
-                    </button>
-                    <span className="text-[10px] font-bold text-gray-200">#{idx + 1}</span>
-                </div>
-            </div>
-        </motion.div>
-    )
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function Page() {
     const router   = useRouter()
     const { user } = useAuth()
@@ -195,7 +141,6 @@ export default function Page() {
     const [categorias, setCategorias] = useState([])
     const [loading,    setLoading]    = useState(true)
 
-    // Form
     const [form,       setForm]      = useState(INIT_FORM)
     const [variantes,  setVariantes] = useState([{ ...INIT_VARIANTE }])
     const [varianteTiendaGlobal, setVTG] = useState(true)
@@ -204,13 +149,10 @@ export default function Page() {
     const [imagenFile,    setImagenFile]    = useState(null)
     const [sugerido] = useState(genCodigo);
     
-
-    // Lote
     const [listProducts,   setListProducts]   = useState([])
     const [loteResult,     setLoteResult]     = useState(null)
     const [loteSubmitting, setLoteSubmitting] = useState(false)
 
-    // ── Carga inicial ─────────────────────────────────────────────────────────
     useEffect(() => {
         if (!user) return
         Promise.all([getTiendasByUser(), getCategoriasByUser()])
@@ -222,7 +164,6 @@ export default function Page() {
             .finally(() => setLoading(false))
     }, [user])
 
-    // ── Form handlers ─────────────────────────────────────────────────────────
     const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
 
     const handlePreset = (tipo) => {
@@ -314,11 +255,9 @@ export default function Page() {
         }
     }
 
-    // ── Render ────────────────────────────────────────────────────────────────
     return (
         <div className="w-full pb-12">
 
-            {/* Header */}
             <div className="flex items-center gap-3 mb-7">
                 <button
                     onClick={() => router.push('/dashboard/bd/inventario')}
@@ -351,7 +290,6 @@ export default function Page() {
             ) : (
                 <div className="grid grid-cols-5 gap-6 items-start">
 
-                    {/* ─── Left: formulario ─────────────────────────── */}
                     <div className="col-span-3">
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-7">
 

@@ -191,7 +191,7 @@ export default function PaginaHome() {
                     tiendas={tiendas}
                 />
                 <PanelRouteHome itemVariants={itemVariants} BD_ROUTES={BD_ROUTES} />
-                <PanelRouteHome itemVariants={itemVariants} BD_ROUTES={GRAPH_ROUTES} isGraph={true} />
+                {/**<PanelRouteHome itemVariants={itemVariants} BD_ROUTES={GRAPH_ROUTES} isGraph={true} /> */}
 
             </motion.div>
         </div>
