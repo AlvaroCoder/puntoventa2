@@ -12,7 +12,8 @@ export default function TopBar() {
   const pathname = usePathname();
 
   if (pathname.startsWith("/dashboard")) return null;
-
+  if (pathname.startsWith("/login")) return null;
+  if(pathname.startsWith("/signup")) return null;
   return (
     <nav className="fixed w-full z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 h-20 flex items-center">
       <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
