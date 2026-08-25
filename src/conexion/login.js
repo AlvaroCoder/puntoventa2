@@ -19,3 +19,10 @@ export async function LOGIN_GOOGLE(credential) {
         body: JSON.stringify({ credential })
     });
 }
+
+export async function VALIDATE_EMAIL(email) {
+    return await fetch(`http://localhost:3030/api/usuarios/verificar-email/${email}`, {
+        method: 'GET',
+        mode: 'cors'
+    })
+}

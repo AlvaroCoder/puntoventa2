@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/Context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 
-/* ── Slides del panel derecho ─────────────────────────────────────────── */
 const SLIDES = [
     {
         tag: 'Inventario inteligente',
@@ -86,7 +85,6 @@ function MarketingPanel() {
         <div className="relative flex-1 h-full bg-[#1F4363] flex flex-col justify-between px-10 py-12 overflow-hidden">
             <ArcDecoration />
 
-            {/* Logo */}
             <div className="relative z-10 flex items-center gap-2.5">
                 <Image
                     src="https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
@@ -201,7 +199,7 @@ export default function LoginPage() {
                     {/* Encabezado */}
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold text-[#1F4363]">Iniciar sesión</h1>
-                        <p className="text-gray-400 text-sm mt-1">Qué bueno verte de nuevo 👋</p>
+                        <p className="text-gray-400 text-sm mt-1">Qué bueno verte de nuevo.</p>
                     </div>
 
                     {/* Formulario */}
@@ -212,7 +210,7 @@ export default function LoginPage() {
                             <input
                                 name="email"
                                 type="email"
-                                placeholder="tucorreo@empresa.com"
+                                placeholder="correo@hotmail.com"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required

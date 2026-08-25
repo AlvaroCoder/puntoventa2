@@ -71,7 +71,6 @@ export async function RESET_PASSWORD(reset_token, nueva_password) {
     });
 }
 
-// ─── Trabajadores ────────────────────────────────────────────────────────────
 
 async function authHeaders() {
     const session = await getSession();

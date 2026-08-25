@@ -6,7 +6,6 @@ const URL_FETCH_RUBROS = "http://localhost:3030/api/rubro/"
 
 export default function GridSelectCardRubro({onClick, formData}) {
     const {data : dataRubros, loading : loadingDataRubros } = useFetch(URL_FETCH_RUBROS);
-    console.log(dataRubros);
     
     if (loadingDataRubros) {
         return (<div>Cargando rubros...</div>)
