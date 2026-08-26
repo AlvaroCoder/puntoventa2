@@ -5,7 +5,8 @@ import React from 'react'
 export default function StepTwoSignUp({
     formData,
     handleInputChange,
-    errors
+    errors,
+    handleBlurInputDocumento
 }) {
 
   return (
@@ -23,6 +24,7 @@ export default function StepTwoSignUp({
               value={formData?.fullName}
               onChange={handleInputChange}
               error={errors?.fullName}
+            
           />  
           <InputField
               label={"Ingresa tu (DNI/RUC)"}
@@ -33,7 +35,7 @@ export default function StepTwoSignUp({
               value={formData?.dni}
               onChange={handleInputChange}
               error={errors?.dni || errors?.ruc}
-              onBlur={handleBlurDniRuc}
+              onBlur={handleBlurInputDocumento}
           />
           <InputField
               label={"Teléfono / Celular"}

@@ -1,17 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import {
-  User, Mail, Phone, CreditCard, Store,
-  ArrowRight, ArrowLeft, Check, Building2, MapPin, Loader2,
+  Store, ArrowRight, ArrowLeft, Check, Building2, MapPin, Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import InputField from "@/elements/InputField";
 import SelectableCard from "@/elements/SelectableCard";
-import InputPassword from "@/elements/InputPassword";
 import { validateEmail } from "@/lib/validation";
 import { getVerificarDocumento, getVerificarEmail } from "../../../API/user/getConnections";
-import GridSelectCardRubro from "@/components/Cards/GridSelectCardRubro";
 import { REGISTER_USER, CREATE_COMPANY } from "@/conexion/apiconexion";
 import { login } from "@/lib/authentication";
 import { useRouter } from "next/navigation";
@@ -19,9 +15,18 @@ import MarketingPanel from "@/components/Panel/MarketingPanel";
 import HorizontalStepper from "@/components/Stepper/HorizontalStepper";
 import StepOneSignUp from "@/components/Stepper/StepOneSignUp";
 import StepTwoSignUp from "@/components/Stepper/StepTwoSignUp";
+import StepThreSignUp from "@/components/Stepper/StepThreSignUp";
 
 
-const URL_LOGO   = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
+const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
+
+const PASSWORD_REQS = [
+  (p) => p.length >= 8,
+  (p) => /[A-Z]/.test(p),
+  (p) => /[a-z]/.test(p),
+  (p) => /\d/.test(p),
+  (p) => /[!@#$%^&*(),.?":{}|<>]/.test(p),
+]
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -45,6 +50,13 @@ export default function SignUpPage() {
     }
   };
 
+  const handleBlurDocumento = (e) => {
+    const doc = e.target.value.trim();
+    if (doc.length > 0 && doc.length !== 8 && doc.length !== 11) {
+      setErrors((p) => ({ ...p, dni: "DNI debe tener 8 dígitos o RUC 11 dígitos" }));
+    }
+  };
+
   const changeStep = async (direction) => {
     if (direction === "prev") { setCurrentStep((p) => p - 1); return; }
 
@@ -54,16 +66,21 @@ export default function SignUpPage() {
 
     try {
       switch (currentStep) {
-        case 1:
+
+        case 1: {
           if (!formData.email) {
             setErrors((p) => ({ ...p, email: "El correo es obligatorio" })); hasError = true;
           } else if (!validateEmail(formData.email)) {
             setErrors((p) => ({ ...p, email: "Formato de correo inválido" })); hasError = true;
           }
-          if (!formData.password || formData.password.length < 8) {
-            setErrors((p) => ({ ...p, password: "Mínimo 8 caracteres" })); hasError = true;
+          if (!formData.password) {
+            setErrors((p) => ({ ...p, password: "La contraseña es obligatoria" })); hasError = true;
+          } else if (!PASSWORD_REQS.every(r => r(formData.password))) {
+            setErrors((p) => ({ ...p, password: "La contraseña no cumple todos los requisitos" })); hasError = true;
           }
-          if (formData.password !== formData.confirmPassword) {
+          if (!formData.confirmPassword) {
+            setErrors((p) => ({ ...p, confirmPassword: "Confirma tu contraseña" })); hasError = true;
+          } else if (formData.password !== formData.confirmPassword) {
             setErrors((p) => ({ ...p, confirmPassword: "Las contraseñas no coinciden" })); hasError = true;
           }
           if (!hasError) {
@@ -73,28 +90,59 @@ export default function SignUpPage() {
             }
           }
           break;
+        }
 
-        case 2:
-          if (!formData.fullName) { setErrors((p) => ({ ...p, fullName: "Nombre completo requerido" })); hasError = true; }
-          if (!formData.dni)      { setErrors((p) => ({ ...p, dni:      "Documento requerido"       })); hasError = true; }
-          if (!formData.phone)    { setErrors((p) => ({ ...p, phone:    "Teléfono requerido"         })); hasError = true; }
+        case 2: {
+          if (!formData.fullName.trim()) {
+            setErrors((p) => ({ ...p, fullName: "Nombre completo requerido" })); hasError = true;
+          }
+          const dniClean = formData.dni.trim();
+          if (!dniClean) {
+            setErrors((p) => ({ ...p, dni: "Documento requerido" })); hasError = true;
+          } else if (!/^\d+$/.test(dniClean)) {
+            setErrors((p) => ({ ...p, dni: "Solo se permiten dígitos" })); hasError = true;
+          } else if (dniClean.length !== 8 && dniClean.length !== 11) {
+            setErrors((p) => ({ ...p, dni: "DNI debe tener 8 dígitos o RUC 11 dígitos" })); hasError = true;
+          }
+          const phoneClean = formData.phone.replace(/\s+/g, "");
+          if (!phoneClean) {
+            setErrors((p) => ({ ...p, phone: "Teléfono requerido" })); hasError = true;
+          } else if (!/^9\d{8}$/.test(phoneClean)) {
+            setErrors((p) => ({ ...p, phone: "Ingresa un celular peruano válido (9XXXXXXXX)" })); hasError = true;
+          }
           if (!hasError) {
-            const docStatus = await getVerificarDocumento(formData.dni);
+            const docStatus = await getVerificarDocumento(dniClean);
             if (docStatus === 404) {
               setErrors((p) => ({ ...p, dni: "Documento inválido o ya registrado" })); hasError = true;
             }
           }
           break;
+        }
 
-        case 3:
-          if (!formData.businessName)       { setErrors((p) => ({ ...p, businessName: "Nombre del negocio requerido" })); hasError = true; }
-          if (!formData.ruc)                { setErrors((p) => ({ ...p, ruc:          "RUC requerido"                })); hasError = true; }
-          if (!formDataEnterprise.rubro_id) { setErrors((p) => ({ ...p, rubro:        "Selecciona un rubro"          })); hasError = true; }
+        case 3: {
+          if (!formData.businessName.trim()) {
+            setErrors((p) => ({ ...p, businessName: "Nombre del negocio requerido" })); hasError = true;
+          }
+          const rucClean = formData.ruc.trim();
+          if (!rucClean) {
+            setErrors((p) => ({ ...p, ruc: "RUC requerido" })); hasError = true;
+          } else if (!/^\d{11}$/.test(rucClean)) {
+            setErrors((p) => ({ ...p, ruc: "El RUC debe tener exactamente 11 dígitos" })); hasError = true;
+          } else if (!/^(10|20)/.test(rucClean)) {
+            setErrors((p) => ({ ...p, ruc: "RUC inválido (debe iniciar con 10 o 20)" })); hasError = true;
+          }
+          if (!formDataEnterprise.rubro_id) {
+            setErrors((p) => ({ ...p, rubro: "Selecciona un rubro" })); hasError = true;
+          }
           break;
+        }
 
-        case 4:
-          if (!formData.storeCount) { setErrors((p) => ({ ...p, storeCount: "Selecciona una escala" })); hasError = true; }
+        case 4: {
+          if (!formData.storeCount) {
+            setErrors((p) => ({ ...p, storeCount: "Selecciona una escala" })); hasError = true;
+          }
           break;
+        }
       }
     } catch (error) {
       console.error("Error en validación:", error);
@@ -168,7 +216,6 @@ export default function SignUpPage() {
 
       router.push("/dashboard/home");
     } catch (error) {
-      console.error("Error en registro:", error);
       setSubmitError("Error inesperado. Por favor intenta de nuevo.");
       setIsLoading(false);
     }
@@ -183,6 +230,13 @@ export default function SignUpPage() {
           <p className="text-[#1F4363] font-medium text-sm">Procesando...</p>
         </div>
       );
+    }
+
+    const handleBlurInputDocumento = (e) => {
+      const documento = e.target.value;
+      if (documento?.length != 8 || documento?.length != 11) {
+        setErrors((p) => ({ ...p, dni: 'Documento inválido.' }));  
+      } 
     }
 
     switch (currentStep) {
@@ -201,28 +255,19 @@ export default function SignUpPage() {
             formData={formData}
             handleInputChange={handleInputChange}
             errors={errors}
+            handleBlurInputDocumento={handleBlurInputDocumento}
           />
         );
 
       case 3:
         return (
-          <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
-            <div className="mb-2">
-              <h2 className="text-xl font-bold text-[#1F4363]">Tu Primer Negocio</h2>
-              <p className="text-gray-500 text-sm">Rubro e identificación de tu primera empresa.</p>
-            </div>
-            <InputField label="Nombre Comercial" icon={Store} name="businessName"
-              placeholder="Ej: Bodega El Chino" value={formData.businessName}
-              onChange={handleInputChange} error={errors?.businessName} />
-            <InputField label="RUC Empresa" icon={Building2} name="ruc"
-              placeholder="20123456789" value={formData.ruc}
-              onChange={handleInputChange} error={errors?.ruc} />
-            <div>
-              <label className="text-xs font-bold text-[#333] block mb-2">Selecciona tu Rubro</label>
-              {errors?.rubro && <p className="text-red-500 text-xs mb-2">{errors.rubro}</p>}
-              <GridSelectCardRubro onClick={handleClickCategory} formData={formDataEnterprise} />
-            </div>
-          </div>
+          <StepThreSignUp
+            formData={formData}
+            formDataEnterprise={formDataEnterprise}
+            errors={errors}
+            handleClickCategory={handleClickCategory}
+            handleInputChange={handleInputChange}
+          />
         );
 
       case 4:
