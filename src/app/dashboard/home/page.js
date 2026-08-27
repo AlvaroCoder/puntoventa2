@@ -214,10 +214,10 @@ export default function HomePage() {
 
     return (
         <div className="w-full max-w-4xl mx-auto py-4">
-            {/* Header */}
+        
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-bold text-[#1F4363]">
+                    <h1 className="text-2xl font-bold text-[#1F4363]">
                         Bienvenido, {firstName}!
                     </h1>
                     <span className="bg-[#198E7B] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
@@ -227,7 +227,6 @@ export default function HomePage() {
                 <p className="text-sm text-gray-400 font-medium">{formatDate(now)}</p>
             </div>
 
-            {/* Sections */}
             {sections.map((section, i) => (
                 <Section
                     key={section.id}

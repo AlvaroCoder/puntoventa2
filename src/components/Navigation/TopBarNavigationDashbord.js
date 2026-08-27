@@ -2,6 +2,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -15,7 +16,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import BadgeIcon from '@mui/icons-material/Badge'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { Search, Bell } from 'lucide-react'
+import { Search, Bell, Database, TrendingUp } from 'lucide-react'
 
 const NIVEL_LABEL = {
     999: { label: 'Dueño',         color: 'bg-[#FE811F]/15 text-[#FE811F]' },
@@ -26,42 +27,65 @@ const NIVEL_LABEL = {
     0:   { label: 'Invitado',      color: 'bg-gray-100 text-gray-400'       },
 }
 
+const NAV_LINKS = [
+    { href: '/dashboard/bd',    label: 'Base de datos', Icon: Database    },
+    { href: '/dashboard/graph', label: 'Gráficos',      Icon: TrendingUp  },
+]
+
+const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804945/LOGO/01_lbpeuw.png"
+
 export default function TopBarNavigationDashbord() {
     const { user } = useAuth()
+    const pathname  = usePathname()
     const initials  = user?.nombre_completo?.split(' ').map(n => n[0]?.toUpperCase()).join('') || ''
     const nivelInfo = NIVEL_LABEL[user?.nivel_permiso] ?? NIVEL_LABEL[0]
-    const URL_LOGO_PUNTO_VENTA = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
-    return (
-        <nav className="w-full h-20 bg-white sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-gray-100 shadow-sm">
 
-            {/* Logo */}
-            <Link href="/dashboard/bd/home" className="flex items-center gap-2.5">
+    return (
+        <nav className="w-full h-16 bg-white sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
+
+            <Link href="/dashboard/home" className="flex items-center gap-2.5">
                 <Image
-                    src={URL_LOGO_PUNTO_VENTA}
+                    src={URL_LOGO}
                     alt="Logo Punto de Venta 360"
-                    width={88}
-                    height={34}
+                    width={44}
+                    height={44}
                 />
-                <span className="text-base font-bold text-[#1F4363]">
-                    Punto de Venta <span className="text-[#FE811F]">360</span>
+                <span className="text-sm font-bold text-azulMarino">
+                    Punto de Venta <span className="text-verdeAgua">360</span>
                 </span>
             </Link>
 
-            {/* Acciones derechas */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
 
-                {/* Buscar */}
-                <button className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-[#1F4363] hover:bg-gray-100 transition-colors">
-                    <Search size={17} />
+                <div className="flex items-center gap-1 mr-3 p-1 bg-grisClaro rounded-xl">
+                    {NAV_LINKS.map(({ href, label, Icon }) => {
+                        const isActive = pathname.startsWith(href)
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
+                                    ${isActive
+                                        ? 'bg-white text-azulMarino shadow-sm'
+                                        : 'text-gray-400 hover:text-azulMarino'
+                                    }`}
+                            >
+                                <Icon size={15} />
+                                <span>{label}</span>
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                <button className="w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-azulMarino hover:bg-grisClaro transition-colors">
+                    <Search size={16} />
                 </button>
 
-                {/* Notificaciones */}
-                <button className="relative w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-[#1F4363] hover:bg-gray-100 transition-colors">
-                    <Bell size={17} />
+                <button className="relative w-9 h-9 flex items-center justify-center rounded-lg text-gray-400 hover:text-azulMarino hover:bg-grisClaro transition-colors">
+                    <Bell size={16} />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FE811F]" />
                 </button>
 
-                {/* Perfil */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <button className="ml-1 w-9 h-9 rounded-full bg-[#1F4363] flex items-center justify-center text-white font-bold text-xs shrink-0 hover:bg-[#1a3557] transition-colors focus:outline-none">
@@ -71,7 +95,6 @@ export default function TopBarNavigationDashbord() {
 
                     <DropdownMenuContent align="end" className="w-64 p-2 shadow-lg border border-gray-100 rounded-xl mt-1">
 
-                        {/* Header del perfil */}
                         <div className="flex items-center gap-3 px-2 py-3">
                             <div className="w-10 h-10 rounded-full bg-[#1F4363] flex items-center justify-center text-white font-bold text-sm shrink-0">
                                 {initials || <PersonOutlineIcon style={{ fontSize: 18 }} />}

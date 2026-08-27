@@ -38,6 +38,7 @@ export default function SignUpPage() {
     fullName: "", dni: "", phone: "",
     businessName: "", ruc: "", businessType: "", storeCount: "",
   });
+  const [haveContinue, setHaveContinue] = useState(false);
   const [formDataEnterprise, setFormDataEnterprise] = useState({ rubro_id: 1 });
   const [errors,      setErrors]      = useState({});
   const [submitError, setSubmitError] = useState(null);
@@ -47,13 +48,6 @@ export default function SignUpPage() {
     setFormData({ ...formData, [name]: value });
     if (errors[name]) {
       setErrors((prev) => { const n = { ...prev }; delete n[name]; return n; });
-    }
-  };
-
-  const handleBlurDocumento = (e) => {
-    const doc = e.target.value.trim();
-    if (doc.length > 0 && doc.length !== 8 && doc.length !== 11) {
-      setErrors((p) => ({ ...p, dni: "DNI debe tener 8 dígitos o RUC 11 dígitos" }));
     }
   };
 

@@ -18,7 +18,6 @@ export function AuthProvider({ children }) {
         async function loadSession() {
             try {
                 const session = await getSession();    
-                console.log('Session : ', session);
                 
                 setUser(session ?? null)
             } catch {

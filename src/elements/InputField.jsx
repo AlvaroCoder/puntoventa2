@@ -22,7 +22,7 @@ export default function InputField({ label, icon: Icon, error, loading=false, ob
           ? "border-red-500 ring-2 ring-red-500/10"
           : "border-gray-200 hover:border-[#1F4363]/50 focus-within:border-[#FF821E] focus-within:ring-4 focus-within:ring-[#FF821E]/10"
       }
-      ${checkValue && "border-green-400 ring-green-200 "}
+      ${checkValue ? "border-green-400 ring-green-200 " : "border-red-400 ring-red-400"}
     `}
       >
         <Icon

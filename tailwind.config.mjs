@@ -9,14 +9,11 @@ export default {
   theme: {
   	extend: {
   		colors: {
-			azulOscuro : "#2B2D42",
-			rojoEncendido : "#EF233C",
-				grisClaro: "#8D99AE",
-				naranjaClaro: "#ffd8b9",
-			naranjaEncendido : "#FF821E",
-			beigeClaro : "#EDF2F4",
-			rojoPasion :"#D90429",
-			azulClaro : "#191A29",
+			grisClaro : "#E1E7F0",
+			celestaClaro: "#CEDEF",
+			verdeAgua: "#1EB3B2",
+			azulMarino: "#1F2F57",
+			azulClaro : "#3960A9",
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

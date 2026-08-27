@@ -52,6 +52,7 @@ export default function StepOneSignUp({ formData, handleInputChange, errors }) {
             
                const response = await objectValidation.json();
                const disponible = response?.data?.disponible;
+               console.log("DISPONIBLE : "+disponible)
                setCheckEmail(disponible);
             
         } catch (error) {
@@ -59,7 +60,6 @@ export default function StepOneSignUp({ formData, handleInputChange, errors }) {
         } finally {
             setLoadingValidation(false)
         }
-            
         }
         
     }
