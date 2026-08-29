@@ -12,6 +12,7 @@ import SliderClientData from '@/components/Cards/SliderClientData'
 import ImportExcelModal from '@/components/Modal/ImportExcelModal'
 import { getClientesByEmpresa, deleteCliente } from '@/Connections/clientes'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const CATEGORIA_BADGE = {
     RESPONSABLE: 'bg-green-100 text-green-700',
@@ -66,12 +67,10 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
     return (
         <div className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col">
 
-            {/* Card body — clickable */}
             <button
                 onClick={() => onSelect(client)}
                 className="flex flex-col items-center text-center px-5 pt-6 pb-4 gap-3 flex-1 w-full focus:outline-none"
             >
-                {/* Avatar */}
                 {client.foto_url ? (
                     <Image
                         src={client.foto_url}
@@ -89,13 +88,11 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
                     </div>
                 )}
 
-                {/* Name */}
                 <div className="w-full">
                     <p className="font-bold text-[#1F4363] text-sm leading-tight line-clamp-2">
                         {nombre}
                     </p>
 
-                    {/* Document */}
                     <div className="flex items-center justify-center gap-1.5 mt-1.5 flex-wrap">
                         {client.tipo_documento && (
                             <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${docClass}`}>
@@ -107,7 +104,6 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
                         </span>
                     </div>
 
-                    {/* Email */}
                     {client.email && (
                         <div className="flex items-center justify-center gap-1 mt-1.5">
                             <Mail size={11} className="text-gray-300 shrink-0" />
@@ -117,7 +113,6 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
                         </div>
                     )}
 
-                    {/* Phone */}
                     {client.telefono && (
                         <div className="flex items-center justify-center gap-1 mt-1">
                             <Phone size={11} className="text-gray-300 shrink-0" />
@@ -126,7 +121,6 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
                     )}
                 </div>
 
-                {/* Category badge */}
                 {catClass && (
                     <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${catClass}`}>
                         {client.categoria}
@@ -134,7 +128,6 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
                 )}
             </button>
 
-            {/* Footer actions */}
             <div className="flex items-center border-t border-gray-50 divide-x divide-gray-50">
                 <button
                     onClick={() => onEdit(client)}
@@ -247,7 +240,6 @@ export default function Page() {
     return (
         <div className="w-full p-8">
 
-            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                     <h1 className="font-bold text-[#1F4363] text-2xl">Clientes</h1>
@@ -269,17 +261,16 @@ export default function Page() {
                         <Upload size={16} />
                         Importar Excel
                     </Button>
-                    <Button
-                        onClick={() => setShowForm(true)}
-                        className="flex items-center gap-2 bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
+                    <Link
+                        href={"/dashboard/clientes/crear"}
+                        className="flex items-center gap-2 p-2 rounded-lg bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
                     >
                         <Plus size={16} />
                         Nuevo Cliente
-                    </Button>
+                    </Link>
                 </div>
             </div>
 
-            {/* Search */}
             <div className="relative max-w-sm mb-6">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <Input
@@ -290,7 +281,6 @@ export default function Page() {
                 />
             </div>
 
-            {/* Grid */}
             {loading ? (
                 <div className="flex items-center justify-center h-56">
                     <Loader2 className="animate-spin text-[#1F4363]" size={32} />

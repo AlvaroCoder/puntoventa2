@@ -36,7 +36,7 @@ import ReceiptLongIcon   from '@mui/icons-material/ReceiptLong'
 
 const ALL_ITEMS = [
     { label:'Clientes',                    module:'Clientes',      href:'/dashboard/clientes',          Icon:PeopleIcon,        bg:'#1F4363', type:'module' },
-    { label:'Agregar Nuevo Cliente',       module:'Clientes',      href:'/dashboard/clientes/create',          Icon:PersonAddIcon,     bg:'#1F4363', type:'action' },
+    { label:'Agregar Nuevo Cliente',       module:'Clientes',      href:'/dashboard/clientes/crear',          Icon:PersonAddIcon,     bg:'#1F4363', type:'action' },
     { label:'Nuevo Crédito',               module:'Clientes',      href:'/dashboard/bd/clientes',          Icon:AddIcon,           bg:'#1F4363', type:'action' },
     { label:'Buscar Crédito',              module:'Clientes',      href:'/dashboard/bd/clientes',          Icon:SearchMuiIcon,     bg:'#1F4363', type:'action' },
     { label:'Editar Cliente',              module:'Clientes',      href:'/dashboard/bd/clientes',          Icon:EditIcon,          bg:'#1F4363', type:'action' },
@@ -87,10 +87,10 @@ const NIVEL_LABEL = {
 const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804945/LOGO/01_lbpeuw.png"
 
 function CommandPalette({ open, onClose }) {
-    const router       = useRouter()
-    const inputRef     = useRef(null)
-    const listRef      = useRef(null)
-    const itemRefs     = useRef([])
+    const router = useRouter()
+    const inputRef = useRef(null)
+    const listRef = useRef(null)
+    const itemRefs = useRef([])
     const [query, setQuery]             = useState('')
     const [selectedIdx, setSelectedIdx] = useState(0)
 
