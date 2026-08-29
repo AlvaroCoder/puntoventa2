@@ -28,7 +28,7 @@ const NIVEL_LABEL = {
 }
 
 const NAV_LINKS = [
-    { href: '/dashboard/bd',    label: 'Base de datos', Icon: Database    },
+    { href: '/dashboard/bd',    label: 'Dashboard', Icon: Database    },
     { href: '/dashboard/graph', label: 'Gráficos',      Icon: TrendingUp  },
 ]
 
