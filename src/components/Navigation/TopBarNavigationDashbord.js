@@ -273,10 +273,10 @@ export default function TopBarNavigationDashbord() {
 
             <button
                 onClick={openPalette}
-                className="flex items-center gap-2 w-64 px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-400 hover:border-[#1F4363]/30 hover:bg-white transition-colors"
+                className="flex items-center gap-2 w-[500px] px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-400 hover:border-[#1F4363]/30 hover:bg-white transition-colors"
             >
                 <Search size={14} className="shrink-0" />
-                <span className="flex-1 text-left text-gray-400">Buscar...</span>
+                <span className="flex-1 text-left text-gray-400">Buscar funcionalidad...</span>
                 <div className="flex items-center gap-0.5 shrink-0">
                     <kbd className="bg-white border border-gray-200 text-gray-400 text-[10px] px-1.5 py-0.5 rounded font-mono leading-none">⌘</kbd>
                     <kbd className="bg-white border border-gray-200 text-gray-400 text-[10px] px-1.5 py-0.5 rounded font-mono leading-none">K</kbd>
