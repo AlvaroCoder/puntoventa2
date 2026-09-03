@@ -13,6 +13,9 @@ import ImportExcelModal from '@/components/Modal/ImportExcelModal'
 import { getClientesByEmpresa, deleteCliente } from '@/Connections/clientes'
 import Image from 'next/image'
 import Link from 'next/link'
+import PrimaryButton from '@/components/Buttons/PrimaryButton'
+import NegativeButton from '@/components/Buttons/NegativeButton'
+import { useRouter } from 'next/navigation'
 
 const CATEGORIA_BADGE = {
     RESPONSABLE: 'bg-green-100 text-green-700',
@@ -179,7 +182,7 @@ function EmptyState({ query }) {
 
 export default function Page() {
     const { user } = useAuth()
-
+    const router = useRouter();
     const [dataClient, setDataClient]     = useState([])
     const [loading, setLoading]           = useState(true)
     const [queryInput, setQueryInput]     = useState('')
@@ -253,21 +256,16 @@ export default function Page() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => setShowImport(true)}
-                        className="flex items-center gap-2 border-[#1F4363] text-[#1F4363] hover:bg-[#1F4363] hover:text-white transition-colors"
+                    <NegativeButton
+                        handleClick={() => setShowImport(true)}
                     >
-                        <Upload size={16} />
                         Importar Excel
-                    </Button>
-                    <Link
-                        href={"/dashboard/clientes/crear"}
-                        className="flex items-center gap-2 p-2 rounded-lg bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
+                    </NegativeButton>
+                    <PrimaryButton
+                        handleClick={()=>router.push("/dashboard/clientes/crear")}
                     >
-                        <Plus size={16} />
                         Nuevo Cliente
-                    </Link>
+                    </PrimaryButton>
                 </div>
             </div>
 

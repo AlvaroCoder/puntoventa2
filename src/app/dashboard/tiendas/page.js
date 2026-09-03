@@ -11,10 +11,12 @@ import TableTiendas from '@/components/Tables/TableTiendas'
 import SliderFormTienda from '@/components/Forms/SliderFormTienda'
 import AddIcon from '@mui/icons-material/Add'
 import { Title } from '@/components/Titles/Title'
+import PrimaryButton from '@/components/Buttons/PrimaryButton'
+import { useRouter } from 'next/navigation'
 
 export default function PageTiendas() {
     const { user } = useAuth()
-
+    const router = useRouter();
     const [tiendas, setTiendas] = useState([])
     const [loading, setLoading]       = useState(true)
     const [query, setQuery]           = useState('')
@@ -49,15 +51,6 @@ export default function PageTiendas() {
         )
     }, [tiendas, query])
 
-    const handleAddSuccess = nueva => {
-        setTiendas(prev => [nueva, ...prev])
-        setShowForm(false)
-    }
-
-    const handleUpdateSuccess = actualizada => {
-        setTiendas(prev => prev.map(t => t.id === actualizada.id ? actualizada : t))
-        setTiendaEdit(null)
-    }
 
     const handleEdit = tienda => {
         setTiendaEdit(tienda)
@@ -94,13 +87,11 @@ export default function PageTiendas() {
                     <Title>Tiendas</Title>
                     <p className="text-sm text-gray-400">Administra las tiendas o locales de tu empresa</p>
                 </div>
-                <Button
-                    onClick={() => { setTiendaEdit(null); setShowForm(true) }}
-                    className="flex items-center gap-2 bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
+                <PrimaryButton
+                    handleClick={()=>router.push("/dashboard/tiendas/crear")}
                 >
-                    <AddIcon style={{ fontSize: 18 }} />
                     Nueva Tienda
-                </Button>
+                </PrimaryButton>
             </div>
 
             <div className="relative max-w-sm mb-4">
@@ -126,14 +117,6 @@ export default function PageTiendas() {
                     onToggleEstado={handleToggleEstado}
                 />
             </motion.div>
-
-            <SliderFormTienda
-                open={showForm}
-                onClose={() => { setShowForm(false); setTiendaEdit(null) }}
-                tiendaData={tiendaEdit}
-                onAddSuccess={handleAddSuccess}
-                onUpdateSuccess={handleUpdateSuccess}
-            />
 
         </div>
     )

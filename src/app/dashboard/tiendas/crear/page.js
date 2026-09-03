@@ -10,6 +10,8 @@ import { useAuth } from '@/Context/AuthContext'
 import { createTienda } from '@/Connections/tiendas'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Field } from '@/components/Inputs/Field'
+import { IconInput } from '@/components/Inputs/IconInput'
 
 const INITIAL = {
     nombre: '',
@@ -20,29 +22,6 @@ const INITIAL = {
     fecha_apertura: '',
 }
 
-function Field({ label, required, error, children }) {
-    return (
-        <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                {label}{required && <span className="text-red-400 ml-0.5">*</span>}
-            </label>
-            {children}
-            {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
-        </div>
-    )
-}
-
-function IconInput({ icon: Icon, error, ...props }) {
-    return (
-        <div className="relative">
-            <Icon size={14} className="absolute left-3 top-3 text-gray-400 pointer-events-none" />
-            <Input
-                {...props}
-                className={`pl-9 focus-visible:ring-[#FF821E]/30 focus-visible:border-[#FF821E] ${error ? 'border-red-400' : ''}`}
-            />
-        </div>
-    )
-}
 
 export default function CreateTiendaPage() {
     const { user }  = useAuth()
@@ -114,23 +93,10 @@ export default function CreateTiendaPage() {
                     <span className="text-[#1F4363] font-semibold">Nueva Tienda</span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        onClick={() => router.push('/dashboard/tiendas')}
-                        className="flex items-center gap-1.5 border-gray-200 text-gray-500 hover:bg-gray-50"
-                    >
-                        <ArrowLeft size={15} />
-                        Cancelar
-                    </Button>
-                    <SaveBtn />
-                </div>
             </div>
 
-            {/* Tarjeta principal */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-                {/* Header de la tarjeta */}
                 <div className="flex items-center gap-4 px-8 pt-7 pb-6 border-b border-gray-100">
                     <div className="w-12 h-12 rounded-xl bg-[#FE811F]/10 flex items-center justify-center shrink-0">
                         <Store size={22} className="text-[#FE811F]" />
@@ -147,13 +113,11 @@ export default function CreateTiendaPage() {
                         {errors.nombre && (
                             <p className="text-xs text-red-500 mt-1">{errors.nombre}</p>
                         )}
-                        <p className="text-xs text-gray-400 mt-1">Empresa ID: {user?.empresa_id ?? '—'}</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 px-8 py-7">
 
-                    {/* Columna izquierda */}
                     <div className="flex flex-col gap-5">
 
                         <Field label="Código de tienda" required error={errors.codigo}>
@@ -192,7 +156,6 @@ export default function CreateTiendaPage() {
 
                     </div>
 
-                    {/* Columna derecha */}
                     <div className="flex flex-col gap-5">
 
                         <Field label="Responsable">

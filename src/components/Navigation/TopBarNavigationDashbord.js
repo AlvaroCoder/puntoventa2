@@ -60,6 +60,7 @@ const ALL_ITEMS = [
     { label:'Escanear Nuevo Producto',     module:'Inventario',     href:'/dashboard/bd/inventario',        Icon:QrCode2Icon,       bg:'#1F4363', type:'action' },
     { label:'Eliminar Producto',           module:'Inventario',     href:'/dashboard/bd/inventario',        Icon:RemoveIcon,        bg:'#1F4363', type:'action' },
 
+
     { label: 'Tiendas', module: 'Tiendas', href: '/dashboard/tiendas', Icon: StorefrontIcon, bg: '#FE811F', type: 'module' },
     { label:'Nueva Tienda',                module:'Tiendas',        href:'/dashboard/tiendas/crear',           Icon:AddIcon,           bg:'#FE811F', type:'action' },
     { label:'Buscar Tienda',               module:'Tiendas',        href:'/dashboard/tiendas',           Icon:SearchMuiIcon,     bg:'#FE811F', type:'action' },
