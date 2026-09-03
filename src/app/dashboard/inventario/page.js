@@ -201,7 +201,7 @@ export default function PageInventarioGraph() {
                 <div className="flex items-center gap-2 flex-wrap">
  
                     <Button
-                        onClick={() => { router.push("/dashboard/bd/inventario/create") }}
+                        onClick={() => { router.push("/dashboard/inventario/crear") }}
                         className="flex items-center gap-2 bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
                     >
                         <AddIcon style={{ fontSize: 18 }} />
