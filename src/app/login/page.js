@@ -32,7 +32,6 @@ const SLIDES = [
     },
 ]
 
-/* ── Decoración de arcos (SVG) ────────────────────────────────────────── */
 function ArcDecoration() {
     return (
         <svg
@@ -55,7 +54,6 @@ function ImagePlaceholder({ imgSrc, imgAlt }) {
     return (
         <div className="relative w-full rounded-2xl overflow-hidden bg-white/10 border border-white/15"
              style={{ aspectRatio: '16/9' }}>
-            {/* Cuando tengas la imagen real, reemplaza este bloque por <Image ... /> */}
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeOpacity="0.5">
@@ -70,7 +68,6 @@ function ImagePlaceholder({ imgSrc, imgAlt }) {
     )
 }
 
-/* ── Panel derecho con slider ─────────────────────────────────────────── */
 function MarketingPanel() {
     const [current, setCurrent] = useState(0)
 
@@ -97,7 +94,6 @@ function MarketingPanel() {
                 </span>
             </div>
 
-            {/* Slide content */}
             <div className="relative z-10 flex-1 flex flex-col justify-center gap-7 py-8">
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -149,6 +145,8 @@ function MarketingPanel() {
 }
 
 export default function LoginPage() {
+    const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804945/LOGO/01_lbpeuw.png"
+
     const { loginUser } = useAuth()
     const router = useRouter()
     const [formData, setFormData] = useState({ email: '', password: '' })
@@ -186,7 +184,7 @@ export default function LoginPage() {
                     {/* Logo mobile (oculto en desktop) */}
                     <div className="flex items-center gap-2 mb-10 lg:hidden">
                         <Image
-                            src="https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
+                            src={URL_LOGO   }
                             alt="Logo"
                             width={72}
                             height={28}

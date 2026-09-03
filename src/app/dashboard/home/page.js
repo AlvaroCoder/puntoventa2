@@ -14,8 +14,8 @@ const MODULES = [
     { id:'clientes',  title:'Clientes',       subtitle:'Clientes y créditos',       href:'/dashboard/clientes',    Icon:PeopleIcon,        bg:'#1F4363', hover:'#1a3557' },
     { id:'ventas',    title:'Ventas',          subtitle:'Registro de ventas',         href:'/dashboard/bd/ventas',      Icon:ShoppingCartIcon,  bg:'#FE811F', hover:'#e5731a' },
     { id:'logistica', title:'Logística',       subtitle:'Órdenes y mercancía',        href:'/dashboard/bd/logistica',   Icon:LocalShippingIcon, bg:'#1B8D7C', hover:'#167567' },
-    { id:'inventario',title:'Inventario',      subtitle:'Productos y stock',          href:'/dashboard/bd/inventario',  Icon:InventoryIcon,     bg:'#1F4363', hover:'#1a3557' },
-    { id:'tiendas',   title:'Tiendas',         subtitle:'Gestión de sucursales',      href:'/dashboard/bd/tiendas',     Icon:StorefrontIcon,    bg:'#FE811F', hover:'#e5731a' },
+    { id:'inventario',title:'Inventario',      subtitle:'Productos y stock',          href:'/dashboard/inventario',  Icon:InventoryIcon,     bg:'#1F4363', hover:'#1a3557' },
+    { id:'tiendas',   title:'Tiendas',         subtitle:'Gestión de sucursales',      href:'/dashboard/tiendas',     Icon:StorefrontIcon,    bg:'#FE811F', hover:'#e5731a' },
     { id:'sunat',     title:'SUNAT/NUBEFACT',  subtitle:'Facturación electrónica',    href:'/dashboard/bd/clientes',    Icon:ReceiptLongIcon,   bg:'#1B8D7C', hover:'#167567' },
     { id:'personal',  title:'Personal',        subtitle:'Gestión de empleados',       href:'/dashboard/bd/trabajadores',Icon:BadgeIcon,         bg:'#1F4363', hover:'#1a3557' },
 ]
@@ -57,12 +57,10 @@ function ModuleTile({ title, subtitle, href, Icon, bg, hover }) {
     )
 }
 
-/* ── Página principal ─────────────────────────────────────────────────── */
 export default function HomePage() {
     const { user }  = useAuth()
     const [now, setNow] = useState(new Date())
 
-    /* Reloj */
     useEffect(() => {
         const id = setInterval(() => setNow(new Date()), 60_000)
         return () => clearInterval(id)

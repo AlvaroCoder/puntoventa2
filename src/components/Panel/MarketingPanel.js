@@ -18,7 +18,7 @@ const FEATURES = [
 ];
 export default function MarketingPanel() {
     const URL_LOGO   = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
-    const URL_BG     = "https://res.cloudinary.com/dzfrrapfk/image/upload/v1787546104/Screenshot_2026-08-18_at_23.31.08_oahtir.png"
+    const URL_BG = "https://res.cloudinary.com/dzfrrapfk/image/upload/v1787546104/Screenshot_2026-08-18_at_23.31.08_oahtir.png"
 
   return (
     <div className="relative hidden md:flex md:w-[42%] flex-col overflow-hidden">

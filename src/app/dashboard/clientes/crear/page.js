@@ -38,7 +38,6 @@ const TABS = [
     { id: 'historial', label: 'Historial de compras', Icon: ShoppingBag },
 ]
 
-/* ── Selector de campo con label ──────────────────────────────── */
 function Field({ label, required, error, children }) {
     return (
         <div className="flex flex-col gap-1.5">
@@ -70,7 +69,6 @@ function Select({ name, value, onChange, options }) {
     )
 }
 
-/* ── Sección de Crédito (maqueta) ─────────────────────────────── */
 function CreditoTab() {
     return (
         <div className="py-6">
@@ -99,7 +97,6 @@ function CreditoTab() {
     )
 }
 
-/* ── Sección de Historial (maqueta) ───────────────────────────── */
 function HistorialTab() {
     return (
         <div className="py-6">
@@ -114,7 +111,6 @@ function HistorialTab() {
     )
 }
 
-/* ── Página principal ─────────────────────────────────────────── */
 export default function CreateClientPage() {
     const { user }   = useAuth()
     const router     = useRouter()
@@ -173,7 +169,6 @@ export default function CreateClientPage() {
     return (
         <div className="w-full max-w-4xl mx-auto px-6 py-8">
 
-            {/* Breadcrumb + acciones */}
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Link href="/dashboard/clientes" className="hover:text-[#1F4363] transition-colors font-medium">
@@ -187,7 +182,7 @@ export default function CreateClientPage() {
                     <Button
                         variant="outline"
                         onClick={() => router.push('/dashboard/clientes')}
-                        className="flex items-center gap-1.5 border-gray-200 text-gray-500 hover:bg-gray-50"
+                        className="flex items-center gap-1.5 border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-azulMarino"
                     >
                         <ArrowLeft size={15} />
                         Cancelar

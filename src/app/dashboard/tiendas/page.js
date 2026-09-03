@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import TableTiendas from '@/components/Tables/TableTiendas'
 import SliderFormTienda from '@/components/Forms/SliderFormTienda'
 import AddIcon from '@mui/icons-material/Add'
+import { Title } from '@/components/Titles/Title'
 
 export default function PageTiendas() {
     const { user } = useAuth()
@@ -48,7 +49,6 @@ export default function PageTiendas() {
         )
     }, [tiendas, query])
 
-    // ── Handlers ──
     const handleAddSuccess = nueva => {
         setTiendas(prev => [nueva, ...prev])
         setShowForm(false)
@@ -87,12 +87,12 @@ export default function PageTiendas() {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full p-8">
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="font-bold text-[#1F4363] text-2xl">Tiendas</h1>
-                    <p className="text-sm text-gray-400">Administra las tiendas de tu empresa</p>
+                    <Title>Tiendas</Title>
+                    <p className="text-sm text-gray-400">Administra las tiendas o locales de tu empresa</p>
                 </div>
                 <Button
                     onClick={() => { setTiendaEdit(null); setShowForm(true) }}
