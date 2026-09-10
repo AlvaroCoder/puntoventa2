@@ -29,7 +29,6 @@ const INITIAL = {
     descripcion: '',
 }
 
-/* ── Select estilizado ────────────────────────────────────────── */
 function StyledSelect({ name, value, onChange, options, placeholder, error }) {
     return (
         <div className="relative">
@@ -64,7 +63,6 @@ export default function Page() {
     const [tiendas, setTiendas] = useState([])
     const [loadingTiendas, setLoadingTiendas] = useState(true)
 
-    /* Cargar tiendas de la empresa */
     useEffect(() => {
         if (!user?.empresa_id) return
         async function fetchTiendas() {
@@ -161,10 +159,7 @@ export default function Page() {
                 </div>
             </div>
 
-            {/* Tarjeta principal */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-
-                {/* Header con nombre */}
                 <div className="flex items-center gap-4 px-8 pt-7 pb-6 border-b border-gray-100">
                     <div className="w-12 h-12 rounded-xl bg-[#1F4363]/8 flex items-center justify-center shrink-0">
                         <Warehouse size={22} className="text-[#1F4363]" />
@@ -186,10 +181,8 @@ export default function Page() {
                     </div>
                 </div>
 
-                {/* Campos */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 px-8 py-7">
 
-                    {/* Tienda */}
                     <Field label="Tienda" required error={errors.tiendaId}>
                         {loadingTiendas ? (
                             <div className="h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center px-3 gap-2">
@@ -208,7 +201,6 @@ export default function Page() {
                         )}
                     </Field>
 
-                    {/* Código */}
                     <Field label="Código de almacén" required error={errors.codigo}>
                         <IconInput
                             icon={Hash}
@@ -221,7 +213,6 @@ export default function Page() {
                         />
                     </Field>
 
-                    {/* Tipo */}
                     <Field label="Tipo de almacén" required error={errors.tipo}>
                         <StyledSelect
                             name="tipo"
@@ -237,7 +228,6 @@ export default function Page() {
                         )}
                     </Field>
 
-                    {/* Descripción */}
                     <Field label="Descripción" error={errors.descripcion}>
                         <IconInput
                             icon={Text}

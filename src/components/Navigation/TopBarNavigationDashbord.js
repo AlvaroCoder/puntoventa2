@@ -85,7 +85,7 @@ const NIVEL_LABEL = {
     0:   { label: 'Invitado',      color: 'bg-gray-100 text-gray-400'       },
 }
 
-const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804945/LOGO/01_lbpeuw.png"
+const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804947/LOGO/positivo_co0kxc.png"
 
 function CommandPalette({ open, onClose }) {
     const router = useRouter()
@@ -258,16 +258,16 @@ export default function TopBarNavigationDashbord() {
     }, [])
 
     return (
-        <nav className="w-full h-16 bg-white sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
+        <nav className="w-full h-16 bg-azulMarino sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
 
-            <Link href="/dashboard/home" className="flex items-center gap-2.5">
+            <Link href="/dashboard" className="flex items-center gap-2.5">
                 <Image
                     src={URL_LOGO}
                     alt="Logo Punto de Venta 360"
                     width={44}
                     height={44}
                 />
-                <span className="text-sm font-bold text-azulMarino">
+                <span className="text-sm font-bold text-grisClaro tracking-wide">
                     Punto de Venta <span className="text-verdeAgua">360</span>
                 </span>
             </Link>

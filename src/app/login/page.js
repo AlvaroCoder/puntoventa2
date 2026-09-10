@@ -79,19 +79,16 @@ function MarketingPanel() {
     const slide = SLIDES[current]
 
     return (
-        <div className="relative flex-1 h-full bg-[#1F4363] flex flex-col justify-between px-10 py-12 overflow-hidden">
+        <div className="relative flex-1 h-full bg-azulMarino flex flex-col justify-between px-10 py-12 overflow-hidden">
             <ArcDecoration />
 
             <div className="relative z-10 flex items-center gap-2.5">
                 <Image
-                    src="https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
+                    src="https://res.cloudinary.com/dabyqnijl/image/upload/v1788581912/05_tec1bo.png"
                     alt="Punto de Venta 360"
-                    width={80}
-                    height={32}
+                    width={200}
+                    height={180}
                 />
-                <span className="text-white font-bold text-base">
-                    Punto de Venta <span className="text-[#FE811F]">360</span>
-                </span>
             </div>
 
             <div className="relative z-10 flex-1 flex flex-col justify-center gap-7 py-8">
@@ -109,8 +106,8 @@ function MarketingPanel() {
 
                         {/* Texto */}
                         <div className="flex flex-col gap-3">
-                            <span className="inline-flex items-center gap-1.5 w-fit bg-[#FE811F]/20 text-[#FE811F] text-xs font-semibold px-3 py-1 rounded-full">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#FE811F]" />
+                            <span className="inline-flex items-center gap-1.5 w-fit bg-verdeAgua/20 text-verdeAgua text-xs font-semibold px-3 py-1 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-verdeAgua" />
                                 {slide.tag}
                             </span>
                             <h2 className="text-white font-bold text-2xl leading-snug">
@@ -132,7 +129,7 @@ function MarketingPanel() {
                             onClick={() => setCurrent(i)}
                             className={`rounded-full transition-all duration-300 ${
                                 i === current
-                                    ? 'w-5 h-2 bg-[#FE811F]'
+                                    ? 'w-5 h-2 bg-azulClaro'
                                     : 'w-2 h-2 bg-white/25 hover:bg-white/40'
                             }`}
                         />
@@ -145,7 +142,7 @@ function MarketingPanel() {
 }
 
 export default function LoginPage() {
-    const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804945/LOGO/01_lbpeuw.png"
+    const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1788581897/01_bl0vpw.png"
 
     const { loginUser } = useAuth()
     const router = useRouter()
@@ -177,26 +174,22 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex">
 
-            {/* ── Panel izquierdo: formulario ─────────────────────────── */}
             <div className="w-full lg:w-[45%] flex items-center justify-center px-8 py-12 bg-white">
                 <div className="w-full max-w-[360px]">
 
                     {/* Logo mobile (oculto en desktop) */}
                     <div className="flex items-center gap-2 mb-10 lg:hidden">
                         <Image
-                            src={URL_LOGO   }
+                            src={URL_LOGO}
                             alt="Logo"
-                            width={72}
-                            height={28}
+                            width={150}
+                            height={100}
                         />
-                        <span className="font-bold text-[#1F4363]">
-                            Punto de Venta <span className="text-[#FE811F]">360</span>
-                        </span>
                     </div>
 
                     {/* Encabezado */}
                     <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-[#1F4363]">Iniciar sesión</h1>
+                        <h1 className="text-2xl font-bold text-azulMarino">Iniciar sesión</h1>
                         <p className="text-gray-400 text-sm mt-1">Qué bueno verte de nuevo.</p>
                     </div>
 
@@ -254,7 +247,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-[#FE811F] text-white font-bold py-3.5 rounded-xl hover:bg-[#e5731a] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait mt-1"
+                            className="w-full bg-verdeAgua text-white font-bold py-3.5 rounded-xl hover:bg-[#e5731a] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait mt-1"
                         >
                             {isLoading
                                 ? <><Loader2 size={17} className="animate-spin" /> Ingresando...</>
@@ -266,7 +259,7 @@ export default function LoginPage() {
 
                     <p className="text-center text-xs text-gray-400 mt-8">
                         ¿No tienes cuenta?{' '}
-                        <Link href="/signup" className="text-[#FE811F] font-semibold hover:underline">
+                        <Link href="/signup" className="text-azulClaro font-semibold hover:underline">
                             Crear cuenta gratis
                         </Link>
                     </p>
