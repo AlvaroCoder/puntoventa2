@@ -6,14 +6,12 @@ import PeopleIcon        from '@mui/icons-material/People'
 import ShoppingCartIcon  from '@mui/icons-material/ShoppingCart'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import InventoryIcon     from '@mui/icons-material/Inventory'
-import StorefrontIcon    from '@mui/icons-material/Storefront'
 import ReceiptLongIcon   from '@mui/icons-material/ReceiptLong'
 import BadgeIcon         from '@mui/icons-material/Badge'
-import { Warehouse } from 'lucide-react'
 
 const MODULES = [
     { id:'clientes',  title:'Clientes', subtitle:'Clientes y créditos', href:'/dashboard/clientes',    Icon:PeopleIcon,        bg:'#1F4363', hover:'#1a3557' },
-    { id:'ventas',    title:'Ventas', subtitle:'Registro de ventas', href:'/dashboard/bd/ventas',      Icon:ShoppingCartIcon,  bg:'#FE811F', hover:'#e5731a' },
+    { id:'ventas',    title:'Ventas', subtitle:'Registro de ventas', href:'/dashboard/ventas',      Icon:ShoppingCartIcon,  bg:'#FE811F', hover:'#e5731a' },
     { id:'logistica', title:'Logística', subtitle:'Ordenes de compra y entradas', href:'/dashboard/logistica',   Icon:LocalShippingIcon, bg:'#1B8D7C', hover:'#167567' },
     { id:'inventario',title:'Inventario', subtitle:'Productos y stock', href:'/dashboard/inventario',  Icon:InventoryIcon,     bg:'#1F4363', hover:'#1a3557' },
     { id: 'personal', title: 'Personal', subtitle: 'Gestión de empleados', href: '/dashboard/trabajadores', Icon: BadgeIcon, bg: '#1F4363', hover: '#1a3557' },

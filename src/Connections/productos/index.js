@@ -46,3 +46,7 @@ export async function getCategorias() {
 export async function getInventarioByTienda(tiendaId) {
     return fetchWithAuth(ENDPOINTS_INVENTARIO.getStockByTienda(tiendaId))
 }
+
+export async function getInventarioByAlmacen(almacenId) {
+    return fetchWithAuth(ENDPOINTS_INVENTARIO.getStockByAlmacen(almacenId))
+}

@@ -1,18 +1,16 @@
 'use client'
 import React, { useEffect, useState, useMemo } from 'react'
 import { toast } from 'react-toastify'
-import { Loader2, Upload, Search, Plus, Users, Mail, Phone, Pencil, Trash2, MoreHorizontal } from 'lucide-react'
+import { Loader2, Search, Users, Mail, Phone, Pencil, Trash2, MoreHorizontal } from 'lucide-react'
 import { useAuth } from '@/Context/AuthContext'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
 import SliderFormNewClient from '@/components/Forms/SliderFormNewClient'
 import SliderFormEditClient from '@/components/Forms/SliderFormEditClient'
 import SliderClientData from '@/components/Cards/SliderClientData'
 import ImportExcelModal from '@/components/Modal/ImportExcelModal'
 import { getClientesByEmpresa, deleteCliente } from '@/Connections/clientes'
 import Image from 'next/image'
-import Link from 'next/link'
 import PrimaryButton from '@/components/Buttons/PrimaryButton'
 import NegativeButton from '@/components/Buttons/NegativeButton'
 import { useRouter } from 'next/navigation'
@@ -33,13 +31,8 @@ const TIPO_DOC_BADGE = {
 }
 
 const AVATAR_COLORS = [
-    '#1F4363',
-    '#1B8D7C',
-    '#FE811F',
-    '#6366f1',
-    '#0891b2',
-    '#7c3aed',
-    '#be185d',
+    '#1F4363', '#1B8D7C', '#FE811F',
+    '#6366f1', '#0891b2', '#7c3aed', '#be185d',
 ]
 
 function getAvatarColor(name = '') {
@@ -50,11 +43,11 @@ function getAvatarColor(name = '') {
 function ClientCard({ client, onSelect, onEdit, onDelete }) {
     const [menuOpen, setMenuOpen] = useState(false)
 
-    const nombre    = client.nombre_completo ?? '—'
-    const initials  = nombre.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('')
-    const avatarBg  = getAvatarColor(nombre)
-    const catClass  = CATEGORIA_BADGE[client.categoria] ?? null
-    const docClass  = TIPO_DOC_BADGE[client.tipo_documento] ?? 'bg-gray-100 text-gray-500'
+    const nombre   = client.nombre_completo ?? '—'
+    const initials = nombre.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('')
+    const avatarBg = getAvatarColor(nombre)
+    const catClass = CATEGORIA_BADGE[client.categoria] ?? null
+    const docClass = TIPO_DOC_BADGE[client.tipo_documento] ?? 'bg-gray-100 text-gray-500'
 
     const handleDelete = async () => {
         setMenuOpen(false)
@@ -163,7 +156,10 @@ function ClientCard({ client, onSelect, onEdit, onDelete }) {
 
 function EmptyState({ query }) {
     return (
-        <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
+        <div
+            className="flex flex-col items-center justify-center py-20 gap-3 text-center bg-white rounded-xl"
+            style={{ border: '0.5px solid rgba(31,47,87,0.12)' }}
+        >
             <div className="w-14 h-14 rounded-2xl bg-[#1F4363]/5 flex items-center justify-center">
                 <Users size={24} className="text-[#1F4363]/40" />
             </div>
@@ -182,18 +178,17 @@ function EmptyState({ query }) {
 
 export default function Page() {
     const { user } = useAuth()
-    const router = useRouter();
-    const [dataClient, setDataClient]     = useState([])
-    const [loading, setLoading]           = useState(true)
-    const [queryInput, setQueryInput]     = useState('')
+    const router = useRouter()
+    const [dataClient, setDataClient]         = useState([])
+    const [loading, setLoading]               = useState(true)
+    const [queryInput, setQueryInput]         = useState('')
     const [clientSelected, setClientSelected] = useState(null)
-    const [clientToEdit, setClientToEdit] = useState(null)
-    const [showForm, setShowForm]         = useState(false)
-    const [showImport, setShowImport]     = useState(false)
+    const [clientToEdit, setClientToEdit]     = useState(null)
+    const [showForm, setShowForm]             = useState(false)
+    const [showImport, setShowImport]         = useState(false)
 
     useEffect(() => {
         if (!user?.access_token) return
-
         async function getData() {
             try {
                 const res = await getClientesByEmpresa(user.empresa_id)
@@ -214,74 +209,71 @@ export default function Page() {
         ),
     [dataClient, queryInput])
 
-    const handleAddClient = newClient => {
-        setDataClient(prev => [newClient, ...prev])
-        setShowForm(false)
-    }
-
-    const handleEditFromTable = cliente => {
-        setClientSelected(null)
-        setClientToEdit(cliente)
-    }
-
-    const handleEditFromPanel = cliente => {
-        setClientSelected(null)
-        setClientToEdit(cliente)
-    }
-
-    const handleUpdateClient = updatedClient => {
-        setDataClient(prev =>
-            prev.map(c => c.id === updatedClient.id ? updatedClient : c)
-        )
-        setClientToEdit(null)
-    }
-
-    const handleDeleteClient = deletedId => {
-        setDataClient(prev => prev.filter(c => c.id !== deletedId))
-    }
+    const handleAddClient    = newClient => { setDataClient(prev => [newClient, ...prev]); setShowForm(false) }
+    const handleEditFromTable = cliente  => { setClientSelected(null); setClientToEdit(cliente) }
+    const handleEditFromPanel = cliente  => { setClientSelected(null); setClientToEdit(cliente) }
+    const handleUpdateClient = updated  => { setDataClient(prev => prev.map(c => c.id === updated.id ? updated : c)); setClientToEdit(null) }
+    const handleDeleteClient = id       => { setDataClient(prev => prev.filter(c => c.id !== id)) }
 
     return (
-        <div className="w-full p-8">
+        <div className="p-6 flex flex-col gap-6 bg-[#E1E7F0] min-h-full">
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            {/* ── Encabezado + controles ───────────────────────────── */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+
+                {/* Título */}
                 <div>
-                    <h1 className="font-bold text-[#1F4363] text-2xl">Clientes</h1>
-                    <p className="text-sm text-gray-400">
+                    <h1 className="text-lg font-semibold" style={{ color: '#1F2F57' }}>
+                        Clientes
+                    </h1>
+                    <p className="text-xs mt-0.5 flex items-center gap-2" style={{ color: 'rgba(31,47,87,0.55)' }}>
                         Gestiona la cartera de tus clientes
                         {!loading && (
-                            <span className="ml-2 text-xs font-semibold bg-[#1F4363]/8 text-[#1F4363] px-2 py-0.5 rounded-full">
+                            <span
+                                className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                style={{ background: 'rgba(31,47,87,0.08)', color: '#1F2F57' }}
+                            >
                                 {dataClient.length}
                             </span>
                         )}
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <NegativeButton
-                        handleClick={() => setShowImport(true)}
+
+                {/* Controles */}
+                <div className="flex items-center gap-2 flex-wrap">
+
+                    {/* Buscador */}
+                    <div
+                        className="flex items-center gap-2 px-3 rounded-lg h-9 min-w-[220px]"
+                        style={{ background: '#fff', border: '0.5px solid rgba(31,47,87,0.18)' }}
                     >
+                        <Search size={14} color="rgba(31,47,87,0.4)" />
+                        <input
+                            value={queryInput}
+                            onChange={e => setQueryInput(e.target.value)}
+                            placeholder="Buscar por nombre o documento..."
+                            className="bg-transparent outline-none text-xs flex-1 placeholder:text-[rgba(31,47,87,0.35)]"
+                            style={{ color: '#1F2F57' }}
+                        />
+                    </div>
+
+                    {/* Importar */}
+                    <NegativeButton handleClick={() => setShowImport(true)}>
                         Importar Excel
                     </NegativeButton>
-                    <PrimaryButton
-                        handleClick={()=>router.push("/dashboard/clientes/crear")}
-                    >
+
+                    {/* Nuevo cliente */}
+                    <PrimaryButton handleClick={() => router.push('/dashboard/clientes/crear')}>
                         Nuevo Cliente
                     </PrimaryButton>
+
                 </div>
             </div>
 
-            <div className="relative max-w-sm mb-6">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <Input
-                    placeholder="Buscar por nombre o documento..."
-                    value={queryInput}
-                    onChange={e => setQueryInput(e.target.value)}
-                    className="pl-9 focus-visible:ring-[#FF821E]/30 focus-visible:border-[#FF821E]"
-                />
-            </div>
-
+            {/* ── Contenido ────────────────────────────────────────── */}
             {loading ? (
                 <div className="flex items-center justify-center h-56">
-                    <Loader2 className="animate-spin text-[#1F4363]" size={32} />
+                    <Loader2 className="animate-spin" size={32} style={{ color: '#1F2F57' }} />
                 </div>
             ) : filteredData.length === 0 ? (
                 <EmptyState query={queryInput} />
@@ -299,6 +291,7 @@ export default function Page() {
                 </div>
             )}
 
+            {/* ── Sidebars y modales ───────────────────────────────── */}
             <SliderClientData
                 open={!!clientSelected}
                 onClose={() => setClientSelected(null)}
@@ -323,6 +316,7 @@ export default function Page() {
                 open={showImport}
                 onClose={() => setShowImport(false)}
             />
+
         </div>
     )
 }

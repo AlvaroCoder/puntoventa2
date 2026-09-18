@@ -24,6 +24,7 @@ export const CAJA_ENDPOINTS = {
 
 export const INVENTARIO_ENDPOINTS = {
     getStockByTienda: (tiendaId) => `${BASE_INVENTARIO}/tienda/${tiendaId}`,
+    getStockByAlmacen: (almacenId) => `${BASE_INVENTARIO}/almacen/${almacenId}`,
     getStockByProducto: (tiendaId, productoId) => `${BASE_INVENTARIO}/producto/${productoId}/tienda/${tiendaId}`,
     getBajoStockProducto: (tiendaId) => `${BASE_INVENTARIO}/tienda/${tiendaId}/bajo-stock`,
     actualizarUbicacion : ()=> `${BASE_INVENTARIO}/ubicacion`,

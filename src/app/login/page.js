@@ -101,10 +101,7 @@ function MarketingPanel() {
                         transition={{ duration: 0.4, ease: 'easeOut' }}
                         className="flex flex-col gap-6"
                     >
-                        {/* Imagen maquetada */}
                         <ImagePlaceholder imgSrc={slide.imgSrc} imgAlt={slide.imgAlt} />
-
-                        {/* Texto */}
                         <div className="flex flex-col gap-3">
                             <span className="inline-flex items-center gap-1.5 w-fit bg-verdeAgua/20 text-verdeAgua text-xs font-semibold px-3 py-1 rounded-full">
                                 <span className="w-1.5 h-1.5 rounded-full bg-verdeAgua" />
@@ -167,7 +164,7 @@ export default function LoginPage() {
             setIsLoading(false)
         } else {
             loginUser(result.user)
-            router.push('/dashboard/home')
+            router.push('/dashboard')
         }
     }
 
@@ -177,7 +174,6 @@ export default function LoginPage() {
             <div className="w-full lg:w-[45%] flex items-center justify-center px-8 py-12 bg-white">
                 <div className="w-full max-w-[360px]">
 
-                    {/* Logo mobile (oculto en desktop) */}
                     <div className="flex items-center gap-2 mb-10 lg:hidden">
                         <Image
                             src={URL_LOGO}
