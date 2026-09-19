@@ -1,7 +1,7 @@
 'use client'
-import { AlertTriangle, MoreVertical, Package, Truck, Warehouse } from 'lucide-react'
+import { MoreVertical, Package, Truck, Warehouse } from 'lucide-react'
 import React, { useEffect, useState } from 'react';
-import { getInventarioByAlmacen } from '@/Connections/productos';
+import { getInventarioByAlmacen, getInventarioByTienda } from '@/Connections/productos';
 
 import Link from 'next/link';
 
@@ -30,16 +30,35 @@ function barColor(nivel) {
     return '#C0392B'                   
 }
 
-export default function AlmacenCard({ almacen }) {
-    const { id, nombre, codigo, transito, totales, stock_bajo, nivel } = almacen;
-    const [almacenData, setAlmacenData] =useState({
-        transito: transito || 0,
-        totales: totales || 0,
-        stock_bajo: stock_bajo || 0,
-        nivel: nivel || 0
-    });
+export default function CardDataInventario({ data, groupBySelected }) {
+    const { id, nombre, codigo, totales, nivel } = data;
 
     const bColor = barColor(nivel);
+    const [loading, setLoading] = useState(true);
+    const [inventarioData, setInventarioData] = useState(null);
+    const [cantProductos, setCantProductos] = useState(0);
+    useEffect(() => {
+        async function fetchInventario() { 
+            try {
+                let response;
+                if (groupBySelected === 'Almacen') { 
+                    response = await getInventarioByAlmacen(id);
+                } else {
+                    response = await getInventarioByTienda(id);
+                }
+                const data = response?.data || [];
+                setInventarioData(data);
+                setCantProductos(data?.totalElements || 0);
+            } catch (error) {
+                console.error('Error fetching inventory data:', error);
+            } finally {
+                setLoading(false);
+            }
+            
+        }
+        fetchInventario();
+    }, [groupBySelected, id]);
+
     return (
         <div
             className="bg-white rounded-xl p-5 flex flex-col gap-4"
@@ -71,9 +90,7 @@ export default function AlmacenCard({ almacen }) {
             </div>
 
             <div className="flex gap-2 flex-wrap">
-                <Chip icon={Truck}         value={transito}   label="Productos en tránsito" />
-                <Chip icon={Package}       value={totales}    label="Productos totales"      />
-                <Chip icon={AlertTriangle} value={stock_bajo} label="Stock bajo" alert={stock_bajo > 0} />
+                <Chip icon={Package} value={cantProductos} label="Productos totales" />
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -86,9 +103,9 @@ export default function AlmacenCard({ almacen }) {
                         style={{ color: bColor }}
                         aria-hidden
                     >
-                        {nivel}%
+                        {cantProductos}%
                     </span>
-                    <span className="sr-only">{nivel}% de nivel de stock</span>
+                    <span className="sr-only">{cantProductos}% de nivel de stock</span>
                 </div>
                 <div
                     className="w-full h-1.5 rounded-full"
@@ -96,7 +113,7 @@ export default function AlmacenCard({ almacen }) {
                 >
                     <div
                         className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${nivel}%`, backgroundColor: bColor }}
+                        style={{ width: `${cantProductos}%`, backgroundColor: bColor }}
                     />
                 </div>
             </div>

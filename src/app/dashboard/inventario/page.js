@@ -5,7 +5,7 @@ import {
     Search, Warehouse, LayoutGrid, List, ChevronDown,
     Loader2
 } from 'lucide-react'
-import AlmacenCard from '@/components/Cards/CardInventario'
+import CardDataInventario from '@/components/Cards/CardDataInventario'
 import { getAlmacenesByUser } from '@/Connections/almacen'
 import DropdownMenuGroup from './components/DropdownMenuGroup'
 import { getTiendasByUser } from '@/Connections/tiendas'
@@ -55,7 +55,6 @@ export default function PageInventarioResumen() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                    {/* Buscador */}
                     <div
                         className="flex items-center gap-2 px-3 rounded-lg h-9 min-w-[200px]"
                         style={{ background: '#fff', border: '0.5px solid rgba(31,47,87,0.18)' }}
@@ -70,7 +69,6 @@ export default function PageInventarioResumen() {
                         />
                     </div>
 
-                    {/* Toggle Kanban / Lista */}
                     <div
                         className="flex items-center rounded-lg overflow-hidden h-9"
                         style={{ border: '0.5px solid rgba(31,47,87,0.18)', background: '#fff' }}
@@ -103,7 +101,6 @@ export default function PageInventarioResumen() {
                 </div>
             </div>
 
-            {/* Grid de tarjetas */}
             {
                 loading ? (
                     <div className="flex items-center justify-center py-16">
@@ -112,7 +109,7 @@ export default function PageInventarioResumen() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {filtered.map(a => (
-                            <AlmacenCard key={a.id} almacen={a} />
+                            <CardDataInventario key={a.id} data={a} groupBySelected={groupBySelected} />
                         ))}
                     </div>
                 )

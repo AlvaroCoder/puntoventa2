@@ -47,7 +47,6 @@ export default function CrearProductoPage() {
     return (
         <div className="min-h-full bg-[#E1E7F0] px-8 py-10 flex flex-col">
 
-            {/* Encabezado */}
             <h1 className="text-2xl font-bold" style={{ color: '#1F2F57' }}>
                 ¿Cómo deseas ingresar tus productos?
             </h1>
