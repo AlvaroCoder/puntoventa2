@@ -1,11 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import React from 'react'
 import Link from 'next/link'
 import { Package } from 'lucide-react'
-import { useAuth } from '@/Context/AuthContext'
-import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import DropdownConfiguracion from './components/DropdownConfiguracion'
 import { Title } from '@/components/Titles/Title'
 import Text from '@/components/Titles/Text'

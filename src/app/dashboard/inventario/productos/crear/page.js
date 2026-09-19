@@ -78,7 +78,6 @@ export default function CrearProductoPage() {
                                 {descripcion}
                             </p>
 
-                            {/* Flecha */}
                             <div className="mt-6 flex justify-end">
                                 <div
                                     className="w-9 h-9 rounded-full flex items-center justify-center transition-transform group-hover:translate-x-0.5"

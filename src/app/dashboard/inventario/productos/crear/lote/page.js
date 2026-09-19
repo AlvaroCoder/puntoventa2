@@ -9,15 +9,13 @@ import {
 } from 'lucide-react';
 import {getAlmacenesByUser} from '@/Connections/almacen'
 import AlmacenCard from '../components/AlmacenCard';
-import SwitcherLoader from '../components/SwitcherLoader';
+import SwitcherLoader from '@/components/Navigation/SwitcherLoader';
 import { DrawerNuevoProducto } from '../components/DrawerNuevoProducto';
 
-/* ── Constantes ───────────────────────────────────────────────── */
 const TALLAS  = ['Única', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '29', '30', '31', '32', '33', '34', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 const COLORES = ['Único', 'Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Amarillo', 'Gris', 'Marrón', 'Naranja', 'Rosado']
 const PASOS = ['Seleccionar almacén', 'Ingresar productos']
 
-/* ── Stepper ──────────────────────────────────────────────────── */
 function Stepper({ paso }) {
     return (
         <div className="flex items-center">
@@ -55,10 +53,6 @@ function Stepper({ paso }) {
     )
 }
 
-/* ── Card de almacén seleccionable ────────────────────────────── */
-
-
-/* ── Helpers tabla ────────────────────────────────────────────── */
 function SelectCell({ value, onChange, options }) {
     return (
         <select
