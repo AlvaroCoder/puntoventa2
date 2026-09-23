@@ -7,6 +7,7 @@ import { createCategoriasProducto, getCategorias } from '@/Connections/productos
 import SwitcherLoader from '@/components/Navigation/SwitcherLoader'
 import { useAuth } from '@/Context/AuthContext'
 import {toast} from 'react-toastify'
+import InputFillable from '@/app/dashboard/inventario/productos/crear/components/InputFillable';
 function Field({ label, required, hint, children }) {
     return (
         <div className="grid items-start gap-6" style={{ gridTemplateColumns: '160px 1fr' }}>
@@ -156,18 +157,14 @@ export default function Page() {
                             <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(31,47,87,0.4)' }}>
                                 Categoría
                             </p>
-                            <input
+                            <InputFillable
                                 value={form.nombre}
-                                onChange={e => set('nombre', e.target.value)}
+                                keyValue={'nombre'}
+                                set={set}
                                 onFocus={() => setNombreFocused(true)}
-                                onBlur={() => setNombreFocused(false)}
-                                placeholder="Nombre de la categoría"
-                                className="text-[26px] font-bold outline-none bg-transparent w-full pb-1.5 transition-all placeholder:font-normal"
-                                style={{
-                                    color:       '#1F2F57',
-                                    borderBottom: `2px solid ${nombreFocused ? '#3960A9' : 'rgba(31,47,87,0.12)'}`,
-                                    caretColor:  '#3960A9',
-                                }}
+                                onBlur={() => setNombreFocused(false)}         
+                                placeholder='Nombre de la categoria'
+                                nombreFocused={nombreFocused}
                             />
                         </div>
 

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useMemo, useEffect } from 'react'
 import {
-    Search, Plus, Download, Tag, ChevronLeft, ChevronRight,
+    Search, Plus, Tag, ChevronLeft, ChevronRight,
     Trash2, X, FolderOpen
 } from 'lucide-react';
 
@@ -40,7 +40,7 @@ function PathDisplay({ path }) {
             {partes.map((parte, i) => (
                 <React.Fragment key={i} >
                     {i > 0 && (
-                        <span className="mx-1.5 select-none" style={{ color: 'rgba(31,47,87,0.25)' }}> / </span>
+                        <span className="mx-1.5 select-none" style={{ color: 'rgba(31,47,87,0.25)' }}>&quot; / &quot; </span>
                     )}
                     <span style={{ color: i === partes.length - 1 ? '#1F2F57' : 'rgba(31,47,87,0.45)' }}>
                         {parte}
@@ -132,15 +132,6 @@ export default function Page() {
                             </button>
                         )}
                     </div>
-
-                    <button
-                        className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-white/80"
-                        style={{ background: '#fff', border: '0.5px solid rgba(31,47,87,0.18)' }}
-                        title="Exportar"
-                    >
-                        <Download size={15} color="rgba(31,47,87,0.5)" />
-                    </button>
-
                     <Link
                         href="/dashboard/inventario/categoria/create"
                         className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-xs font-bold text-white transition-opacity hover:opacity-90"

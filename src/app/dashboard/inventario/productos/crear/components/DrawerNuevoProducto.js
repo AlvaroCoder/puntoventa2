@@ -31,7 +31,6 @@ export function DrawerNuevoProducto({ open, onClose, onAgregar }) {
     const [form, setForm]     = useState(DRAWER_INITIAL)
     const [errors, setErrors] = useState({})
 
-    /* Reset al cerrar (después de la animación) */
     useEffect(() => {
         if (!open) {
             const t = setTimeout(() => { setForm(DRAWER_INITIAL); setErrors({}) }, 300)
@@ -106,7 +105,6 @@ export function DrawerNuevoProducto({ open, onClose, onAgregar }) {
                 <div className="flex-1 overflow-y-auto">
                     <div className="px-6 py-5 flex flex-col gap-6">
 
-                        {/* ── Información general ─────────────────── */}
                         <section className="flex flex-col gap-4">
                             <h3
                                 className="text-sm font-bold pb-2"
@@ -143,7 +141,6 @@ export function DrawerNuevoProducto({ open, onClose, onAgregar }) {
                                     )}
                                 </div>
 
-                                {/* Imagen placeholder */}
                                 <div
                                     className="w-28 rounded-xl flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:bg-gray-50 transition-colors shrink-0 py-4"
                                     style={{ border: '1.5px dashed rgba(31,47,87,0.2)' }}
@@ -158,8 +155,7 @@ export function DrawerNuevoProducto({ open, onClose, onAgregar }) {
                                 </div>
                             </div>
 
-                            {/* Código + Código de barras */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4">
                                 <div className="flex flex-col gap-1">
                                     <label className="text-xs font-semibold" style={{ color: '#1F2F57' }}>
                                         Código <span style={{ color: '#C0392B' }}>*</span>
@@ -193,49 +189,9 @@ export function DrawerNuevoProducto({ open, onClose, onAgregar }) {
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="text-xs font-semibold" style={{ color: '#1F2F57' }}>
-                                        Código de barras
-                                    </label>
-                                    <input
-                                        value={form.codigo_barras}
-                                        onChange={e => set('codigo_barras', e.target.value)}
-                                        placeholder="Escanea o ingresa"
-                                        className="h-9 px-3 rounded-lg text-xs outline-none"
-                                        style={{ border: '1px solid rgba(31,47,87,0.2)', color: '#1F2F57' }}
-                                    />
-                                </div>
+                               
                             </div>
 
-                            {/* Tipo de producto */}
-                            <div className="flex flex-col gap-2">
-                                <label className="text-xs font-semibold" style={{ color: '#1F2F57' }}>
-                                    Tipo de producto <span style={{ color: '#C0392B' }}>*</span>
-                                </label>
-                                <div className="flex items-center gap-6">
-                                    {['Bien', 'Servicio', 'Combo'].map(tipo => (
-                                        <label
-                                            key={tipo}
-                                            className="flex items-center gap-2 cursor-pointer select-none"
-                                            onClick={() => set('tipo', tipo)}
-                                        >
-                                            <div
-                                                className="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors"
-                                                style={{
-                                                    borderColor: form.tipo === tipo ? '#3960A9' : 'rgba(31,47,87,0.25)',
-                                                }}
-                                            >
-                                                {form.tipo === tipo && (
-                                                    <div className="w-2 h-2 rounded-full" style={{ background: '#3960A9' }} />
-                                                )}
-                                            </div>
-                                            <span className="text-xs" style={{ color: '#1F2F57' }}>{tipo}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Categoría + Referencia */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1">
                                     <label className="text-xs font-semibold" style={{ color: '#1F2F57' }}>Categoría</label>

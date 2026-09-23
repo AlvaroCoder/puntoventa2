@@ -11,6 +11,8 @@ import {getAlmacenesByUser} from '@/Connections/almacen'
 import AlmacenCard from '../components/AlmacenCard';
 import SwitcherLoader from '@/components/Navigation/SwitcherLoader';
 import { DrawerNuevoProducto } from '../components/DrawerNuevoProducto';
+import Stepper1 from '../components/Stepper1';
+import Stepper2 from '../components/Stepper2';
 
 const TALLAS  = ['Única', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '29', '30', '31', '32', '33', '34', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 const COLORES = ['Único', 'Negro', 'Blanco', 'Azul', 'Rojo', 'Verde', 'Amarillo', 'Gris', 'Marrón', 'Naranja', 'Rosado']
@@ -101,8 +103,8 @@ function InputCell({ value, onChange, placeholder, type = 'text', prefix, warn }
 
 function ProductIcon({ nombre }) {
     const letra = nombre?.[0]?.toUpperCase() ?? 'P'
-    const bgs   = ['#3960A9', '#1EB3B2', '#E8A020', '#1F2F57', '#6450BE', '#C0392B']
-    const bg    = bgs[nombre.charCodeAt(0) % bgs.length]
+    const bgs= ['#3960A9', '#1EB3B2', '#E8A020', '#1F2F57', '#6450BE', '#C0392B']
+    const bg = bgs[nombre.charCodeAt(0) % bgs.length]
     return (
         <div
             className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
@@ -189,7 +191,6 @@ export default function LotePage() {
     return (
         <div className="min-h-screen bg-[#E1E7F0] pb-24">
 
-            {/* ── Encabezado ──────────────────────────────────────── */}
             <div className="bg-white px-8 py-5" style={{ borderBottom: '0.5px solid rgba(31,47,87,0.1)' }}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
@@ -204,77 +205,92 @@ export default function LotePage() {
                 </div>
             </div>
 
-            {/* ── PASO 1: Seleccionar almacén ─────────────────────── */}
-            {pasoActual === 1 && (
-                <div className="px-8 py-6 flex flex-col gap-5 max-w-6xl mx-auto w-full">
+            {pasoActual === 1 && <Stepper1
+                busqAlmacen={busqAlmacen}
+                setBusqAlmacen={setBusqAlmacen}
+                setAlmacenSel={setAlmacenSel}
+                filteredAlmacenes={filteredAlmacenes}
+                loading={loading}
+                almacenSeleccionado={almacenSeleccionado}
+            />}
 
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                        <div>
-                            <h2 className="text-base font-semibold" style={{ color: '#1F2F57' }}>
-                                ¿A qué almacén ingresarán los productos?
-                            </h2>
-                            <p className="text-xs mt-1" style={{ color: 'rgba(31,47,87,0.55)' }}>
-                                Selecciona el almacén de destino para este lote.
-                            </p>
-                        </div>
-                        <div
-                            className="flex items-center gap-2 px-3 rounded-lg h-9 min-w-[220px]"
-                            style={{ background: '#fff', border: '0.5px solid rgba(31,47,87,0.18)' }}
-                        >
-                            <Search size={14} color="rgba(31,47,87,0.4)" />
-                            <input
-                                value={busqAlmacen}
-                                onChange={e => setBusqAlmacen(e.target.value)}
-                                placeholder="Buscar almacén o tienda..."
-                                className="bg-transparent outline-none text-xs flex-1 placeholder:text-[rgba(31,47,87,0.35)]"
-                                style={{ color: '#1F2F57' }}
-                            />
-                            {busqAlmacen && (
-                                <button onClick={() => setBusqAlmacen('')}>
-                                    <X size={13} color="rgba(31,47,87,0.4)" />
-                                </button>
-                            )}
-                        </div>
-                    </div>
-
-                    <SwitcherLoader>
-                         <p className="text-xs -mt-1" style={{ color: 'rgba(31,47,87,0.45)' }}>
-                        {filteredAlmacenes.length} almacén{filteredAlmacenes.length !== 1 ? 'es' : ''} disponible{filteredAlmacenes.length !== 1 ? 's' : ''}
-                    </p>
-                   </SwitcherLoader>
-
-                    <SwitcherLoader loading={loading}>
-                        {filteredAlmacenes.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {filteredAlmacenes.map(alm => (
-                                <AlmacenCard
-                                    key={alm.id}
-                                    almacen={alm}
-                                    selected={almacenSeleccionado === alm.id}
-                                    onSelect={() => setAlmacenSel(alm.id)}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <div
-                            className="flex flex-col items-center justify-center py-16 bg-white rounded-xl"
-                            style={{ border: '0.5px solid rgba(31,47,87,0.12)' }}
-                        >
-                            <Warehouse size={32} color="rgba(31,47,87,0.2)" />
-                            <p className="text-sm mt-3" style={{ color: 'rgba(31,47,87,0.5)' }}>
-                                No se encontraron almacenes para <strong>&quot;{busqAlmacen}&quot;</strong>
-                            </p>
-                        </div>
-                    )}
-                    </SwitcherLoader>
-                </div>
+            {pasoActual === 2 && (
+                <Stepper2
+                    almacenSeleccionado={almacenActual}
+                />
             )}
 
-            {/* ── PASO 2: Ingresar productos ───────────────────────── */}
-            {pasoActual === 2 && (
-                <div className="px-8 py-6 flex flex-col gap-5 max-w-6xl mx-auto w-full">
+            <div
+                className="fixed bottom-0 left-0 right-0 z-30 bg-white"
+                style={{ borderTop: '0.5px solid rgba(31,47,87,0.12)', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}
+            >
+                <div className="max-w-6xl mx-auto px-8 py-3.5 flex items-center justify-between gap-3">
 
-                    {/* Info del lote */}
+                    {pasoActual === 1 ? (
+                        <>
+                            <button
+                                onClick={() => router.push('/dashboard/inventario/productos/crear')}
+                                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                                style={{ color: 'rgba(31,47,87,0.6)', border: '0.5px solid rgba(31,47,87,0.18)' }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => setPasoActual(2)}
+                                disabled={!almacenSeleccionado}
+                                className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                                style={{ background: '#1F2F57' }}
+                            >
+                                Continuar →
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => setPasoActual(1)}
+                                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                                style={{ color: 'rgba(31,47,87,0.6)', border: '0.5px solid rgba(31,47,87,0.18)' }}
+                            >
+                                ← Volver
+                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                                    style={{ color: '#3960A9', border: '0.5px solid rgba(57,96,169,0.3)' }}
+                                >
+                                    <Save size={14} />
+                                    Guardar borrador
+                                </button>
+                                <button
+                                    onClick={handleConfirmar}
+                                    disabled={guardando || hayErrores}
+                                    className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{ background: '#1F2F57' }}
+                                >
+                                    {guardando
+                                        ? <><Loader2 size={13} className="animate-spin" /> Guardando...</>
+                                        : <><Check size={14} /> Confirmar lote</>
+                                    }
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            <DrawerNuevoProducto
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                onAgregar={handleAgregarDesdeDrawer}
+            />
+
+        </div>
+    )
+}
+
+/**
+ * 
+ * <div className="px-8 py-6 flex flex-col gap-5 max-w-6xl mx-auto w-full">
                     <div
                         className="bg-white rounded-xl p-5"
                         style={{ border: '0.5px solid rgba(31,47,87,0.12)' }}
@@ -332,7 +348,6 @@ export default function LotePage() {
                         </div>
                     </div>
 
-                    {/* Tabla */}
                     <div
                         className="bg-white rounded-xl overflow-hidden"
                         style={{ border: '0.5px solid rgba(31,47,87,0.12)' }}
@@ -485,74 +500,4 @@ export default function LotePage() {
                         </div>
                     </div>
                 </div>
-            )}
-
-            {/* ── Barra sticky ────────────────────────────────────── */}
-            <div
-                className="fixed bottom-0 left-0 right-0 z-30 bg-white"
-                style={{ borderTop: '0.5px solid rgba(31,47,87,0.12)', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}
-            >
-                <div className="max-w-6xl mx-auto px-8 py-3.5 flex items-center justify-between gap-3">
-
-                    {pasoActual === 1 ? (
-                        <>
-                            <button
-                                onClick={() => router.push('/dashboard/inventario/productos/crear')}
-                                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
-                                style={{ color: 'rgba(31,47,87,0.6)', border: '0.5px solid rgba(31,47,87,0.18)' }}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={() => setPasoActual(2)}
-                                disabled={!almacenSeleccionado}
-                                className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-                                style={{ background: '#1F2F57' }}
-                            >
-                                Continuar →
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={() => setPasoActual(1)}
-                                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
-                                style={{ color: 'rgba(31,47,87,0.6)', border: '0.5px solid rgba(31,47,87,0.18)' }}
-                            >
-                                ← Volver
-                            </button>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
-                                    style={{ color: '#3960A9', border: '0.5px solid rgba(57,96,169,0.3)' }}
-                                >
-                                    <Save size={14} />
-                                    Guardar borrador
-                                </button>
-                                <button
-                                    onClick={handleConfirmar}
-                                    disabled={guardando || hayErrores}
-                                    className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                                    style={{ background: '#1F2F57' }}
-                                >
-                                    {guardando
-                                        ? <><Loader2 size={13} className="animate-spin" /> Guardando...</>
-                                        : <><Check size={14} /> Confirmar lote</>
-                                    }
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* ── Drawer nuevo producto ────────────────────────────── */}
-            <DrawerNuevoProducto
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                onAgregar={handleAgregarDesdeDrawer}
-            />
-
-        </div>
-    )
-}
+ */
