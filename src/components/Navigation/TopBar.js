@@ -5,6 +5,10 @@ import Button from "@/elements/Button";
 import Link from "next/link";
 import { useAuth } from "@/Context/AuthContext";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+
+const URL_LOGO =
+  "https://res.cloudinary.com/dabyqnijl/image/upload/v1788581897/01_bl0vpw.png";
 
 export default function TopBar() {
   const { isAuthenticated } = useAuth();
@@ -19,17 +23,17 @@ export default function TopBar() {
       <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
         <Link href={"/"}>
         <div className="flex items-center gap-2">
-           <div className="w-10 h-10 bg-[#FF821E] rounded-xl flex items-center justify-center text-white font-extrabold shadow-lg shadow-orange-500/20">
-            360
-          </div>
-          <span className="text-2xl font-bold text-[#1F4363] tracking-tight">PUNTOVENTA</span>
-          </div>
+            <Image
+              src={URL_LOGO}
+              alt="Logo de Punto de venta"
+              width={200}
+              height={50}
+            />
+        </div>
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-[#333333] font-medium">
-          <Link href="/features" className="hover:text-[#FF821E] transition-colors">Soluciones</Link>
-          <Link href="/precios" className="hover:text-[#FF821E] transition-colors">Precios</Link>
-          <Link href="/demo" className="hover:text-[#FF821E] transition-colors">Demo</Link>
+          <Link href="/precios" className="hover:text-verdeAgua transition-colors">Precios</Link>
         </div>
 
         {
@@ -44,14 +48,9 @@ export default function TopBar() {
             </div>) :
             ( <div className="hidden md:flex items-center gap-4">
                 <Link
-                  href={"/login"}
-                  className="font-bold text-[#1F4363] hover:text-[#FF821E] transition-colors">
-                  Iniciar Sesión
-                </Link>
-                <Link
                   href={"/signup"}
                 >
-                  <Button variant="primary">Registrate</Button>
+                  <Button variant="primary">Probar 30 días</Button>
                 </Link>
               </div>)
         }

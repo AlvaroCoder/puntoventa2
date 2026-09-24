@@ -1,179 +1,415 @@
 'use client'
 import React from "react";
-import { 
-  Boxes, 
-  Users, 
-  Store, 
-  CreditCard, 
-  BarChart3, 
-  Wallet, 
-  CheckCircle2, 
-  ArrowRight, 
-  Menu, 
-  X,
-  Play
+import {
+  ShoppingCart,
+  Package,
+  BarChart3,
+  Users,
+  CheckCircle2,
+  ArrowRight,
+  Play,
+  FileText,
+  Truck,
+  ChevronRight,
 } from "lucide-react";
 import Button from "@/elements/Button";
-import Title1 from "@/elements/Title1";
+import { useRouter } from "next/navigation";
 
+const MODULES = [
+  {
+    icon: <ShoppingCart className="w-6 h-6" />,
+    title: "Módulo de Ventas",
+    desc: "Registra ventas, emite boletas y facturas electrónicas en segundos. Compatible con POS físico y online.",
+    color: "#FF821E",
+    bg: "rgba(255,130,30,0.10)",
+  },
+  {
+    icon: <Users className="w-6 h-6" />,
+    title: "Módulo de Clientes",
+    desc: "Gestiona tu cartera de clientes, historial de compras, créditos y fidelización desde un solo lugar.",
+    color: "#198E7B",
+    bg: "rgba(25,142,123,0.10)",
+  },
+  {
+    icon: <Package className="w-6 h-6" />,
+    title: "Módulo de Inventario",
+    desc: "Control total de stock en tiempo real. Alertas de bajo stock, lotes, variantes y múltiples almacenes.",
+    color: "#3960A9",
+    bg: "rgba(57,96,169,0.10)",
+  },
+  {
+    icon: <FileText className="w-6 h-6" />,
+    title: "Módulo de SUNAT",
+    desc: "Emisión de comprobantes electrónicos, validación de RUC/DNI y declaraciones integradas con SUNAT.",
+    color: "#D90429",
+    bg: "rgba(217,4,41,0.10)",
+  },
+  {
+    icon: <Truck className="w-6 h-6" />,
+    title: "Módulo de Logística",
+    desc: "Gestiona pedidos, despachos, guías de remisión y seguimiento de entregas desde un solo panel.",
+    color: "#7C3AED",
+    bg: "rgba(124,58,237,0.10)",
+  },
+];
+
+const QUICK_FEATURES = [
+  {
+    icon: <ShoppingCart className="w-5 h-5" />,
+    title: "Ventas más rápidas",
+    desc: "Emite boletas y facturas en segundos.",
+  },
+  {
+    icon: <Package className="w-5 h-5" />,
+    title: "Control de inventario",
+    desc: "Conoce el stock en tiempo real en todas tus tiendas.",
+  },
+  {
+    icon: <BarChart3 className="w-5 h-5" />,
+    title: "Reportes claros",
+    desc: "Toma mejores decisiones con información en tiempo real.",
+  },
+  {
+    icon: <Users className="w-5 h-5" />,
+    title: "Hecho para tu negocio",
+    desc: "Ideal para zapaterías, bodegas, bazares y más.",
+  },
+];
+
+const STATS = [
+  { label: "Ventas hoy",       value: "S/ 1,250", delta: "+12%", color: "#3960A9" },
+  { label: "Prod. vendidos",   value: "24",        delta: "+8%",  color: "#198E7B" },
+  { label: "Clientes",         value: "18",        delta: "+20%", color: "#FF821E" },
+];
+
+const BAR_HEIGHTS = [40, 62, 35, 78, 55, 92, 68];
+const BAR_DAYS = ["L", "M", "M", "J", "V", "S", "D"];
 
 export default function LandingPage() {
-  const features = [
-    { 
-      icon: <Boxes className="w-8 h-8 text-white" />, 
-      title: "Gestiona Inventario", 
-      desc: "Control total de tu stock en tiempo real con alertas automáticas."
-    },
-    { 
-      icon: <Users className="w-8 h-8 text-white" />, 
-      title: "Gestiona Clientes", 
-      desc: "Base de datos detallada para fidelizar y conocer a tu público."
-    },
-    { 
-      icon: <Store className="w-8 h-8 text-white" />, 
-      title: "Gestiona Tiendas", 
-      desc: "Administra múltiples sucursales desde un solo panel centralizado."
-    },
-    { 
-      icon: <CreditCard className="w-8 h-8 text-white" />, 
-      title: "Gestiona Créditos", 
-      desc: "Seguimiento de cuentas por cobrar y líneas de crédito."
-    },
-    { 
-      icon: <BarChart3 className="w-8 h-8 text-white" />, 
-      title: "Reportes Avanzados", 
-      desc: "Toma decisiones basadas en datos con analíticas precisas."
-    },
-    { 
-      icon: <Wallet className="w-8 h-8 text-white" />, 
-      title: "Gestión de Caja", 
-      desc: "Cierres de caja, arqueos y control de flujo de efectivo seguro."
-    },
-  ];
-
+  const router = useRouter();
   return (
-    <div className="min-h-screen bg-[#F5F5F5] font-sans selection:bg-[#FF821E] selection:text-white">
-      <section className="pt-32 pb-20 px-6 md:px-12 container mx-auto">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          
-          <div className="flex-1 space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#198E7B]/10 rounded-full text-[#198E7B] font-bold text-sm mb-4">
-              <span className="w-2 h-2 rounded-full bg-[#198E7B] animate-pulse"></span>
-              Nuevo Sistema V 2.0 Disponible
-            </div>
-            
-            <Title1>
-              La solución <span className="text-[#FF821E] relative">
-                inteligente
-                <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#FF821E] opacity-30" viewBox="0 0 100 10" preserveAspectRatio="none">
-                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
-                </svg>
-              </span> <br />
-              para tu negocio.
-            </Title1>
-            
-            <p className="text-xl text-gray-500 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Simplifica tus operaciones, controla tu inventario y aumenta tus ventas con la plataforma todo en uno diseñada para empresas en crecimiento.
-            </p>
+    <div className="min-h-screen font-sans" style={{ background: "#EEF2F7" }}>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-              <Button variant="primary" icon={ArrowRight} className="text-lg px-8">
-                Comenzar Ahora
-              </Button>
-              <Button variant="outline" icon={Play} className="text-lg px-8">
-                Ver Demo
-              </Button>
+      <section className="relative overflow-hidden pt-16 pb-0 px-6 md:px-16">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-center gap-12 min-h-[88vh]">
+
+            <div className="flex-1 space-y-6 text-center lg:text-left pt-6 z-10">
+
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                style={{ background: "rgba(25,142,123,0.12)", color: "#198E7B" }}
+              >
+                <span className="w-2 h-2 rounded-full bg-[#198E7B] animate-pulse" />
+                Más de 5,000 negocios ya confían en nosotros
+              </div>
+
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight"
+                style={{ color: "#1F2F57" }}
+              >
+                Tu negocio,{" "}
+                <span className="relative inline-block" style={{ color: "#1F4363" }}>
+                  bajo control.
+                  <svg
+                    className="absolute -bottom-2 left-0 w-full"
+                    viewBox="0 0 300 10"
+                    preserveAspectRatio="none"
+                    height="8"
+                  >
+                    <path
+                      d="M0 6 Q 150 10 300 6"
+                      stroke="#FF821E"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+              </h1>
+
+              <p className="text-xl font-bold" style={{ color: "#3960A9" }}>
+                Todo tu negocio en un solo lugar.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
+                <Button variant="secondary" onClick={()=>router.push("/signup")} icon={ArrowRight} className="text-base px-8 py-3.5 rounded-xl">
+                  Probar por 30 días
+                </Button>
+                <Button variant="outline" icon={Play} className="text-base px-8 py-3.5 rounded-xl">
+                  Ver Demo
+                </Button>
+              </div>
+
+              <div
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-5 pt-1 text-sm font-medium"
+                style={{ color: "#8D99AE" }}
+              >
+                {[ "30 días de prueba", "Soporte en español"].map(
+                  (t) => (
+                    <div key={t} className="flex items-center gap-1.5">
+                      <CheckCircle2 size={15} style={{ color: "#198E7B" }} />
+                      {t}
+                    </div>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="pt-8 flex items-center justify-center lg:justify-start gap-6 text-sm text-gray-400 font-medium">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-[#198E7B]" /> Sin tarjeta de crédito
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-[#198E7B]" /> 14 días de prueba
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-[#198E7B]" /> Soporte 24/7
-              </div>
-            </div>
-          </div>
+            <div className="flex-1 relative w-full max-w-xl lg:max-w-none pb-12">
 
-          <div className="flex-1 relative w-full max-w-xl lg:max-w-full">
-            <div className="absolute top-10 -left-10 w-72 h-72 bg-[#FF821E] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-            <div className="absolute top-10 -right-10 w-72 h-72 bg-[#1F4363] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-            
-            <div className="relative bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 md:p-6 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-              <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+              <div
+                className="absolute top-4 right-0 w-80 h-80 rounded-full pointer-events-none"
+                style={{
+                  background: "radial-gradient(circle, rgba(25,142,123,0.25) 0%, transparent 70%)",
+                }}
+              />
+
+              <div
+                className="relative rounded-2xl overflow-hidden shadow-2xl ml-4"
+                style={{ background: "#1A3A5C" }}
+              >
+                <div
+                  className="flex items-center gap-2 px-4 py-3"
+                  style={{ background: "#142E48" }}
+                >
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#EF233C] opacity-80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] opacity-80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#22C55E] opacity-80" />
+                  <span className="ml-2 text-xs font-semibold text-white/40">
+                    PuntoVenta360
+                  </span>
                 </div>
-                <div className="h-2 w-20 bg-gray-100 rounded-full"></div>
+
+                <div className="flex">
+                  <div
+                    className="w-28 px-2 py-4 flex flex-col gap-0.5 shrink-0"
+                    style={{ background: "#172F4A" }}
+                  >
+                    {["Inicio", "Ventas", "Productos", "Inventario", "Clientes", "Reportes"].map(
+                      (item, i) => (
+                        <div
+                          key={item}
+                          className="px-3 py-1.5 rounded-lg text-[11px] font-medium"
+                          style={{
+                            background: i === 0 ? "#3960A9" : "transparent",
+                            color: i === 0 ? "#fff" : "rgba(255,255,255,0.45)",
+                          }}
+                        >
+                          {item}
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  <div className="flex-1 p-4" style={{ background: "#EEF2F7" }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold" style={{ color: "#1F2F57" }}>
+                        Resumen de hoy
+                      </span>
+                      <span className="text-[10px]" style={{ color: "#8D99AE" }}>
+                        24 set. 2026
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {STATS.map((s) => (
+                        <div key={s.label} className="bg-white rounded-xl p-2.5 shadow-sm">
+                          <div
+                            className="text-[9px] font-medium mb-1"
+                            style={{ color: "#8D99AE" }}
+                          >
+                            {s.label}
+                          </div>
+                          <div
+                            className="text-xs font-extrabold"
+                            style={{ color: s.color }}
+                          >
+                            {s.value}
+                          </div>
+                          <div
+                            className="text-[9px] font-bold mt-0.5"
+                            style={{ color: "#198E7B" }}
+                          >
+                            ↑ {s.delta}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="bg-white rounded-xl p-3 shadow-sm">
+                      <div
+                        className="text-[9px] font-bold mb-2"
+                        style={{ color: "#1F2F57" }}
+                      >
+                        Ventas últimos 7 días
+                      </div>
+                      <div className="flex items-end gap-1.5 h-12">
+                        {BAR_HEIGHTS.map((h, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 rounded-t-sm transition-all"
+                            style={{
+                              height: `${h}%`,
+                              background: i === 5 ? "#3960A9" : "rgba(57,96,169,0.25)",
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex justify-between mt-1.5">
+                        {BAR_DAYS.map((d, i) => (
+                          <span
+                            key={i}
+                            className="flex-1 text-center text-[8px] font-medium"
+                            style={{ color: "#8D99AE" }}
+                          >
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                 <div className="bg-[#F5F5F5] p-4 rounded-xl h-24 animate-pulse"></div>
-                 <div className="bg-[#F5F5F5] p-4 rounded-xl h-24 animate-pulse"></div>
-              </div>
-              <div className="bg-[#1F4363] h-40 rounded-xl w-full flex items-center justify-center text-white/20">
-                <BarChart3 size={64} />
+
+              <div
+                className="absolute -bottom-2 left-2 bg-white rounded-2xl shadow-xl p-3 flex items-center gap-3 border border-gray-100"
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: "rgba(57,96,169,0.10)" }}
+                >
+                  <ShoppingCart size={18} style={{ color: "#3960A9" }} />
+                </div>
+                <div>
+                  <div className="text-[11px] font-semibold" style={{ color: "#8D99AE" }}>
+                    Venta registrada
+                  </div>
+                  <div className="text-sm font-extrabold" style={{ color: "#1F4363" }}>
+                    S/ 120.00
+                  </div>
+                </div>
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center ml-1 shrink-0"
+                  style={{ background: "#198E7B" }}
+                >
+                  <CheckCircle2 size={14} color="white" />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="features" className="py-20 bg-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-gray-50 skew-x-12 opacity-50 pointer-events-none"></div>
-
-        <div className="container mx-auto px-6 md:px-12 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-[#FF821E] font-bold tracking-wider uppercase text-sm mb-2">Características Principales</h2>
-            <h3 className="text-3xl md:text-4xl font-bold text-[#1F4363] mb-4">Todo lo que necesitas para crecer</h3>
-            <p className="text-gray-500">
-              Hemos integrado las herramientas más potentes en una interfaz simple e intuitiva para que te concentres en vender.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, idx) => (
-              <div
-                key={idx}
-                className="group bg-white p-8 rounded-2xl border border-gray-100 hover:border-[#FF821E]/30 shadow-sm hover:shadow-xl hover:shadow-[#FF821E]/10 transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <div className="w-14 h-14 bg-[#1F4363] rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#FF821E] transition-colors duration-300 shadow-md">
-                  {feature.icon}
+      <section className="bg-white py-12 px-6 md:px-16 mt-16 border-y border-gray-100">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {QUICK_FEATURES.map((f, i) => (
+              <div key={i} className="flex items-start gap-4">
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: "rgba(31,67,99,0.08)", color: "#1F4363" }}
+                >
+                  {f.icon}
                 </div>
-                <h3 className="text-xl font-bold text-[#333333] mb-3 group-hover:text-[#FF821E] transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  {feature.desc}
-                </p>
+                <div>
+                  <h3
+                    className="text-sm font-bold mb-1"
+                    style={{ color: "#1F2F57" }}
+                  >
+                    {f.title}
+                  </h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "#8D99AE" }}>
+                    {f.desc}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#1F4363] py-20 px-6">
-        <div className="container mx-auto text-center">
-           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-             ¿Listo para digitalizar tu negocio?
-           </h2>
-           <p className="text-gray-300 max-w-2xl mx-auto mb-10 text-lg">
-             Únete a más de 500 empresas que ya gestionan sus ventas con PuntoVenta360.
-           </p>
-           <div className="flex flex-col sm:flex-row justify-center gap-4">
-             <Button variant="primary" className="text-lg px-10 py-4">
-               Crear cuenta gratis
-             </Button>
-             <Button variant="ghost" className="text-lg px-10 py-4 border border-white/20">
-               Contactar Ventas
-             </Button>
-           </div>
+      <section className="py-24 px-6 md:px-16" style={{ background: "#EEF2F7" }}>
+        <div className="container mx-auto max-w-7xl">
+
+          <div className="text-center mb-14">
+            <span
+              className="text-xs font-bold uppercase tracking-widest"
+              style={{ color: "#FF821E" }}
+            >
+              Módulos de la plataforma
+            </span>
+            <h2
+              className="text-3xl md:text-4xl font-extrabold mt-2"
+              style={{ color: "#1F2F57" }}
+            >
+              Todo lo que tu negocio necesita
+            </h2>
+            <p
+              className="text-base mt-3 max-w-xl mx-auto leading-relaxed"
+              style={{ color: "#8D99AE" }}
+            >
+              Cada módulo está diseñado para simplificar una parte clave de tu
+              operación.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {MODULES.map((m, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-7 border border-transparent hover:border-gray-200 hover:shadow-lg transition-all duration-300 group cursor-pointer"
+              >
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5"
+                  style={{ background: m.bg, color: m.color }}
+                >
+                  {m.icon}
+                </div>
+                <h3
+                  className="text-base font-bold mb-2"
+                  style={{ color: "#1F2F57" }}
+                >
+                  {m.title}
+                </h3>
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: "#8D99AE" }}
+                >
+                  {m.desc}
+                </p>
+                <div
+                  className="flex items-center gap-1 mt-5 text-xs font-bold transition-all group-hover:gap-2"
+                  style={{ color: m.color }}
+                >
+                  Conocer más <ChevronRight size={14} />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+
+      <section className="py-20 px-6" style={{ background: "#1F4363" }}>
+        <div className="container mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+            ¿Listo para tomar el control?
+          </h2>
+          <p className="text-base mb-10" style={{ color: "rgba(255,255,255,0.60)" }}>
+            Únete a más de 5,000 negocios que ya gestionan sus ventas con
+            PuntoVenta360.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button variant="primary" icon={ArrowRight} className="text-base px-10 py-3.5 rounded-xl">
+              Crear cuenta gratis
+            </Button>
+            <Button variant="ghost" icon={Play} className="text-base px-10 py-3.5 rounded-xl border border-white/20">
+              Ver Demo
+            </Button>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

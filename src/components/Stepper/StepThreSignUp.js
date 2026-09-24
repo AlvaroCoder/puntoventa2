@@ -13,8 +13,8 @@ export default function StepThreSignUp({
   return (
       <div className='space-y-4 animate-in slide-in-from-right-4 duration-300'>
           <div className='mb-2'>
-              <h2 className='text-xl font-bold text-[#1F4363]'>Tu primer Negocio</h2>
-              <p className='text-gray-500 text-sm'>Rubro e identificación de tu primera empresa.</p>
+              <h2 className='text-xl font-bold text-[#1F4363]'>Cuentanos sobre tu negocio</h2>
+              <p className='text-gray-500 text-sm'>Rubro e identificación de tu empresa.</p>
           </div>
           <InputField
               label={"Nombre Comercial"}
@@ -23,14 +23,13 @@ export default function StepThreSignUp({
               placeholder={"Ej: Bodega El Chino"}
               value={formData?.businessName}
               onChange={handleInputChange}
-              error={errors?.businessName}
+              error={null}
           />
           <InputField
               label={"RUC Empresa"}
               icon={Building2}
               name="ruc"
               placeholder="2012346789"
-              error={errors?.ruc}
             onChange={handleInputChange}  
           />
           <div>

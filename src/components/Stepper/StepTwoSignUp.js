@@ -34,7 +34,6 @@ export default function StepTwoSignUp({
               placeholder="DNI"
               value={formData?.dni}
               onChange={handleInputChange}
-              error={errors?.dni || errors?.ruc}
               onBlur={handleBlurInputDocumento}
           />
           <InputField

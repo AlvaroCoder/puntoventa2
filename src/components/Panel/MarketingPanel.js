@@ -17,7 +17,7 @@ const FEATURES = [
   "Soporte en español incluido sin costo adicional",
 ];
 export default function MarketingPanel() {
-    const URL_LOGO   = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787111787/puntoVenta360/Logo_Punto_Venta_wrgis4.png"
+    const URL_LOGO ="https://res.cloudinary.com/dabyqnijl/image/upload/v1787804947/LOGO/positivo_co0kxc.png";
     const URL_BG = "https://res.cloudinary.com/dzfrrapfk/image/upload/v1787546104/Screenshot_2026-08-18_at_23.31.08_oahtir.png"
 
   return (
@@ -26,7 +26,7 @@ export default function MarketingPanel() {
         className="absolute inset-0 scale-105 blur-[3px]"
         style={{ backgroundImage: `url(${URL_BG})`, backgroundSize: "cover", backgroundPosition: "center" }}
       />
-      <div className="absolute inset-0 bg-[#1F4363]/90" />
+      <div className="absolute inset-0 bg-azulMarino" />
       <div className="absolute -bottom-24 -right-16 w-72 h-72 bg-[#FE811F]/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -top-12 -left-12 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
@@ -34,9 +34,9 @@ export default function MarketingPanel() {
       <Link href={"/"}>
         <div className="flex items-center gap-2.5 mb-8">
           
-          <Image src={URL_LOGO} alt="PuntoVenta360" width={72} height={28} />
+          <Image src={URL_LOGO} alt="PuntoVenta360" width={60} height={28} />
           <span className="text-white font-bold text-sm">
-            Punto de Venta <span className="text-[#FE811F]">360</span>
+            Punto de Venta <span className="text-verdeAgua">360</span>
             </span>
           
         </div>
@@ -55,8 +55,8 @@ export default function MarketingPanel() {
           <div className="grid grid-cols-2 gap-3">
             {STATS.map(({ Icon, value, label }) => (
               <div key={label} className="bg-white/8 rounded-2xl p-4 border border-white/10 flex flex-col gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#FE811F]/20 flex items-center justify-center">
-                  <Icon size={16} className="text-[#FE811F]" />
+                <div className="w-8 h-8 rounded-xl bg-verdeAgua/20 flex items-center justify-center">
+                  <Icon size={16} className="text-verdeAgua" />
                 </div>
                 <p className="text-white font-bold text-xl leading-none">{value}</p>
                 <p className="text-white/45 text-xs leading-tight">{label}</p>

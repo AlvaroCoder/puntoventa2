@@ -52,6 +52,7 @@ export async function login(dataUser) {
         esAdmin: esDueno,
         empresa_id: data?.usuario?.empresa_id ?? null,
         rol_id: data?.rol_id ?? null,
+        rubro_id : data?.usuario?.rubro_id,
         nivel_permiso: esDueno ? 999 : (data?.nivel_permiso ?? 0),
     };
     const session = await encrypt(user);

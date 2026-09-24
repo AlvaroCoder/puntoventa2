@@ -23,8 +23,8 @@ function Stepper({ paso }) {
                                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors"
                                 style={{
                                     background: activo || completo ? '#3960A9' : 'transparent',
-                                    border:     activo || completo ? 'none' : '1.5px solid rgba(31,47,87,0.25)',
-                                    color:      activo || completo ? '#fff'  : 'rgba(31,47,87,0.4)',
+                                    border: activo || completo ? 'none' : '1.5px solid rgba(31,47,87,0.25)',
+                                    color: activo || completo ? '#fff'  : 'rgba(31,47,87,0.4)',
                                 }}
                             >
                                 {completo ? <Check size={13} /> : num}

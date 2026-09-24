@@ -23,13 +23,13 @@ return (
         ${
           error
             ? "border-red-500 ring-2 ring-red-500/10"
-            : "border-gray-200 hover:border-[#1F4363]/50 focus-within:border-[#FF821E] focus-within:ring-4 focus-within:ring-[#FF821E]/10"
+            : "border-gray-200 hover:border-[#1F4363]/50 focus-within:border-azulClaro focus-within:ring-4 focus-within:ring-[#FF821E]/10"
         }
         ${checkValue && "border-green-400"}
       `}
     >
       <Lock
-        className={`mr-3 transition-colors ${error ? "text-red-500" : "text-[#1F4363] group-focus-within:text-[#FF821E]"}`}
+        className={`mr-3 transition-colors ${error ? "text-red-500" : "text-[#1F4363] group-focus-within:text-azulMarino"}`}
         size={20}
       />
       <input

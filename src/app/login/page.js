@@ -183,15 +183,12 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    {/* Encabezado */}
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold text-azulMarino">Iniciar sesión</h1>
                         <p className="text-gray-400 text-sm mt-1">Qué bueno verte de nuevo.</p>
                     </div>
 
-                    {/* Formulario */}
                     <form onSubmit={handleSubmit} className="space-y-4">
-
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-semibold text-gray-500">Correo electrónico</label>
                             <input
