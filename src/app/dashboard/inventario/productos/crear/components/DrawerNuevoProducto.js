@@ -16,8 +16,6 @@ const MOCK_CATEGORIAS = [
     { id: 4, nombre: 'Calzado'         },
     { id: 5, nombre: 'Textil'          },
 ]
-
-
 const UNIDADES = [
     { value: 'UNIDAD', label: 'Unidad (und)' },
     { value: 'PAR',    label: 'Par'           },

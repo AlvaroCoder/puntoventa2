@@ -2,6 +2,7 @@
 import { ShowerSharp } from "@mui/icons-material";
 import { Sheet, Trash } from "lucide-react";
 import { useState } from "react";
+
 export default function CardProducto({ product, onDelete }) {
   const [confirm, setConfirm] = useState(false);
   const [leaving, setLeaving] = useState(false);

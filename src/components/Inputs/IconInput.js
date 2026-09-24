@@ -1,13 +1,20 @@
-import { Input } from "../ui/input";
 
-export function IconInput({ icon: Icon, error, ...props }) {
+export function IconInput({ icon: Icon, value, placeholder, onChange, ...props }) {
     return (
-        <div className="relative">
-            <Icon size={14} className="absolute left-3 top-3 text-gray-400 pointer-events-none" />
-            <Input
+      <div className="relative">
+        {Icon && (
+          <Icon
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-azulClaro"
+          />
+        )}
+            <input
+                className="focus-ring h-11 w-full rounded-lg border border-azulMarino/20 pl-10 pr-3 text-[15px]"
+                value={value}
+                placeholder={placeholder}
+                onChange={onChange}
                 {...props}
-                className={`pl-9 focus-visible:ring-[#FF821E]/30 focus-visible:border-[#FF821E] ${error ? 'border-red-400' : ''}`}
             />
-        </div>
-    )
+      </div>
+    );
 }
