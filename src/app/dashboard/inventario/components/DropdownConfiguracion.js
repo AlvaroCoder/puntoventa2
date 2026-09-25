@@ -20,45 +20,54 @@ export default function DropdownConfiguracion() {
         { label : 'Categorias', href: '/dashboard/inventario/categoria' },
     ]
 
+    const NAV_LINK_TIENDAS = [
+        { label : 'Tiendas', href : '/dashboard/inventario/tienda'}
+    ]
   return (
-      <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-                <button
-                    className="flex justify-center items-center hover:bg-gray-100 py-2 px-4 rounded-lg transition-colors"
-                >
-                    <Text>Configuraciones</Text>
-                </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44" align="start" sideOffset={5}>
-              <DropdownMenuGroup>
-                  <DropdownMenuLabel>Gestión de almacenes</DropdownMenuLabel>
-                  {
-                      NAV_LINK_ALMACENES.map((link) => (
-                          <Link
-                              key={link.href}
-                              href={link.href}
-                              className="block px-4 py-2 text-sm text-azulMarino hover:bg-gray-100"
-                          >
-                              {link.label}
-                          </Link>
-                      ))
-                  }
-                </DropdownMenuGroup>
-              <DropdownMenuGroup>
-                  <DropdownMenuLabel>Gestión de productos</DropdownMenuLabel>
-                  {
-                      NAV_LINK_PRODUCTOS.map((link) => (
-                          <Link
-                              key={link.href}
-                              href={link.href}
-                              className="block px-4 py-2 text-sm text-azulMarino hover:bg-gray-100"
-                          >
-                              {link.label}
-                          </Link>
-                      ))
-                  }
-                </DropdownMenuGroup>
-          </DropdownMenuContent>
-   </DropdownMenu>
-  )
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex justify-center items-center hover:bg-gray-100 py-2 px-4 rounded-lg transition-colors">
+          <Text>Configuraciones</Text>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-44" align="start" sideOffset={5}>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Gestión de Tiendas</DropdownMenuLabel>
+          {NAV_LINK_TIENDAS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block px-4 py-2 text-sm text-azulMarino hover:bg-gray-100"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Gestión de almacenes</DropdownMenuLabel>
+          {NAV_LINK_ALMACENES.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block px-4 py-2 text-sm text-azulMarino hover:bg-gray-100"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </DropdownMenuGroup>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Gestión de productos</DropdownMenuLabel>
+          {NAV_LINK_PRODUCTOS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block px-4 py-2 text-sm text-azulMarino hover:bg-gray-100"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
