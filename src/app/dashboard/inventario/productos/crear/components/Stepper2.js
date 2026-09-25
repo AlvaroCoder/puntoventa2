@@ -1,6 +1,6 @@
 "use client";
 import Title2 from "@/components/Titles/Title2";
-import { Calendar, File, Icon, Plus, RefreshCcw, Warehouse } from "lucide-react";
+import { Calendar, File, Plus, RefreshCcw, Warehouse } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import SeccionVariantes from "./SeccionVariantes";
 import PanelProductos from "@/elements/PanelProductos";
@@ -47,7 +47,7 @@ const initial = (code) => ({
   genero: "Unisex",
   stock_minimo: 0,
 });
-export default function Stepper2({ almacenSeleccionado }) {
+export default function Stepper2({ almacenSeleccionado, handlePayload }) {
   const [reference, setReference] = useState("LOTE-20260922-001");
   const [form, setForm] = useState(
     initial(
@@ -88,7 +88,7 @@ export default function Stepper2({ almacenSeleccionado }) {
     const producto = { ...form, id: Date.now(), stock_inicial: stock };
     const nuevosProductos = [...productos, producto];
     setProductos(nuevosProductos);
-
+   
     const payload = {
       referencia_lote: reference,
       almacen_id: almacenSeleccionado?.id,
@@ -96,8 +96,7 @@ export default function Stepper2({ almacenSeleccionado }) {
       fecha_registro: new Date().toISOString(),
       productos: nuevosProductos,
     };
-    console.log("JSON a enviar:", JSON.stringify(payload, null, 2));
-
+    handlePayload(payload);
     setForm(
       initial(
         `PROD-${String(Math.floor(Math.random() * 999999) + 1).padStart(6, "0")}`,

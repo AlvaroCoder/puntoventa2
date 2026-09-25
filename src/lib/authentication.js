@@ -46,6 +46,7 @@ export async function login(dataUser) {
     const esDueno = data?.usuario?.tipo === 'dueño';
     
     const user = {
+        id : data?.usuario?.id,
         email: dataUser?.email,
         nombre_completo: data?.usuario?.nombre_completo,
         access_token: data?.token,

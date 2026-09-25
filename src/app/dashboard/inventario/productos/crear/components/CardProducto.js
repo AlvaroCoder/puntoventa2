@@ -1,12 +1,10 @@
 "use client";
-import { ShowerSharp } from "@mui/icons-material";
-import { Sheet, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useState } from "react";
 
 export default function CardProducto({ product, onDelete }) {
   const [confirm, setConfirm] = useState(false);
   const [leaving, setLeaving] = useState(false);
-  const shoe = product.categoria?.startsWith("Calzado");
   function remove() {
     setLeaving(true);
     setTimeout(() => onDelete(product.id), 150);
@@ -17,7 +15,7 @@ export default function CardProducto({ product, onDelete }) {
     >
       <div className="flex gap-3">
         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#3960A9]/10 text-[#3960A9]">
-          {shoe ? <ShowerSharp size={22} /> : <Sheet size={22} />}
+         
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
@@ -30,9 +28,6 @@ export default function CardProducto({ product, onDelete }) {
             <div className="whitespace-nowrap font-extrabold text-[#3960A9]">
               S/ {Number(product.precio_venta || 0).toFixed(2)}
             </div>
-          </div>
-          <div className="mt-2 truncate text-sm text-[#1F2F57]/58">
-            {product.categoria || "Sin categoría"}
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <span

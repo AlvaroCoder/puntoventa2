@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import {
-    Search, SlidersHorizontal, LayoutGrid, List,
+    Search, SlidersHorizontal,
     Plus, Star, MoreVertical, ChevronDown
 } from 'lucide-react'
 import { useAuth } from '@/Context/AuthContext'
@@ -78,7 +78,7 @@ function ProductoCard({ producto, favorito, onToggleFav }) {
                         </p>
                     )}
                     <p className="text-sm font-semibold mt-1" style={{ color: '#1F2F57' }}>
-                        S/ {producto.precio.toFixed(2).replace('.', ',')}
+                        S/ {producto.precioVenta.toFixed(2).replace('.', ',')}
                     </p>
                 </div>
 
@@ -111,13 +111,13 @@ function ProductoCard({ producto, favorito, onToggleFav }) {
 
 export default function ProductosPage() {
     const [query, setQuery] = useState('')
-    const [view, setView] = useState('tarjetas') 
     const [sort, setSort] = useState('nombre_az')
     const [page, setPage] = useState(1)
     const [favoritos, setFavoritos] = useState(new Set())
     const [showSort, setShowSort]   = useState(false)
 
     const { user } = useAuth();
+    
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
     useEffect(() => {
@@ -195,7 +195,6 @@ export default function ProductosPage() {
                         />
                     </div>
 
-                    {/* Filtros */}
                     <button
                         className="flex items-center gap-1.5 px-3 h-9 rounded-lg text-xs font-medium"
                         style={{ background: '#fff', border: '0.5px solid rgba(31,47,87,0.18)', color: '#1F2F57' }}
@@ -205,31 +204,7 @@ export default function ProductosPage() {
                         <ChevronDown size={13} color="rgba(31,47,87,0.5)" />
                     </button>
 
-                    {/* Toggle Tarjetas / Lista */}
-                    <div
-                        className="flex items-center rounded-lg overflow-hidden h-9"
-                        style={{ border: '0.5px solid rgba(31,47,87,0.18)', background: '#fff' }}
-                    >
-                        {[
-                            { key: 'tarjetas', Icon: LayoutGrid, label: 'Tarjetas' },
-                            { key: 'lista',    Icon: List,       label: 'Lista'    },
-                        ].map(({ key, Icon, label }) => (
-                            <button
-                                key={key}
-                                onClick={() => setView(key)}
-                                aria-label={label}
-                                className="flex items-center gap-1.5 px-3 h-full text-xs font-medium transition-colors"
-                                style={{
-                                    background: view === key ? '#3960A9' : 'transparent',
-                                    color:      view === key ? '#fff'    : 'rgba(31,47,87,0.6)',
-                                }}
-                            >
-                                <Icon size={14} />
-                                {label}
-                            </button>
-                        ))}
-                    </div>
-
+                 
                     <Link
                         href="/dashboard/inventario/productos/crear"
                         className="flex items-center gap-1.5 px-4 h-9 rounded-lg text-xs font-semibold text-white"
@@ -304,7 +279,6 @@ export default function ProductosPage() {
                 </div>
             )}
 
-            {/* ── Paginación ─────────────────────────────────────── */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-1 pt-2">
                     <button

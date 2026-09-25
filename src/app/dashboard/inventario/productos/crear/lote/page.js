@@ -2,10 +2,14 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, Loader2, Save} from 'lucide-react';
+import { Check, Loader2, Save} from 'lucide-react'
+import { toast } from 'react-toastify'
 import {getAlmacenesByUser} from '@/Connections/almacen'
 import Stepper1 from '../components/Stepper1';
 import Stepper2 from '../components/Stepper2';
+import { useAuth } from '@/Context/AuthContext';
+import { createProducto } from '@/Connections/productos';
+import { getTrabajadorByIdUser } from '@/Connections/trabajadores'
 
 const PASOS = ['Seleccionar almacén', 'Ingresar productos']
 
@@ -48,16 +52,16 @@ function Stepper({ paso }) {
 
 export default function LotePage() {
     const router = useRouter()
-
+    const { user } = useAuth();
     const [pasoActual, setPasoActual] = useState(1)
     const [almacenSeleccionado, setAlmacenSel] = useState(null)
     const [busqAlmacen, setBusqAlmacen] = useState('')
     const [filas, setFilas] = useState([])
     const [guardando, setGuardando] = useState(false)
     const [almacenes, setAlmacenes] = useState([]);
-
     const almacenActual = almacenes.find(a => a.id === almacenSeleccionado)
     const [loading, setLoading] = useState(true);
+    const [payload, setPayload] = useState(null);
     useEffect(() => {
         async function fetchAlmacenes() { 
             try {
@@ -85,101 +89,187 @@ export default function LotePage() {
 
     const handleConfirmar = async () => {
         if (hayErrores) return
-        setGuardando(true)
-        await new Promise(r => setTimeout(r, 1200))
-        setGuardando(false)
-        router.push('/dashboard/inventario/productos')
+
+        const productos = payload?.productos
+        const almacenId = payload?.almacen_id ?? almacenActual?.id ?? null
+
+        if (!productos || productos.length === 0) {
+            toast.error('Agrega al menos un producto antes de confirmar')
+            return
+        }
+
+        try {
+          setGuardando(true);
+
+          const responseTrabajador = await getTrabajadorByIdUser(user?.id);
+          const jsonResponseTrabajador = responseTrabajador.data;
+            await Promise.all(
+                productos.map(async (producto) => {
+                    const variantes = producto.variantes ?? []
+
+                    const body = {
+                        nombre:         producto.nombre,
+                        codigo:         producto.codigo         || null,
+                        categoriaId:    producto.categoria      || null,
+                        precioVenta:    parseFloat(producto.precio_venta)  || null,
+                        precioCompra:   parseFloat(producto.precio_compra) || null,
+                        unidadMedida:   producto.unidad         || 'UNIDAD',
+                        tieneVariantes: variantes.length > 0,
+                        trabajadorId : jsonResponseTrabajador?.id,
+                        stockInicial:   parseInt(producto.stock_inicial) || 0,
+                        stockMinimo:    parseInt(producto.stock_minimo)  || 0,
+
+                        almacenId: (parseInt(producto.stock_inicial) || 0) > 0
+                            ? almacenId
+                            : null,
+
+                        variantes: variantes.length > 0
+                            ? variantes.map(v => ({
+                                talla:           v.talla           || null,
+                                color:           v.color           || null,
+                                codigoVariante:  v.codigo          || null,
+                                codigoBarras:    v.codigoBarras    || null,
+                                precioAdicional: parseFloat(v.precioAdicional) || 0,
+                                stockInicial:    parseInt(v.stock)    || 0,
+                                stockMinimo:     parseInt(v.stockMin) || 0,
+                            }))
+                            : null,
+                    }
+
+                    const response = await createProducto(body);
+                    console.log("Respuesta : ", response.data);
+                    
+                    return response.data 
+                })
+            )
+
+            const n = productos.length
+            toast.success(`${n} producto${n > 1 ? 's' : ''} registrado${n > 1 ? 's' : ''} correctamente`)
+            router.push('/dashboard/inventario/productos')
+        } catch (err) {
+            console.error('Error al confirmar lote:', err)
+            toast.error('Error al confirmar el lote')
+        } finally {
+            setGuardando(false)
+        }
     }
 
     return (
-        <div className="min-h-screen bg-[#E1E7F0] pb-24">
-
-            <div className="bg-white px-8 py-5" style={{ borderBottom: '0.5px solid rgba(31,47,87,0.1)' }}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-lg font-bold" style={{ color: '#1F2F57' }}>
-                            Ingreso de productos en lote
-                        </h1>
-                        <p className="text-xs mt-0.5" style={{ color: 'rgba(31,47,87,0.55)' }}>
-                            Registra varios productos a la vez para el almacén seleccionado.
-                        </p>
-                    </div>
-                    <Stepper paso={pasoActual} />
-                </div>
+      <div className="min-h-screen bg-[#E1E7F0] pb-24">
+        <div
+          className="bg-white px-8 py-5"
+          style={{ borderBottom: "0.5px solid rgba(31,47,87,0.1)" }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-lg font-bold" style={{ color: "#1F2F57" }}>
+                Ingreso de productos en lote
+              </h1>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "rgba(31,47,87,0.55)" }}
+              >
+                Registra varios productos a la vez para el almacén seleccionado.
+              </p>
             </div>
-
-            {pasoActual === 1 && <Stepper1
-                busqAlmacen={busqAlmacen}
-                setBusqAlmacen={setBusqAlmacen}
-                setAlmacenSel={setAlmacenSel}
-                filteredAlmacenes={filteredAlmacenes}
-                loading={loading}
-                almacenSeleccionado={almacenSeleccionado}
-            />}
-
-            {pasoActual === 2 && (
-                <Stepper2
-                    almacenSeleccionado={almacenActual}
-                />
-            )}
-
-            <div
-                className="fixed bottom-0 left-0 right-0 z-30 bg-white"
-                style={{ borderTop: '0.5px solid rgba(31,47,87,0.12)', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}
-            >
-                <div className="max-w-6xl mx-auto px-8 py-3.5 flex items-center justify-between gap-3">
-
-                    {pasoActual === 1 ? (
-                        <>
-                            <button
-                                onClick={() => router.push('/dashboard/inventario/productos/crear')}
-                                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
-                                style={{ color: 'rgba(31,47,87,0.6)', border: '0.5px solid rgba(31,47,87,0.18)' }}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={() => setPasoActual(2)}
-                                disabled={!almacenSeleccionado}
-                                className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-                                style={{ background: '#1F2F57' }}
-                            >
-                                Continuar →
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={() => setPasoActual(1)}
-                                className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
-                                style={{ color: 'rgba(31,47,87,0.6)', border: '0.5px solid rgba(31,47,87,0.18)' }}
-                            >
-                                ← Volver
-                            </button>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
-                                    style={{ color: '#3960A9', border: '0.5px solid rgba(57,96,169,0.3)' }}
-                                >
-                                    <Save size={14} />
-                                    Guardar borrador
-                                </button>
-                                <button
-                                    onClick={handleConfirmar}
-                                    disabled={guardando || hayErrores}
-                                    className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                                    style={{ background: '#1F2F57' }}
-                                >
-                                    {guardando
-                                        ? <><Loader2 size={13} className="animate-spin" /> Guardando...</>
-                                        : <><Check size={14} /> Confirmar lote</>
-                                    }
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
+            <Stepper paso={pasoActual} />
+          </div>
         </div>
-    )
+
+        {pasoActual === 1 && (
+          <Stepper1
+            busqAlmacen={busqAlmacen}
+            setBusqAlmacen={setBusqAlmacen}
+            setAlmacenSel={setAlmacenSel}
+            filteredAlmacenes={filteredAlmacenes}
+            loading={loading}
+            almacenSeleccionado={almacenSeleccionado}
+          />
+        )}
+
+        {pasoActual === 2 && (
+          <Stepper2
+            almacenSeleccionado={almacenActual}
+            handlePayload={setPayload}
+          />
+        )}
+
+        <div
+          className="fixed bottom-0 left-0 right-0 z-30 bg-white"
+          style={{
+            borderTop: "0.5px solid rgba(31,47,87,0.12)",
+            boxShadow: "0 -4px 20px rgba(0,0,0,0.06)",
+          }}
+        >
+          <div className="max-w-6xl mx-auto px-8 py-3.5 flex items-center justify-between gap-3">
+            {pasoActual === 1 ? (
+              <>
+                <button
+                  onClick={() =>
+                    router.push("/dashboard/inventario/productos/crear")
+                  }
+                  className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                  style={{
+                    color: "rgba(31,47,87,0.6)",
+                    border: "0.5px solid rgba(31,47,87,0.18)",
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => setPasoActual(2)}
+                  disabled={!almacenSeleccionado}
+                  className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: "#1F2F57" }}
+                >
+                  Continuar →
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setPasoActual(1)}
+                  className="flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                  style={{
+                    color: "rgba(31,47,87,0.6)",
+                    border: "0.5px solid rgba(31,47,87,0.18)",
+                  }}
+                >
+                  ← Volver
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-gray-50"
+                    style={{
+                      color: "#3960A9",
+                      border: "0.5px solid rgba(57,96,169,0.3)",
+                    }}
+                  >
+                    <Save size={14} />
+                    Guardar borrador
+                  </button>
+                  <button
+                    onClick={handleConfirmar}
+                    disabled={guardando || hayErrores}
+                    className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ background: "#1F2F57" }}
+                  >
+                    {guardando ? (
+                      <>
+                        <Loader2 size={13} className="animate-spin" />{" "}
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        <Check size={14} /> Confirmar lote
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
 }

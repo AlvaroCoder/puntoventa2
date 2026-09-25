@@ -14,6 +14,10 @@ export async function getTrabajadorById(id) {
     return fetchWithAuth(`${BASE}/${id}`)
 }
 
+export async function getTrabajadorByIdUser(userId) {
+    return fetchWithAuth(`${BASE}/usuario/${userId}`)
+}
+
 export async function createTrabajador(data = {}, token) {
     return fetch(`http://localhost:3030${BASE}`, {
       method: "POST",
