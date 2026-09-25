@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button'
 import DatosOC from '@/components/ordenes-compra/DatosOC'
 import BuscadorProducto from '@/components/ordenes-compra/BuscadorProducto'
 import TablaLineasOC from '@/components/ordenes-compra/TablaLineasOC'
-import DrawerProductoNuevo from '@/components/ordenes-compra/DrawerProductoNuevo'
 import ResumenOC from '@/components/ordenes-compra/ResumenOC'
 
 const INITIAL_FORM = {
@@ -307,14 +306,6 @@ export default function CrearOrdenCompraPage() {
                 </div>
 
             </div>
-
-            {/* ── Drawer de nuevo producto ─────────────────────────────── */}
-            <DrawerProductoNuevo
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                onCreado={handleProductoCreado}
-                nombreInicial={queryDrawer}
-            />
 
             {/* ── Modal de resumen post-creación ───────────────────────── */}
             <ResumenOC

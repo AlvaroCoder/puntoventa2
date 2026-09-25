@@ -1,7 +1,8 @@
 'use client'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Field } from '@/components/Inputs/Field'
+
 import { Input } from '@/components/ui/input'
+import Field from '@/elements/Field'
 
 /**
  * DatosOC — columna izquierda del formulario de orden de compra.

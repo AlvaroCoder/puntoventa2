@@ -136,7 +136,6 @@ function SkeletonCard() {
     )
 }
 
-/* ── página ── */
 export default function Page() {
     const { user } = useAuth()
     const [tiendas, setTiendas]   = useState([])
