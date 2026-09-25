@@ -133,7 +133,7 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-2">
-                <Button variant="secondary" onClick={()=>router.push("/signup")} icon={ArrowRight} className="text-base px-8 py-3.5 rounded-xl">
+                <Button variant="secondary" onClick={() => router.push('/signup')} icon={ArrowRight} className="text-base px-8 py-3.5 rounded-xl">
                   Probar por 30 días
                 </Button>
                 <Button variant="outline" icon={Play} className="text-base px-8 py-3.5 rounded-xl">

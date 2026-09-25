@@ -14,8 +14,16 @@ export async function getTrabajadorById(id) {
     return fetchWithAuth(`${BASE}/${id}`)
 }
 
-export async function createTrabajador(data = {}) {
-    return fetchWithAuth(BASE, { method: 'POST', body: data })
+export async function createTrabajador(data = {}, token) {
+    return fetch(`http://localhost:3030${BASE}`, {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 }
 
 export async function updateTrabajador(id, data = {}) {

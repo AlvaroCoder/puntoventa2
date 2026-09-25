@@ -18,18 +18,19 @@ export default function StepThreSignUp({
           </div>
           <InputField
               label={"Nombre Comercial"}
+              obligatory={true}
               icon={Store}
               name={"businessName"}
               placeholder={"Ej: Bodega El Chino"}
               value={formData?.businessName}
               onChange={handleInputChange}
-              error={null}
           />
           <InputField
               label={"RUC Empresa"}
               icon={Building2}
               name="ruc"
               placeholder="2012346789"
+            obligatory={true}
             onChange={handleInputChange}  
           />
           <div>

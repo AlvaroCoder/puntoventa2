@@ -13,11 +13,10 @@ import HorizontalStepper from "@/components/Stepper/HorizontalStepper";
 import StepOneSignUp from "@/components/Stepper/StepOneSignUp";
 import StepThreSignUp from "@/components/Stepper/StepThreSignUp";
 import { createTrabajador } from "@/Connections/trabajadores";
-
+import {toast} from 'react-toastify'
 
 const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804947/LOGO/positivo_co0kxc.png";
-const URL_LOGO_FULL =
-  "https://res.cloudinary.com/dabyqnijl/image/upload/v1788581897/01_bl0vpw.png";
+const URL_LOGO_FULL = "https://res.cloudinary.com/dabyqnijl/image/upload/v1788581897/01_bl0vpw.png";
 const PASSWORD_REQS = [
   (p) => p.length >= 8,
   (p) => /[A-Z]/.test(p),
@@ -28,17 +27,14 @@ const PASSWORD_REQS = [
 
 export default function SignUpPage() {
   const router = useRouter();
-
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading,   setIsLoading]   = useState(false);
   const [formData, setFormData] = useState({
     email: "", password: "", confirmPassword: "",
-    fullName: "", dni: "", phone: "",
-    businessName: "", ruc: "", businessType: "", storeCount: "",
+    businessName: "", ruc: "", businessType: "",
   });
   const [formDataEnterprise, setFormDataEnterprise] = useState({ rubro_id: 1 });
-  const [errors,      setErrors]      = useState({});
-  const [submitError, setSubmitError] = useState(null);
+  const [errors, setErrors]      = useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,6 +43,7 @@ export default function SignUpPage() {
       setErrors((prev) => { const n = { ...prev }; delete n[name]; return n; });
     }
   };
+
 
   const changeStep = async (direction) => {
     if (direction === "prev") { setCurrentStep((p) => p - 1); return; }
@@ -83,32 +80,7 @@ export default function SignUpPage() {
           break;
         }
 
-        case 2: {
-          if (!formData.fullName.trim()) {
-            setErrors((p) => ({ ...p, fullName: "Nombre completo requerido" })); hasError = true;
-          }
-          const dniClean = formData.dni.trim();
-          if (!dniClean) {
-            setErrors((p) => ({ ...p, dni: "Documento requerido" })); hasError = true;
-          } else if (!/^\d+$/.test(dniClean)) {
-            setErrors((p) => ({ ...p, dni: "Solo se permiten dígitos" })); hasError = true;
-          } else if (dniClean.length !== 8 && dniClean.length !== 11) {
-            setErrors((p) => ({ ...p, dni: "DNI debe tener 8 dígitos o RUC 11 dígitos" })); hasError = true;
-          }
-          const phoneClean = formData.phone.replace(/\s+/g, "");
-          if (!phoneClean) {
-            setErrors((p) => ({ ...p, phone: "Teléfono requerido" })); hasError = true;
-          } else if (!/^9\d{8}$/.test(phoneClean)) {
-            setErrors((p) => ({ ...p, phone: "Ingresa un celular peruano válido (9XXXXXXXX)" })); hasError = true;
-          }
-          if (!hasError) {
-            const docStatus = await getVerificarDocumento(dniClean);
-            if (docStatus === 404) {
-              setErrors((p) => ({ ...p, dni: "Documento inválido o ya registrado" })); hasError = true;
-            }
-          }
-          break;
-        }
+
       }
     } catch (error) {
       console.error("Error en validación:", error);
@@ -123,67 +95,103 @@ export default function SignUpPage() {
   const handleClickCategory = (id)=> setFormDataEnterprise((p) => ({ ...p, rubro_id: id }));
 
   const handleClickSubmit = async () => {
-    if (currentStep < 4) { await changeStep("next"); return; }
+
+    if (currentStep < 2) { await changeStep("next"); return; }
     const isValid = await changeStep("next");
     if (!isValid) return;
 
     setIsLoading(true);
-    setSubmitError(null);
-
+    
     try {
       const dataToSendUser = {
-        email: formData.email, password: formData.password,
-        nombre_completo: formData.fullName, ruc_dni: formData.dni, telefono: formData.phone,
+        email: formData.email,
+        password: formData.password,
       };
 
       const responseRegister     = await REGISTER_USER(dataToSendUser);
       const responseRegisterJSON = await responseRegister.json();
 
       if (!responseRegister.ok) {
-        setSubmitError(responseRegisterJSON?.message || "Error al registrar usuario");
+        toast.error(
+          responseRegisterJSON?.message || "Error al registrar usuario",
+        );
         setIsLoading(false);
         return;
       }
 
+      const plan_actual = 4;
       const token  = responseRegisterJSON?.data?.token;
       const idUser = responseRegisterJSON?.data?.usuario?.id;
 
       const dataToSendEnterprise = {
         usuario_id: idUser,
         rubro_id: formDataEnterprise.rubro_id,
-        plan_actual_id: 1,
+        plan_actual_id: plan_actual,
         nombre_empresa: formData.businessName,
         nombre_comercial: formData.businessName,
         ruc: formData.ruc,
         direccion: "",
-        telefono: formData.phone,
+        telefono: 0,
         email: formData.email,
         logo_url: "",
         moneda_base: "PEN",
       };
       
+      console.log("DATA ENTERPRISE : ", dataToSendEnterprise);
 
       const responseCreateEnterprise = await CREATE_COMPANY(dataToSendEnterprise, token);
+      const jsonResponseCreateEnterprise = await responseCreateEnterprise.json();
+
       if (!responseCreateEnterprise.ok) {
-        console.log("Error:", await responseCreateEnterprise.json());
-        setSubmitError("Usuario creado, pero error al crear empresa. Intenta iniciar sesión.");
+        console.log("Error al crear la empresa : ", jsonResponseCreateEnterprise);
+        
+        toast.error("No se pudo crear la empresa e: ", jsonResponseCreateEnterprise);
         setIsLoading(false);
         return;
       }
 
-      const responseCreateTrabajador = await createTrabajador()
+      console.log("RESPONSE CREATE ENTERPRISE : ", jsonResponseCreateEnterprise);
+      
+      const IdEmpresa = jsonResponseCreateEnterprise?.data?.empresa?.id;
+
+      const dataToSendTrabajador = {
+        usuario_id: idUser,
+        empresa_id: IdEmpresa,
+        email : formData?.email,
+        nombre_completo: "",
+        tipo_documento: "DNI",
+        numero_documento: "",
+        telefono: "",
+        codigo_empleado: `EMP-${Date.now()}`,
+        fecha_contratacion: null,
+        salario_base: 0,
+        rol_id: 1,
+        tienda_id : null
+      }
+      console.log('Data Send Trabajador : ',dataToSendTrabajador);
+      
+      const responseCreateTrabajador = await createTrabajador(dataToSendTrabajador, token);
+      const jsonResponseCreateTrabajador = await responseCreateTrabajador.json();
+      console.log(jsonResponseCreateTrabajador);
+      
+      if (!responseCreateTrabajador.ok) {
+          toast.error("No se pudo crear al trabajador")
+          setIsLoading(false);
+          return;
+      }
 
       const loginResult = await login({ email: formData.email, password: formData.password });
       if (loginResult.error) {
-        setSubmitError("Registro exitoso. Por favor inicia sesión.");
+        toast.error("Hubo un error al iniciar sesión");
         setIsLoading(false);
         router.push("/login");
         return;
       }
 
-      router.push("/dashboard/home");
+      router.push("/dashboard");
+      toast.success("Te registraste exitosamente")
     } catch (error) {
-      setSubmitError("Error inesperado. Por favor intenta de nuevo.");
+      toast.error("Error inesperado. Por favor intenta de nuevo.");
       setIsLoading(false);
     }
   };
