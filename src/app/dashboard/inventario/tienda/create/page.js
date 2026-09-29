@@ -44,7 +44,6 @@ const onBlurInput = e => {
     e.target.style.boxShadow   = 'none'
 }
 
-/* ── sub-componentes ── */
 function Field({ label, required, hint, children }) {
     return (
         <div className="grid items-start gap-6" style={{ gridTemplateColumns: '160px 1fr' }}>

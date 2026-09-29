@@ -10,14 +10,62 @@ import ReceiptLongIcon   from '@mui/icons-material/ReceiptLong'
 import BadgeIcon         from '@mui/icons-material/Badge'
 
 const MODULES = [
-    { id:'clientes',  title:'Clientes', subtitle:'Clientes y créditos', href:'/dashboard/clientes',    Icon:PeopleIcon,        bg:'#1F4363', hover:'#1a3557' },
-    { id:'ventas',    title:'Ventas', subtitle:'Registro de ventas', href:'/dashboard/ventas',      Icon:ShoppingCartIcon,  bg:'#FE811F', hover:'#e5731a' },
-    { id:'logistica', title:'Logística', subtitle:'Ordenes de compra y entradas', href:'/dashboard/logistica',   Icon:LocalShippingIcon, bg:'#1B8D7C', hover:'#167567' },
-    { id:'inventario',title:'Inventario', subtitle:'Productos y stock', href:'/dashboard/inventario',  Icon:InventoryIcon,     bg:'#1F4363', hover:'#1a3557' },
-    { id: 'personal', title: 'Personal', subtitle: 'Gestión de empleados', href: '/dashboard/trabajadores', Icon: BadgeIcon, bg: '#1F4363', hover: '#1a3557' },
-    {id : 'caja', title : 'Caja', subtitle : 'Gestión de caja y movimientos', href : '/dashboard/caja', Icon : ReceiptLongIcon, bg: '#FE811F', hover : '#e5731a'},
-    { id: 'sunat', title: 'SUNAT/NUBEFACT', subtitle: 'Facturación electrónica', href: '/dashboard/bd/clientes', Icon: ReceiptLongIcon, bg: '#1B8D7C', hover: '#167567' },
-]
+  {
+    id: "inventario",
+    title: "Inventario",
+    subtitle: "Productos y stock",
+    href: "/dashboard/inventario",
+    Icon: InventoryIcon,
+    bg: "#1F4363",
+    hover: "#1a3557",
+  },
+
+  {
+    id: "ventas",
+    title: "Punto de Venta",
+    subtitle: "Gestiona tu Punto de venta",
+    href: "/dashboard/ventas",
+    Icon: ShoppingCartIcon,
+    bg: "#FE811F",
+    hover: "#e5731a",
+  },
+  {
+    id: "logistica",
+    title: "Logística",
+    subtitle: "Ordenes de compra y entradas",
+    href: "/dashboard/logistica",
+    Icon: LocalShippingIcon,
+    bg: "#1B8D7C",
+    hover: "#167567",
+  },
+  {
+    id: "personal",
+    title: "Personal",
+    subtitle: "Gestión de empleados",
+    href: "/dashboard/trabajadores",
+    Icon: BadgeIcon,
+    bg: "#1F4363",
+    hover: "#1a3557",
+  },
+  {
+    id: "caja",
+    title: "Caja",
+    subtitle: "Gestión de caja y movimientos",
+    href: "/dashboard/caja",
+    Icon: ReceiptLongIcon,
+    bg: "#FE811F",
+    hover: "#e5731a",
+  },
+  {
+    id: "sunat",
+    title: "SUNAT/NUBEFACT",
+    subtitle: "Facturación electrónica",
+    href: "/dashboard/bd/clientes",
+    Icon: ReceiptLongIcon,
+    bg: "#1B8D7C",
+    hover: "#167567",
+  },
+];
 
 const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
