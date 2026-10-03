@@ -2,25 +2,31 @@ const BASE_URL_SPRING = process.env.NEXT_PUBLIC_BASE_URL_2 ?? 'http://localhost:
 const BASE_URL_EXPRESS = process.env.NEXT_PUBLIC_BASE_URL_1 ?? 'http://localhost:3030'
 
 const BASE_CAJA = BASE_URL_SPRING + '/api/cajas';
+const BASE_CAJA_2 = BASE_URL_EXPRESS + '/api/caja'
 const BASE_INVENTARIO = BASE_URL_SPRING + '/api/inventario';
 const BASE_PRODUCTO = BASE_URL_SPRING + '/api/productos';
 const BASE_VARIANTES = BASE_URL_SPRING + '/api/variantes';
 const BASE_CATEGORIA = BASE_URL_EXPRESS + '/api/categoria';
 const BASE_IMAGES = BASE_URL_SPRING + '/api/imagenes';
 export const CAJA_ENDPOINTS = {
-    getAllCajasByTienda: (tiendaId) => `${BASE_CAJA}?tiendaId=${tiendaId}`,
-    getCajaByTienda : (tiendaId, idCaja) => `${BASE_CAJA}/${idCaja}?tiendaId=${tiendaId}`,
-    createCaja: () => BASE_CAJA,
-    updateCaja: (cajaId, tiendaId) => `${BASE_CAJA}/${cajaId}?tiendaId=${tiendaId}`,
-    getSesionActual: (cajaId) => `${BASE_CAJA}/${cajaId}/sesion`,
-    getSesionesActivas : (tiendaId)=>`${BASE_CAJA}/sesiones/activas?tiendaId=${tiendaId}`,
-    getSesionesByCaja: (cajaId) => `${BASE_CAJA}/sesiones?cajaId=${cajaId}`,
-    abrirCaja: (sesionId) => `${BASE_CAJA}/sesiones/${sesionId}/abrir`,
-    cerrarCaja: (sesionId) => `${BASE_CAJA}/sesiones/${sesionId}/cerrar`,
-    getSesionesActivas: (tiendaId) => `${BASE_CAJA}/sesiones/activas?tiendaId=${tiendaId}`,
-    registerMovements: (cajaId) => `${BASE_CAJA}/${cajaId}/movimientos`,
-    getMovementsByCaja: (cajaId) => `${BASE_CAJA}/${cajaId}/movimientos`,
-}
+  getCajas: () => `${BASE_CAJA_2}`,
+  getAllCajasByTienda: (tiendaId) => `${BASE_CAJA}?tiendaId=${tiendaId}`,
+  getCajaByTienda: (tiendaId, idCaja) =>
+    `${BASE_CAJA}/${idCaja}?tiendaId=${tiendaId}`,
+  createCaja: () => BASE_CAJA,
+  updateCaja: (cajaId, tiendaId) =>
+    `${BASE_CAJA}/${cajaId}?tiendaId=${tiendaId}`,
+  getSesionActual: (cajaId) => `${BASE_CAJA}/${cajaId}/sesion`,
+  getSesionesActivas: (tiendaId) =>
+    `${BASE_CAJA}/sesiones/activas?tiendaId=${tiendaId}`,
+  getSesionesByCaja: (cajaId) => `${BASE_CAJA}/sesiones?cajaId=${cajaId}`,
+  abrirCaja: (sesionId) => `${BASE_CAJA}/sesiones/${sesionId}/abrir`,
+  cerrarCaja: (sesionId) => `${BASE_CAJA}/sesiones/${sesionId}/cerrar`,
+  getSesionesActivas: (tiendaId) =>
+    `${BASE_CAJA}/sesiones/activas?tiendaId=${tiendaId}`,
+  registerMovements: (cajaId) => `${BASE_CAJA}/${cajaId}/movimientos`,
+  getMovementsByCaja: (cajaId) => `${BASE_CAJA}/${cajaId}/movimientos`,
+};
 
 export const INVENTARIO_ENDPOINTS = {
     getStockByTienda: (tiendaId) => `${BASE_INVENTARIO}/tienda/${tiendaId}`,

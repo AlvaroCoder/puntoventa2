@@ -98,7 +98,7 @@ const [error, setError] = useState(null);
             dataTiendas.map((t) => getCajaByTienda(t.id)),
         );
         
-        const dataCajas = responsesCajas.map((r) => r.data?.data ?? []);
+        const dataCajas = responsesCajas.map((r) => r.data ?? []);
         
             const data = unirTiendasConCajas(dataTiendas, dataCajas);
             setTiendas(data)

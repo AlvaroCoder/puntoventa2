@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export default function PanelTiendas({ tienda }) {
     const router = useRouter();
+    const idTienda = tienda?.id;
   return (
     <div key={tienda.id} className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
@@ -42,7 +43,7 @@ export default function PanelTiendas({ tienda }) {
               </div> : 
             <div className='flex-1 p-4 rounded-xl bg-gray-100 min-h-40 flex flex-col gap-4 justify-center items-center'>
                   <h1 className='font-semibold text-azulMarino text-lg'>Aún no has registrado una caja en este local</h1>
-                  <PrimaryButton handleClick={()=>router.push("/dashboard/ventas/caja/crear")}><Plus/> Crear Caja</PrimaryButton>
+                  <PrimaryButton handleClick={()=>router.push(`/dashboard/ventas/caja/create?tiendaId=${idTienda}`)}><Plus/> Crear Caja</PrimaryButton>
             </div>}
     </div>
   );

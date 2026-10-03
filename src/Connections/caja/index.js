@@ -3,6 +3,10 @@ import { CAJA_ENDPOINTS } from '../EndpointsRouter';
 
 const ENDPOINTS = CAJA_ENDPOINTS;
 
+export async function getAllCajas() {
+    return fetchWithAuth(ENDPOINTS.getCajas())
+}
+
 export async function getCajaByTienda(tiendaId) {
     return fetchWithAuth(ENDPOINTS.getAllCajasByTienda(tiendaId), {}, 'spring')
 }

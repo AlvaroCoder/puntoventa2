@@ -1,354 +1,145 @@
 'use client'
-import React, { useEffect, useState, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import { toast } from 'react-toastify'
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { Plus, LayoutGrid } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/Context/AuthContext'
-import { getTiendasByEmpresa } from '@/Connections/tiendas'
-import {
-    getCajaByTienda,
-     getSesionesByCaja,
-    getMovimientosByCaja,
-    getSesionesActivas, 
-} from '@/Connections/caja'
-import { Button } from '@/components/ui/button'
+import { getAllCajas } from '@/Connections/caja'
+import CajaCard from '@/components/Cards/CajaCard'
+import { Title } from '@/components/Titles/Title'
+import { toast } from 'react-toastify'
 
-import AddIcon from '@mui/icons-material/Add'
-import LockOpenIcon from '@mui/icons-material/LockOpen'
-import LockIcon from '@mui/icons-material/Lock'
-import EditIcon from '@mui/icons-material/Edit'
-import PointOfSaleIcon from '@mui/icons-material/PointOfSale'
-import SwapVertIcon from '@mui/icons-material/SwapVert'
-import HistoryIcon from '@mui/icons-material/History'
-import StorefrontIcon from '@mui/icons-material/Storefront'
-import DialogCaja from '@/elements/DialogCaja';
-import DialogAbrirCaja from '@/elements/DialogAbrirCaja';
-import DialogCerrarCaja from '@/elements/DialogCerrarCaja';
-import DialogMovimiento from '@/elements/DialogMovimiento';
-import TablaMovimientos from '@/components/Tables/TablaMovimientos';
-import TablaSesiones from '@/components/Tables/TablaSesiones'
-import { fmtDate } from '@/lib/utils'
+function normalizarCaja(caja) {
+    const estado = caja.estado ?? 'CERRADA'
+    const base   = { id: caja.id, nombre: caja.nombre, codigo: caja.codigo, estado }
 
-const fmt = v =>
-    new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
-
-const extractList = res =>
-    res?.data?.data?.data ?? res?.data?.data ?? res?.data ?? []
-
-const extractOne = res => {
-    const d = res?.data?.data ?? res?.data
-    if (!d) return null
-    if (Array.isArray(d)) return d[0] ?? null
-    return d
+    if (estado === 'ABIERTA') return {
+        ...base,
+        cajero:        caja.cajero        ?? caja.responsable ?? '-',
+        hora_apertura: caja.hora_apertura ?? caja.fechaApertura ?? '-',
+        ventas_hoy:    Number(caja.ventas_hoy  ?? 0),
+        num_ventas:    Number(caja.num_ventas   ?? 0),
+    }
+    if (estado === 'TRASPASO') return {
+        ...base,
+        cajero:         caja.cajero          ?? '-',
+        hora_apertura:  caja.hora_apertura    ?? '-',
+        monto_traspaso: Number(caja.monto_traspaso ?? 0),
+    }
+    return {
+        ...base,
+        ultimo_cierre: caja.ultimo_cierre ?? caja.fechaCierre ?? 'Sin registros',
+        ultimo_cajero: caja.ultimo_cajero ?? caja.cajero      ?? '-',
+    }
 }
 
+function SkeletonCard() {
+    return (
+        <div
+            className="bg-white rounded-xl p-4 flex flex-col gap-3 animate-pulse"
+            style={{ border: '0.5px solid rgba(31,47,87,0.1)', borderLeft: '3px solid rgba(31,47,87,0.1)' }}
+        >
+            <div className="flex justify-between gap-2">
+                <div className="h-3 rounded w-1/2" style={{ background: 'rgba(31,47,87,0.08)' }} />
+                <div className="h-4 rounded-full w-14" style={{ background: 'rgba(31,47,87,0.06)' }} />
+            </div>
+            <div className="h-2 rounded w-1/4" style={{ background: 'rgba(31,47,87,0.05)' }} />
+            <div style={{ borderTop: '0.5px solid rgba(31,47,87,0.08)' }} />
+            {[60, 50, 40].map((w, i) => (
+                <div key={i} className="h-2.5 rounded" style={{ width: `${w}%`, background: 'rgba(31,47,87,0.05)' }} />
+            ))}
+        </div>
+    )
+}
 
 export default function PageCaja() {
-    const { user } = useAuth()
-
-    const [tiendas, setTiendas] = useState([])
-    const [tiendaId, setTiendaId] = useState('')
-    const [caja, setCaja] = useState(null)
-    const [sesion, setSesion] = useState(null)
-    const [sesiones, setSesiones] = useState([])
-    const [movimientos, setMovimientos] = useState([])
-
-    const [loadingTiendas,  setLoadingTiendas]  = useState(true)
-    const [loadingCaja, setLoadingCaja] = useState(false)
-    const [loadingMovs, setLoadingMovs] = useState(false)
-    const [loadingSesiones, setLoadingSesiones] = useState(false)
-
-    const [tab, setTab] = useState('movimientos')
-
-    const [dlgCaja, setDlgCaja]      = useState(false)
-    const [dlgAbrir, setDlgAbrir]     = useState(false)
-    const [dlgCerrar, setDlgCerrar]    = useState(false)
-    const [dlgMovimiento, setDlgMovimiento] = useState(false)
+    const { user }  = useAuth()
+    const [cajas,   setCajas]   = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (!user?.empresa_id) return
-        async function load() {
+        let cancelado = false
+
+        async function fetchData() {
+            setLoading(true)
             try {
-                const res = await getTiendasByEmpresa(user.empresa_id);                
-                const list = extractList(res)
-                setTiendas(list)
-                if (list.length === 1) setTiendaId(String(list[0].id))
-            } catch {
-                toast.error('Error al cargar las tiendas')
+                const res = await getAllCajas()
+                console.log("RESPONSE : ", res);
+                
+                const data = res?.data?.data ?? res?.data ?? []
+                const list = Array.isArray(data) ? data : []
+                if (!cancelado) setCajas(list.map(normalizarCaja))
+            } catch (err) {
+                console.error('Error cargando cajas:', err)
+                if (!cancelado) toast.error('Error al cargar las cajas')
             } finally {
-                setLoadingTiendas(false)
+                if (!cancelado) setLoading(false)
             }
         }
-        load()
-    }, [user])
 
-    const loadCaja = useCallback(async () => {
-        if (!tiendaId) return
-        setLoadingCaja(true)
-        setCaja(null)
-        setSesion(null)
-        setMovimientos([])
-        setSesiones([])
-        try {
-            const res = await getCajaByTienda(tiendaId);
-
-            const cajaObj = extractOne(res)
-            setCaja(cajaObj)
-            if (cajaObj?.id) {                
-                const cajaId = cajaObj.id;
-                const resSesion = await getSesionesActivas(tiendaId);
-                const sesion = resSesion.data;
-                const sesionActual = sesion?.filter((item)=>item?.cajaId == cajaId)[0] ?? null;
-                setSesion(sesionActual);
-            }
-        } catch {
-            toast.error('Error al cargar la caja')
-        } finally {
-            setLoadingCaja(false)
-        }
-    }, [tiendaId])
-
-    // Se precarga el estado de la caja
-    useEffect(() => { loadCaja() }, [loadCaja])
-
-    useEffect(() => {
-        if (!caja?.id) return
-        if (tab === 'movimientos') {
-            const sesionIdActivo = sesion?.id;
-            setLoadingMovs(true)
-            getMovimientosByCaja(sesionIdActivo)
-                .then(res =>  setMovimientos(extractList(res))  )
-                .catch(() => toast.error('Error al cargar movimientos'))
-                .finally(() => setLoadingMovs(false));
-        } else {
-            setLoadingSesiones(true)
-            getSesionesByCaja(caja?.id)
-                .then(res => setSesiones(extractList(res)))
-                .catch(() => toast.error('Error al cargar sesiones'))
-                .finally(() => setLoadingSesiones(false));
-        }
-    }, [caja?.id, tab, sesion])
-
-    const reloadMovimientos = useCallback(() => {
-        const sesionIdActivo = sesion?.id;
-
-        setLoadingMovs(true)
-        getMovimientosByCaja(sesionIdActivo)
-            .then(res => setMovimientos(extractList(res)))
-            .catch(() => {})
-            .finally(() => setLoadingMovs(false))
-        
-    }, [sesion])
-    
-    const cajaAbierta = sesion?.estado === "ABIERTA" 
+        fetchData()
+        return () => { cancelado = true }
+    }, [user?.empresa_id])
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="p-6 flex flex-col gap-6 bg-[#E1E7F0] min-h-full">
+
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
-                    <h1 className="font-bold text-[#1F4363] text-2xl">Movimientos de Caja</h1>
-                    <p className="text-sm text-gray-400">Gestiona los movimientos de caja de tus tiendas</p>
+                    <Title>Gestión de Cajas</Title>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(31,47,87,0.55)' }}>
+                        Administra las cajas registradas en tus tiendas.
+                    </p>
                 </div>
-                {caja && (
-                    <Button
-                        onClick={() => setDlgCaja(true)}
-                        variant="outline"
-                        className="flex items-center gap-2 border-[#1F4363]/20 text-[#1F4363] font-semibold hover:bg-[#1F4363]/5"
-                    >
-                        <EditIcon style={{ fontSize: 16 }} />
-                        Editar Caja
-                    </Button>
-                )}
-            </div>
-
-            <div className="mb-6">
-                <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Tienda</label>
-                {loadingTiendas ? (
-                    <div className="h-10 w-64 bg-gray-100 rounded-xl animate-pulse" />
-                ) : (
-                    <select
-                        value={tiendaId}
-                        onChange={e => setTiendaId(e.target.value)}
-                        className="h-10 px-3 pr-8 rounded-xl border border-gray-200 text-sm text-[#1F4363] font-medium bg-white shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF821E]/30 focus:border-[#FF821E] min-w-[220px] transition-all"
-                    >
-                        <option value="">— Selecciona una tienda —</option>
-                        {tiendas.map(t => (
-                            <option key={t.id} value={t.id}>{t.nombre}</option>
-                        ))}
-                    </select>
-                )}
-            </div>
-
-            {!tiendaId ? (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
-                        <StorefrontIcon style={{ fontSize: 32, color: '#D1D5DB' }} />
-                    </div>
-                    <p className="text-gray-400 text-sm font-medium">Selecciona una tienda para ver su caja</p>
-                </div>
-
-            ) : loadingCaja ? (
-                <div className="space-y-4">
-                    <div className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
-                    <div className="h-10 w-56 bg-gray-100 rounded-xl animate-pulse" />
-                    <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
-                </div>
-
-            ) : !caja ? (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-2xl border border-dashed border-gray-300 shadow-sm flex flex-col items-center justify-center py-20 text-center"
+                <Link
+                    href="/dashboard/ventas/caja/create"
+                    className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-xs font-bold text-white transition-opacity hover:opacity-90 self-start sm:self-auto"
+                    style={{ background: '#1F2F57' }}
                 >
-                    <div className="w-16 h-16 rounded-2xl bg-[#FF821E]/10 flex items-center justify-center mb-4">
-                        <PointOfSaleIcon style={{ fontSize: 32, color: '#FF821E' }} />
-                    </div>
-                    <p className="text-[#1F4363] font-semibold text-base">No hay caja registrada</p>
-                    <p className="text-gray-400 text-sm mt-1 mb-5">Crea la caja para comenzar a operar</p>
-                    <Button
-                        onClick={() => setDlgCaja(true)}
-                        className="flex items-center gap-2 bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold shadow-sm"
-                    >
-                        <AddIcon style={{ fontSize: 18 }} />
-                        Crear Caja
-                    </Button>
-                </motion.div>
+                    <Plus size={14} />
+                    Nueva Caja
+                </Link>
+            </div>
 
+            {/* Content */}
+            {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+                </div>
+            ) : cajas.length === 0 ? (
+                <div
+                    className="bg-white rounded-xl flex flex-col items-center gap-3 py-20 text-center"
+                    style={{ border: '0.5px solid rgba(31,47,87,0.1)' }}
+                >
+                    <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                        style={{ background: 'rgba(31,47,87,0.07)' }}
+                    >
+                        <LayoutGrid size={26} style={{ color: 'rgba(31,47,87,0.25)' }} />
+                    </div>
+                    <p className="text-sm font-semibold" style={{ color: 'rgba(31,47,87,0.4)' }}>
+                        No hay cajas registradas
+                    </p>
+                    <Link
+                        href="/dashboard/ventas/caja/create"
+                        className="text-xs font-semibold mt-1 transition-opacity hover:opacity-70"
+                        style={{ color: '#3960A9' }}
+                    >
+                        + Crear la primera caja
+                    </Link>
+                </div>
             ) : (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-5"
-                >
-                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                                    cajaAbierta ? 'bg-green-100' : 'bg-gray-100'
-                                }`}>
-                                    {cajaAbierta
-                                        ? <LockOpenIcon style={{ fontSize: 24, color: '#16a34a' }} />
-                                        : <LockIcon    style={{ fontSize: 24, color: '#9CA3AF' }} />
-                                    }
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <h2 className="font-bold text-[#1F4363] text-lg">{caja.nombre}</h2>
-                                        {cajaAbierta ? (
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                                Abierta
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-                                                Cerrada
-                                            </span>
-                                        )}
-                                    </div>
-                                    {caja.descripcion && (
-                                        <p className="text-sm text-gray-400 mt-0.5">{caja.descripcion}</p>
-                                    )}
-                                    {cajaAbierta && sesion?.fecha_apertura && (
-                                        <p className="text-xs text-gray-400 mt-0.5">
-                                            Abierta desde: {fmtDate(sesion.fecha_apertura)}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-2">
-                                {cajaAbierta ? (
-                                    <>
-                                        {sesion && (
-                                            <div className="text-right pr-3 border-r border-gray-200">
-                                                <p className="text-xs text-gray-400">Apertura</p>
-                                                <p className="font-bold text-[#1F4363] text-base">
-                                                    {fmt(sesion.montoApertura)}
-                                                </p>
-                                            </div>
-                                        )}
-                                        <Button
-                                            onClick={() => setDlgMovimiento(true)}
-                                            className="flex items-center gap-2 bg-[#FF821E] hover:bg-[#FF821E]/90 text-white font-bold"
-                                        >
-                                            <AddIcon style={{ fontSize: 18 }} />
-                                            Movimiento
-                                        </Button>
-                                        <Button
-                                            onClick={() => setDlgCerrar(true)}
-                                            variant="outline"
-                                            className="flex items-center gap-2 border-red-200 text-red-500 hover:bg-red-50 font-semibold"
-                                        >
-                                            <LockIcon style={{ fontSize: 16 }} />
-                                            Cerrar Caja
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <Button
-                                        onClick={() => setDlgAbrir(true)}
-                                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold"
-                                    >
-                                        <LockOpenIcon style={{ fontSize: 18 }} />
-                                        Abrir Caja
-                                    </Button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
-                        {[
-                            { key: 'movimientos', label: 'Movimientos', icon: <SwapVertIcon style={{ fontSize: 16 }} /> },
-                            { key: 'sesiones',    label: 'Sesiones',    icon: <HistoryIcon  style={{ fontSize: 16 }} /> },
-                        ].map(t => (
-                            <button
-                                key={t.key}
-                                onClick={() => setTab(t.key)}
-                                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                                    tab === t.key
-                                        ? 'bg-white text-[#1F4363] shadow-sm'
-                                        : 'text-gray-400 hover:text-gray-600'
-                                }`}
-                            >
-                                {t.icon}
-                                {t.label}
-                            </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <AnimatePresence mode="popLayout">
+                        {cajas.map(caja => (
+                            <CajaCard key={caja.id} caja={caja} />
                         ))}
-                    </div>
-
-                    {tab === 'movimientos' ? (
-                        <TablaMovimientos data={movimientos} loading={loadingMovs} />
-                    ) : (
-                        <TablaSesiones data={sesiones} loading={loadingSesiones} />
-                    )}
-                </motion.div>
+                    </AnimatePresence>
+                </div>
             )}
 
-            <DialogCaja
-                open={dlgCaja}
-                onClose={() => setDlgCaja(false)}
-                caja={caja}
-                tiendaId={tiendaId}
-                onSuccess={loadCaja}
-            />
-            <DialogAbrirCaja
-                tiendaId={tiendaId}
-                open={dlgAbrir}
-                onClose={() => setDlgAbrir(false)}
-                cajaId={caja?.id}
-                onSuccess={loadCaja}
-            />
-            <DialogCerrarCaja
-                open={dlgCerrar}
-                onClose={() => setDlgCerrar(false)}
-                sesion={sesion}
-                onSuccess={loadCaja}
-            />
-            <DialogMovimiento
-                open={dlgMovimiento}
-                cajaId={caja?.id}
-                onClose={() => setDlgMovimiento(false)}
-                cajaSesionId={sesion?.id}
-                onSuccess={reloadMovimientos}
-            />
         </div>
     )
 }
