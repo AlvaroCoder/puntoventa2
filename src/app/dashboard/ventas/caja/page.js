@@ -64,9 +64,7 @@ export default function PageCaja() {
         async function fetchData() {
             setLoading(true)
             try {
-                const res = await getAllCajas()
-                console.log("RESPONSE : ", res);
-                
+                const res = await getAllCajas();                
                 const data = res?.data?.data ?? res?.data ?? []
                 const list = Array.isArray(data) ? data : []
                 if (!cancelado) setCajas(list.map(normalizarCaja))
@@ -103,7 +101,6 @@ export default function PageCaja() {
                 </Link>
             </div>
 
-            {/* Content */}
             {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}

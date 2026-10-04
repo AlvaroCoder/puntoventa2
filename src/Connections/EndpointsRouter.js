@@ -16,7 +16,7 @@ export const CAJA_ENDPOINTS = {
   createCaja: () => BASE_CAJA,
   updateCaja: (cajaId, tiendaId) =>
     `${BASE_CAJA}/${cajaId}?tiendaId=${tiendaId}`,
-  getSesionActual: (cajaId) => `${BASE_CAJA}/${cajaId}/sesion`,
+  getSesionActual: (cajaId) => `${BASE_CAJA_2}/${cajaId}/sesion`,
   getSesionesActivas: (tiendaId) =>
     `${BASE_CAJA}/sesiones/activas?tiendaId=${tiendaId}`,
   getSesionesByCaja: (cajaId) => `${BASE_CAJA}/sesiones?cajaId=${cajaId}`,

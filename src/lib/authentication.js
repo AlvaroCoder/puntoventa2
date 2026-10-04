@@ -52,7 +52,8 @@ export async function login(dataUser) {
         access_token: data?.token,
         esAdmin: esDueno,
         empresa_id: data?.usuario?.empresa_id ?? null,
-        rubro_id : data?.usuario?.rubro_id,        
+        rubro_id: data?.usuario?.rubro_id,
+        trabajador_id : data?.usuario?.trabajador_id
     };
     const session = await encrypt(user);
     (await cookies()).set("session", session, { expires, httpOnly: true });

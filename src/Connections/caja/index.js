@@ -24,7 +24,7 @@ export async function getCajaById(cajaId) {
 }
 
 export async function getSesionActual(cajaId) {
-    return fetchWithAuth(ENDPOINTS.getSesionActual(cajaId), {}, 'spring')
+    return fetchWithAuth(ENDPOINTS.getSesionActual(cajaId), {})
 }
 
 export async function getSesionesActivas(tiendaId) { 

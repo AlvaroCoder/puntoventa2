@@ -296,7 +296,6 @@ export default function Page() {
           </div>
         )}
 
-        {/* ── Sidebars y modales ───────────────────────────────── */}
         <SliderClientData
           open={!!clientSelected}
           onClose={() => setClientSelected(null)}

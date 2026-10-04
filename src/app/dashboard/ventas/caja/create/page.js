@@ -107,7 +107,7 @@ function CreateCajaForm() {
         try {
             await createCaja(buildPayload())
             toast.success('Caja creada correctamente')
-            router.push('/dashboard/ventas')
+            router.push('/dashboard/ventas/caja')
         } catch {
             toast.error('Error al crear la caja')
         } finally {
@@ -118,12 +118,17 @@ function CreateCajaForm() {
     const handleCreateAndOpen = async () => {
         if (!validate()) return
         setLoading(true)
-        try {
+      try {
+        const sendData = {
+          trabajadorId: user?.trabajador_id,
+          montoApertura: 0,
+          observaciones : "Se creo e inicio la caja"
+          }
             const res    = await createCaja(buildPayload())
             const cajaId = res?.data?.data?.id ?? res?.data?.id
-            if (cajaId) await abrirCaja(cajaId)
+            if (cajaId) await abrirCaja(cajaId, sendData)
             toast.success('Caja creada y abierta correctamente')
-            router.push('/dashboard/ventas')
+            router.push('/dashboard/ventas/caja')
         } catch {
             toast.error('Error al crear/abrir la caja')
         } finally {
@@ -272,6 +277,7 @@ function CreateCajaForm() {
 }
 
 export default function PageCreateCaja() {
+  
     return (
         <Suspense>
             <CreateCajaForm />
