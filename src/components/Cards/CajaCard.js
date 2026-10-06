@@ -8,6 +8,8 @@ import {
 import { getSesionActual, abrirCaja } from '@/Connections/caja';
 import SwitcherLoader from '../Navigation/SwitcherLoader';
 import { toast } from 'react-toastify';
+import { useAuth } from '@/Context/AuthContext';
+import { getTrabajadoresByEmpresa } from '@/Connections/trabajadores';
 
 const ESTADO_CONFIG = {
     ABIERTA: {
@@ -30,6 +32,12 @@ const ESTADO_CONFIG = {
     },
 };
 
+const BASE_SELECT_STYLE = {
+    border:     '1px solid rgba(31,47,87,0.18)',
+    color:      '#1F2F57',
+    background: '#fff',
+}
+
 const fmt = v =>
     new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(v ?? 0);
 
@@ -50,12 +58,16 @@ function InfoRow({ icon, label, value, valueStyle }) {
 }
 
 export default function CajaCard({ caja }) {
-    const router = useRouter()
+    const { user } = useAuth();
+    const router   = useRouter()
+
     const [session,         setSession]         = useState(null);
     const [loading,         setLoading]         = useState(false);
     const [showAbrirDialog, setShowAbrirDialog] = useState(false);
     const [montoApertura,   setMontoApertura]   = useState('');
     const [abriendo,        setAbriendo]        = useState(false);
+    const [trabajadores,    setTrabajadores]    = useState([]);
+    const [trabajadorId,    setTrabajadorId]    = useState(null);
 
     useEffect(() => {
         async function fetchSession() {
@@ -72,13 +84,27 @@ export default function CajaCard({ caja }) {
         fetchSession();
     }, [caja]);
 
+    useEffect(() => {
+        if (!user?.empresa_id || !user?.esAdmin) return;
+        async function fetchTrabajadores() {
+            try {
+                const response = await getTrabajadoresByEmpresa(user.empresa_id);
+                setTrabajadores(response.data?.data ?? []);
+            } catch {
+            }
+        }
+        fetchTrabajadores();
+    }, [user?.empresa_id, user?.esAdmin]);
+
     const estado = session?.estado?.toUpperCase() ?? 'CERRADA'
-    const cfg    = ESTADO_CONFIG[estado] ?? ESTADO_CONFIG.CERRADA;
+    const cfg = ESTADO_CONFIG[estado] ?? ESTADO_CONFIG.CERRADA;
 
     const handleCardClick = () => {
         if (estado === 'ABIERTA') {
             router.push(`/dashboard/ventas/caja/pos?cajaId=${caja.id}`)
         } else {
+            setTrabajadorId(user?.trabajador_id ?? null)
+            setMontoApertura('')
             setShowAbrirDialog(true)
         }
     }
@@ -86,7 +112,10 @@ export default function CajaCard({ caja }) {
     const handleAbrirCaja = async () => {
         setAbriendo(true)
         try {
-            await abrirCaja(caja.id, { montoApertura: parseFloat(montoApertura) || 0 })
+            await abrirCaja(caja.id, {
+                montoApertura: parseFloat(montoApertura) || 0,
+                trabajadorId:  trabajadorId ?? user?.trabajador_id,
+            })
             toast.success('Caja abierta correctamente')
             setShowAbrirDialog(false)
             router.push(`/dashboard/ventas/caja/pos?cajaId=${caja.id}`)
@@ -165,7 +194,7 @@ export default function CajaCard({ caja }) {
                             <>
                                 <InfoRow icon={<Clock size={11} />} label="Último cierre" value={caja.ultimo_cierre} />
                                 <InfoRow icon={<User size={11} />}  label="Cajero"        value={caja.ultimo_cajero} />
-                                <div className="mt-2 flex items-center gap-1 text-xs font-semibold" style={{ color: '#3960A9' }}>
+                                <div className="mt-2 flex items-center gap-1 text-xs font-semibold" style={{ color: "#3960A9" }}>
                                     <LockOpen size={12} />
                                     Abrir para operar
                                 </div>
@@ -175,42 +204,75 @@ export default function CajaCard({ caja }) {
                 </motion.div>
             </SwitcherLoader>
 
-            {/* ── Dialog: Abrir caja ── */}
             {showAbrirDialog && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center"
-                    style={{ background: 'rgba(0,0,0,0.35)' }}
+                    style={{ background: "rgba(0,0,0,0.35)" }}
                     onClick={() => setShowAbrirDialog(false)}
                 >
                     <div
                         className="bg-white rounded-2xl p-6 w-full max-w-xs shadow-2xl flex flex-col gap-5"
                         onClick={e => e.stopPropagation()}
                     >
-                        {/* Header */}
                         <div className="flex items-start justify-between gap-3">
                             <div>
-                                <h3 className="text-sm font-bold" style={{ color: '#1F2F57' }}>
+                                <h3 className="text-sm font-bold" style={{ color: "#1F2F57" }}>
                                     Abrir caja
                                 </h3>
-                                <p className="text-xs mt-0.5" style={{ color: 'rgba(31,47,87,0.5)' }}>
+                                <p className="text-xs mt-0.5" style={{ color: "rgba(31,47,87,0.5)" }}>
                                     {caja.nombre} · {caja.codigo}
                                 </p>
                             </div>
-                            <button
-                                onClick={() => setShowAbrirDialog(false)}
-                                className="opacity-40 hover:opacity-70 shrink-0"
-                            >
+                            <button onClick={() => setShowAbrirDialog(false)} className="opacity-40 hover:opacity-70 shrink-0">
                                 <X size={16} />
                             </button>
                         </div>
 
-                        {/* Monto apertura */}
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(31,47,87,0.5)' }}>
+                            <label className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "rgba(31,47,87,0.5)" }}>
+                                Cajero
+                            </label>
+
+                            {user?.esAdmin ? (
+                                <select
+                                    value={trabajadorId ?? ''}
+                                    onChange={e => setTrabajadorId(Number(e.target.value))}
+                                    className="w-full h-11 px-3.5 rounded-xl text-sm outline-none appearance-none transition-all"
+                                    style={BASE_SELECT_STYLE}
+                                    onFocus={e => { e.target.style.borderColor = '#3960A9'; e.target.style.boxShadow = '0 0 0 3px rgba(57,96,169,0.1)' }}
+                                    onBlur={e  => { e.target.style.borderColor = 'rgba(31,47,87,0.18)'; e.target.style.boxShadow = 'none' }}
+                                >
+                                    <option value="">— Selecciona un cajero —</option>
+                                    {trabajadores.map(t => (
+                                        <option key={t.id} value={t.id}>
+                                            {t?.nombre_completo}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div
+                                    className="flex items-center gap-2.5 h-11 px-3.5 rounded-xl"
+                                    style={{ background: 'rgba(31,47,87,0.04)', border: '1px solid rgba(31,47,87,0.1)' }}
+                                >
+                                    <div
+                                        className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                                        style={{ background: '#3960A9' }}
+                                    >
+                                        {(user?.nombre ?? user?.username ?? 'U').slice(0, 1).toUpperCase()}
+                                    </div>
+                                    <span className="text-sm font-medium truncate" style={{ color: '#1F2F57' }}>
+                                        {user?.nombre ?? user?.username ?? 'Cajero actual'}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "rgba(31,47,87,0.5)" }}>
                                 Monto de apertura
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold" style={{ color: 'rgba(31,47,87,0.4)' }}>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold" style={{ color: "rgba(31,47,87,0.4)" }}>
                                     S/
                                 </span>
                                 <input
@@ -221,33 +283,28 @@ export default function CajaCard({ caja }) {
                                     onChange={e => setMontoApertura(e.target.value)}
                                     placeholder="0.00"
                                     className="w-full h-11 pl-9 pr-3 rounded-xl text-sm outline-none transition-all"
-                                    style={{
-                                        border:     '1px solid rgba(31,47,87,0.18)',
-                                        color:      '#1F2F57',
-                                        background: '#fff',
-                                    }}
-                                    onFocus={e => { e.target.style.borderColor = '#3960A9'; e.target.style.boxShadow = '0 0 0 3px rgba(57,96,169,0.1)' }}
-                                    onBlur={e  => { e.target.style.borderColor = 'rgba(31,47,87,0.18)'; e.target.style.boxShadow = 'none' }}
+                                    style={{ border: "1px solid rgba(31,47,87,0.18)", color: "#1F2F57", background: "#fff" }}
+                                    onFocus={e => { e.target.style.borderColor = "#3960A9"; e.target.style.boxShadow = "0 0 0 3px rgba(57,96,169,0.1)" }}
+                                    onBlur={e  => { e.target.style.borderColor = "rgba(31,47,87,0.18)"; e.target.style.boxShadow = "none" }}
                                 />
                             </div>
                         </div>
 
-                        {/* Actions */}
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setShowAbrirDialog(false)}
                                 className="flex-1 py-2.5 rounded-xl text-xs font-medium transition-colors hover:bg-gray-50"
-                                style={{ border: '0.5px solid rgba(31,47,87,0.2)', color: '#1F2F57' }}
+                                style={{ border: "0.5px solid rgba(31,47,87,0.2)", color: "#1F2F57" }}
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleAbrirCaja}
-                                disabled={abriendo}
+                                disabled={abriendo || (user?.esAdmin && !trabajadorId)}
                                 className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                                style={{ background: '#198E7B' }}
+                                style={{ background: "#198E7B" }}
                             >
-                                {abriendo ? 'Abriendo...' : 'Abrir caja'}
+                                {abriendo ? "Abriendo..." : "Abrir caja"}
                             </button>
                         </div>
                     </div>

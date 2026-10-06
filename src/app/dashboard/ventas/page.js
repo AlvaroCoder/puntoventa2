@@ -1,11 +1,11 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Store } from 'lucide-react'
 import { Title } from '@/components/Titles/Title'
 import CajaCard from '@/components/Cards/CajaCard'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import { useAuth } from '@/Context/AuthContext'
-import { getCajaByTienda } from '@/Connections/caja'
+import { cerrarCaja, getCajaByTienda, getMovimientosByCaja, getSesionesActivas } from '@/Connections/caja'
 import PanelTiendas from '@/components/Panel/PanelTiendas'
 import SwitcherLoader from '@/components/Navigation/SwitcherLoader'
 
@@ -75,18 +75,28 @@ function unirTiendasConCajas(tiendas = [], cajasPorTienda = []) {
   });
 }
 
+  function fechaArrayADate([anio, mes, dia, h = 0, m = 0, s = 0]) {
+    return new Date(anio, mes - 1, dia, h, m, s);
+  }
+
+  function esDeUnDiaAnterior(fechaArray) {
+    const apertura = fechaArrayADate(fechaArray);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    return apertura < hoy;
+  }
+
+
 export default function PageVentas() {
     const { user } = useAuth();
-const [tiendas, setTiendas] = useState([]);
-const [cajas, setCajas] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
+    const [tiendas, setTiendas] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [cajaSesiones, setCajaSesiones] = useState(null);
 
     useEffect(() => {
     if (!user?.empresa_id) return; 
-
     let cancelado = false;
-
     async function fetchData() {
         setLoading(true);
         setError(null);
@@ -94,12 +104,27 @@ const [error, setError] = useState(null);
         const responseTiendas = await getTiendasByEmpresa(user.empresa_id);
         const dataTiendas = responseTiendas.data?.data ?? [];
 
-        const responsesCajas = await Promise.all(
-            dataTiendas.map((t) => getCajaByTienda(t.id)),
-        );
-        
+        const [responsesCajas, responsesSesiones] = await Promise.all([
+          Promise.all(dataTiendas.map((t) => getCajaByTienda(t.id))),
+          Promise.all(dataTiendas.map((t) => getSesionesActivas(t.id))),
+        ]);
         const dataCajas = responsesCajas.map((r) => r.data ?? []);
-        
+          const dataSesiones = responsesSesiones.map((r) => r.data ?? []);
+
+          const sesionesPorTienda = dataTiendas.map((t, i) => ({
+            tienda_id: t.id,
+            cantidad: dataSesiones[i].length,
+            sesiones: dataSesiones[i],
+          }));
+           const totalSesiones = sesionesPorTienda.reduce(
+             (acc, s) => acc + s.cantidad,
+             0,
+           );
+                    
+          setCajaSesiones({
+            total: totalSesiones,
+            porTienda: sesionesPorTienda,
+          });
             const data = unirTiendasConCajas(dataTiendas, dataCajas);
             setTiendas(data)
         } catch (err) {
@@ -116,6 +141,76 @@ const [error, setError] = useState(null);
     };
     }, [user?.empresa_id]);
 
+  const sesionesProcesadas = useRef(new Set());
+
+useEffect(() => {
+  if (!cajaSesiones?.porTienda || !user?.trabajador_id) return;
+  
+  let cancelado = false;
+
+  async function validarCierreCaja() {
+    try {
+      setLoading(true)
+          const pendientes = cajaSesiones.porTienda
+            .flatMap((t) => t.sesiones)
+            .filter(
+              (s) =>
+                s.estado === "ABIERTA" &&
+                esDeUnDiaAnterior(s.fechaApertura) &&
+                !sesionesProcesadas.current.has(s.id),
+            );
+
+          if (pendientes.length === 0) return;
+
+          pendientes.forEach((s) => sesionesProcesadas.current.add(s.id));
+
+          const resultados = await Promise.allSettled(
+            pendientes.map(async (sesion) => {
+              const movimientos = await getMovimientosByCaja(sesion.cajaId);
+              const lista = movimientos?.data ?? [];
+
+              const totalMovimientos = lista.reduce(
+                (acc, mov) =>
+                  mov.tipoMovimiento === "EGRESO"
+                    ? acc - mov.monto
+                    : acc + mov.monto,
+                0,
+              );
+
+              const body = {
+                trabajadorId: user.trabajador_id,
+                montoCierreReal: (sesion.montoApertura ?? 0) + totalMovimientos,
+                observaciones: "Cierre automático del sistema",
+              };
+
+              return cerrarCaja(sesion.id, body);
+            }),
+          );
+          
+          if (cancelado) return;
+
+          resultados.forEach((r, i) => {
+            if (r.status === "rejected") {
+              console.error(
+                `Error cerrando sesión ${pendientes[i].id}:`,
+                r.reason,
+              );
+              sesionesProcesadas.current.delete(pendientes[i].id);
+            }
+          });
+    } catch (err) {
+      
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  validarCierreCaja();
+  return () => {
+    cancelado = true;
+  };
+}, [cajaSesiones, user?.trabajador_id]);
+  
     return (
       <div className="p-6 flex flex-col gap-6 bg-[#E1E7F0] min-h-full">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -138,7 +233,7 @@ const [error, setError] = useState(null);
             },
             {
               label: "Cajas abiertas",
-              value: 0,
+              value: cajaSesiones?.total,
               color: "#3960A9",
             },
             { label: "Transacciones", value: totalTx, color: "#FF821E" },

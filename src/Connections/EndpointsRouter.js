@@ -17,8 +17,6 @@ export const CAJA_ENDPOINTS = {
   updateCaja: (cajaId, tiendaId) =>
     `${BASE_CAJA}/${cajaId}?tiendaId=${tiendaId}`,
   getSesionActual: (cajaId) => `${BASE_CAJA_2}/${cajaId}/sesion`,
-  getSesionesActivas: (tiendaId) =>
-    `${BASE_CAJA}/sesiones/activas?tiendaId=${tiendaId}`,
   getSesionesByCaja: (cajaId) => `${BASE_CAJA}/sesiones?cajaId=${cajaId}`,
   abrirCaja: (sesionId) => `${BASE_CAJA}/sesiones/${sesionId}/abrir`,
   cerrarCaja: (sesionId) => `${BASE_CAJA}/sesiones/${sesionId}/cerrar`,

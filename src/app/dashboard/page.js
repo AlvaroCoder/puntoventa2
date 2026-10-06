@@ -2,12 +2,11 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/Context/AuthContext'
-import PeopleIcon        from '@mui/icons-material/People'
 import ShoppingCartIcon  from '@mui/icons-material/ShoppingCart'
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'
-import InventoryIcon     from '@mui/icons-material/Inventory'
-import ReceiptLongIcon   from '@mui/icons-material/ReceiptLong'
-import BadgeIcon         from '@mui/icons-material/Badge'
+import InventoryIcon from '@mui/icons-material/Inventory'
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
+import BadgeIcon from '@mui/icons-material/Badge'
 
 const MODULES = [
   {
@@ -19,7 +18,6 @@ const MODULES = [
     bg: "#1F4363",
     hover: "#1a3557",
   },
-
   {
     id: "ventas",
     title: "Punto de Venta",
@@ -46,15 +44,6 @@ const MODULES = [
     Icon: BadgeIcon,
     bg: "#1F4363",
     hover: "#1a3557",
-  },
-  {
-    id: "caja",
-    title: "Caja",
-    subtitle: "Gestión de caja y movimientos",
-    href: "/dashboard/caja",
-    Icon: ReceiptLongIcon,
-    bg: "#FE811F",
-    hover: "#e5731a",
   },
   {
     id: "sunat",
