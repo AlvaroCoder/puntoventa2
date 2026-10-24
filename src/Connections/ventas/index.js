@@ -3,7 +3,6 @@ import { fetchWithAuth } from '@/lib/fetchwithAuth'
 const BASE_VENTAS  = '/api/ventas'
 const BASE_DETALLES = '/api/venta-detalles'
 
-/** Obtiene todas las ventas de una empresa */
 export async function getVentasByEmpresa(empresaId, params = {}) {
     return fetchWithAuth(`${BASE_VENTAS}/empresa/${empresaId}`, { params })
 }
@@ -23,9 +22,11 @@ export async function getVentaById(id) {
     return fetchWithAuth(`${BASE_VENTAS}/${id}`)
 }
 
-/** Crea una nueva venta */
 export async function createVenta(data = {}) {
-    return fetchWithAuth(BASE_VENTAS, { method: 'POST', body: data })
+    return fetchWithAuth("http://localhost:8085/api/ventas", {
+      method: "POST",
+      body: data,
+    });
 }
 
 /** Obtiene el detalle de líneas de una venta */

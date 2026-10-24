@@ -12,6 +12,10 @@ export async function getProductosByEmpresa(empresaId) {
     return fetchWithAuth(ENDPOINTS_PRODUCTO.getAllProductosByIdEmpresa(empresaId))
 }
 
+export async function getProductosByTienda(tiendaId) {
+    return fetchWithAuth(`http://localhost:8085/api/productos/tienda/${tiendaId}`)
+}
+
 export async function getProductoById(id) {
     return fetchWithAuth(`${BASE_PRODUCTO}/${id}`)
 }

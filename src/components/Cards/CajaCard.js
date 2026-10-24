@@ -38,8 +38,7 @@ const BASE_SELECT_STYLE = {
     background: '#fff',
 }
 
-const fmt = v =>
-    new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(v ?? 0);
+const fmt = v => new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(v ?? 0);
 
 function InfoRow({ icon, label, value, valueStyle }) {
     return (
@@ -61,13 +60,13 @@ export default function CajaCard({ caja }) {
     const { user } = useAuth();
     const router   = useRouter()
 
-    const [session,         setSession]         = useState(null);
-    const [loading,         setLoading]         = useState(false);
+    const [session, setSession] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [showAbrirDialog, setShowAbrirDialog] = useState(false);
     const [montoApertura,   setMontoApertura]   = useState('');
-    const [abriendo,        setAbriendo]        = useState(false);
-    const [trabajadores,    setTrabajadores]    = useState([]);
-    const [trabajadorId,    setTrabajadorId]    = useState(null);
+    const [abriendo, setAbriendo] = useState(false);
+    const [trabajadores, setTrabajadores] = useState([]);
+    const [trabajadorId, setTrabajadorId] = useState(null);
 
     useEffect(() => {
         async function fetchSession() {
@@ -76,7 +75,6 @@ export default function CajaCard({ caja }) {
                 const response = await getSesionActual(caja?.id);
                 setSession(response.data);
             } catch {
-                // sin sesión activa
             } finally {
                 setLoading(false);
             }

@@ -1,64 +1,68 @@
 import { ChevronLeft, ShoppingCart, User, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React from 'react'
-    const NUMPAD_ROWS = [
-    ["1", "2", "3", "CANT"],
-    ["4", "5", "6", "DESC"],
-    ["7", "8", "9", "PRECIO"],
-    ["+/-", "0", ".", "⌫"],
-    ];
+import React, { useEffect } from 'react'
+const NUMPAD_ROWS = [
+  ["1", "2", "3", "CANT"],
+  ["4", "5", "6", "DESC"],
+  ["7", "8", "9", "PRECIO"],
+  ["+/-", "0", ".", "⌫"],
+];
 
-    const fmt = (v) =>
-    new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(
-        v ?? 0,
-    );
+const fmt = (v) =>
+  new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(
+    v ?? 0,
+  );
 
   const MODO_LABEL = { CANT: "Cant.", DESC: "Desc.", PRECIO: "Precio" };
   const MODOS = ["CANT", "DESC", "PRECIO"];
 export default function PosLeftPanel({
-    carrito,
-    setSelectedIdx,
-    setBuffer,
-    setModo,
+  carrito,
+  setSelectedIdx,
+  setBuffer,
+  setModo,
     removeLine,
     cliente,
     modo,
     selectedIdx,
-    setCarrito,
-    buffer
+  setCarrito,
+  buffer,
+  setCliente,
+  setShowClienteModal,
+  onCobrar,
 }) {
+
 
     const subtotal = carrito.reduce(
       (s, l) => s + l.precio * (1 - l.descuento / 100) * l.qty,
       0,
     );
     const totalLineas = carrito.reduce((s, l) => s + l.qty, 0);
-    const handleNumpad = (key) => {
-    if (selectedIdx === null || !carrito[selectedIdx]) return;
-    let next = buffer;
-    if (key === "⌫") {
-        next = buffer.slice(0, -1) || "0";
-    } else if (key === ".") {
-        if (!buffer.includes(".")) next = buffer + ".";
-    } else if (key === "+/-") {
-        next = buffer.startsWith("-") ? buffer.slice(1) : "-" + buffer;
-    } else {
-        next = buffer === "0" || buffer === "" ? key : buffer + key;
-    }
+const handleNumpad = (key) => {
+  if (selectedIdx === null || !carrito[selectedIdx]) return;
+  let next = buffer;
+  if (key === "⌫") {
+    next = buffer.slice(0, -1) || "0";
+  } else if (key === ".") {
+    if (!buffer.includes(".")) next = buffer + ".";
+  } else if (key === "+/-") {
+    next = buffer.startsWith("-") ? buffer.slice(1) : "-" + buffer;
+  } else {
+    next = buffer === "0" || buffer === "" ? key : buffer + key;
+  }
 
-    setBuffer(next);
-    const val = parseFloat(next) || 0;
+  setBuffer(next);
+  const val = parseFloat(next) || 0;
 
-    setCarrito((prev) => {
-        const updated = [...prev];
-        const line = { ...updated[selectedIdx] };
-        if (modo === "CANT") line.qty = Math.max(1, Math.floor(Math.abs(val)));
-        if (modo === "DESC") line.descuento = Math.min(100, Math.max(0, val));
-        if (modo === "PRECIO") line.precio = Math.max(0, val);
-        updated[selectedIdx] = line;
-        return updated;
-    });
-    };
+  setCarrito((prev) => {
+    const updated = [...prev];
+    const line = { ...updated[selectedIdx] };
+    if (modo === "CANT") line.qty = Math.max(1, Math.floor(Math.abs(val)));
+    if (modo === "DESC") line.descuento = Math.min(100, Math.max(0, val));
+    if (modo === "PRECIO") line.precio = Math.max(0, val);
+    updated[selectedIdx] = line;
+    return updated;
+  });
+};
   const router = useRouter();
   return (
     <div
@@ -247,6 +251,7 @@ export default function PosLeftPanel({
 
         <button
           disabled={carrito.length === 0}
+          onClick={carrito.length > 0 ? onCobrar : undefined}
           className="w-full h-11 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed"
           style={{
             background: carrito.length > 0 ? "#1F2F57" : "rgba(31,47,87,0.2)",
