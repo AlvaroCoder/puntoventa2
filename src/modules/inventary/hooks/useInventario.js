@@ -2,17 +2,23 @@
 import React, {useState, useEffect} from 'react'
 import {inventarioService} from '@/modules/inventary/service/inventario.service'
 export default function useInventario() {
-      const [categorias, setCategorias] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState(null);
-    
-    useEffect(() => {
-      inventarioService
-        .getCategorias()
-        .then(setCategorias)
-        .catch(setError)
-        .finally(() => setLoading(false));
-    }, []);
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    return { categorias, loading, error };
+  useEffect(() => {
+    Promise.all([
+      inventarioService.getProductos(),
+      inventarioService.getCategorias(),
+    ])
+      .then(([prods, cats]) => {
+        setProductos(prods);
+        setCategorias(cats);
+      })
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }, []); 
+
+  return { categorias, productos, loading, error };
 }

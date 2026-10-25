@@ -24,7 +24,6 @@ export function useSession() {
     },[]);
     return {dataSession, loading, error}
 }
-// Sirve de fetch solo para metodos "GET"
 export function useFetch(URL="") {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

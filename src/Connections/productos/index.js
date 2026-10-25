@@ -1,5 +1,6 @@
 import { fetchWithAuth } from '@/lib/fetchwithAuth'
 import { PRODUCTO_ENDPOINTS, INVENTARIO_ENDPOINTS, VARIANTES_ENDPOINTS } from '../EndpointsRouter'
+import { fetchServer } from '@/lib/fetchServer';
 
 const BASE_PRODUCTO  = '/api/producto'
 const BASE_CATEGORIA = '/api/categoria'
@@ -9,7 +10,7 @@ const ENDPOINTS_INVENTARIO = INVENTARIO_ENDPOINTS;
 const ENDPOINTS_VARIANTES = VARIANTES_ENDPOINTS;
 
 export async function getProductosByEmpresa(empresaId) {
-    return fetchWithAuth(ENDPOINTS_PRODUCTO.getAllProductosByIdEmpresa(empresaId))
+    return fetchServer(ENDPOINTS_PRODUCTO.getAllProductosByIdEmpresa(empresaId))
 }
 
 export async function getProductosByTienda(tiendaId) {
@@ -45,7 +46,7 @@ export async function createCategoriasProducto(data) {
 }
 
 export async function getCategorias() {
-    return fetchWithAuth(ENDPOINTS_PRODUCTO.getAllCategoriesByUser())
+    return fetchServer(ENDPOINTS_PRODUCTO.getAllCategoriesByUser())
 }
 
 export async function getInventarioByTienda(tiendaId) {

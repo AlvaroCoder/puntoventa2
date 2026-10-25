@@ -1,6 +1,5 @@
-import { MoreVertical, Star } from 'lucide-react';
-import React from 'react'
-
+import { MoreVertical, Star } from "lucide-react";
+import React from "react";
 
 function stockStatus(p) {
   if (p.stock === 0)
@@ -17,7 +16,6 @@ function stockStatus(p) {
     };
   return { dot: "#1EB3B2", label: "En stock", badge: "rgba(30,179,178,0.10)" };
 }
-
 
 function Initials({ nombre }) {
   const letters = nombre
@@ -38,7 +36,7 @@ function Initials({ nombre }) {
 }
 
 export default function NewProductCard({ producto, favorito, onToggleFav }) {
-    const st = stockStatus(producto);
+  const st = stockStatus(producto);
   return (
     <div
       className="bg-white rounded-xl overflow-hidden  h-32 flex flex-col cursor-pointer hover:shadow-md transition-shadow"
@@ -121,4 +119,4 @@ export default function NewProductCard({ producto, favorito, onToggleFav }) {
       </div>
     </div>
   );
-};
+}
