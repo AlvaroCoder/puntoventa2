@@ -1,21 +1,26 @@
+
 import { getSession } from "@/lib/authentication";
 
 const BASE_URL_SPRING = process.env.BASE_URL_SPRING ?? "http://localhost:8085";
+const BASE_URL_NODE = process.env.BASE_URL_NODE ?? "http://localhost:3030";
 
 export async function fetchServer(
   endpoint,
   { method = "GET", body = null, params = {} } = {},
+  type_api = "express"
+
 ) {
   const session = await getSession();
   const token = session?.access_token;
 
   const base = endpoint.startsWith("http")
     ? endpoint
-    : `${BASE_URL_SPRING}${endpoint}`;
+    : type_api === "express"
+      ? `${BASE_URL_NODE}${endpoint}`
+      : `${BASE_URL_SPRING}${endpoint}`;
   const url = Object.keys(params).length
     ? `${base}?${new URLSearchParams(params).toString()}`
     : base;
-
   const response = await fetch(url, {
     method,
     headers: {
@@ -23,7 +28,7 @@ export async function fetchServer(
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     ...(body !== null ? { body: JSON.stringify(body) } : {}),
-    cache: "no-store", // ← importante en Next.js para no cachear datos del usuario
+    cache: "no-store", 
   });
 
   let json = null;

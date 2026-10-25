@@ -1,9 +1,10 @@
+import { fetchServer } from '@/lib/fetchServer';
 import { fetchWithAuth } from '@/lib/fetchwithAuth'
 
 const BASE = '/api/tienda'
 
 export async function getTiendasByEmpresa(empresaId) {
-    return fetchWithAuth(`${BASE}/empresa/${empresaId}`)
+    return fetchServer(`${BASE}/empresa/${empresaId}`)
 }
 
 export async function getTiendasByUser() {
@@ -11,7 +12,7 @@ export async function getTiendasByUser() {
 }
 
 export async function getTiendaById(id) {
-    return fetchWithAuth(`${BASE}/${id}`)
+    return fetchWithAuth(` ${BASE}/${id}`)
 }
 
 export async function createTienda(data = {}) {
@@ -23,5 +24,5 @@ export async function updateTienda(id, data = {}) {
 }
 
 export async function deleteTienda(id) {
-    return fetchWithAuth(`${BASE}/${id}`, { method: 'DELETE' })
+    return fetchServer(`${BASE}/${id}`, { method: 'DELETE' })
 }

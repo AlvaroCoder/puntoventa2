@@ -1,4 +1,5 @@
 import { getCategorias , getProductosByEmpresa} from "@/Connections/productos";
+import { getTiendasByEmpresa } from "@/Connections/tiendas";
 import { getSession } from "@/lib/authentication";
 function agregarPath(categorias) {
   const mapa = new Map(categorias.map((cat) => [cat.id, cat]));
@@ -31,5 +32,15 @@ export const inventarioService = {
       if (!res.ok) throw new Error("Error al obtener productos");
       const data = res?.data;
       return data?.content || [];
-    },
+  },
+  async getTiendas() {
+    const session = await getSession();
+    if (!session) throw new Error("No autorizado");
+    const empresaId = session.empresa_id;
+    const res = await getTiendasByEmpresa(empresaId);
+    console.log("Response from getTiendasByEmpresa:", res);
+    if (!res.ok) throw new Error("Error al obtener tiendas");
+    const data = res?.data;
+    return data?.data || [];
+  }
 };
