@@ -62,5 +62,17 @@ export const inventarioService = {
     if (!response.ok) throw new Error('Error al cargar los almacenes');
     const data = await response.json();
     return data?.data || []
+  },
+  async createTienda(body) {
+    const response = await fetch("/api/tienda", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) throw new Error("Error al crear la categoria");
+    const data = await response.json();
+    return data;
   }
+  
 };

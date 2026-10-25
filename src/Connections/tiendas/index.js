@@ -16,7 +16,7 @@ export async function getTiendaById(id) {
 }
 
 export async function createTienda(data = {}) {
-    return fetchWithAuth(BASE, { method: 'POST', body: data })
+    return fetchServer(BASE, { method: 'POST', body: data })
 }
 
 export async function updateTienda(id, data = {}) {

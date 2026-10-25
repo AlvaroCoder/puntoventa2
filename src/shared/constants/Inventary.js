@@ -13,3 +13,12 @@ export const SORT_OPTIONS = [
 ];
 
 export const PASOS = ["Seleccionar almacén", "Ingresar productos"];
+
+
+export const BASE_INPUT_STYLE = {
+  border: "1px solid rgba(31,47,87,0.18)",
+  color: "#1F2F57",
+  background: "#fff",
+};
+
+export const TIPOS_ALMACEN = ["VITRINA", "BODEGA", "ALMACEN", "DEPOSITO"];

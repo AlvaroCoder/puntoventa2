@@ -1,3 +1,4 @@
+import { fetchServer } from "@/lib/fetchServer";
 import { fetchWithAuth } from "@/lib/fetchwithAuth";
 
 const BASE = 'http://localhost:8085/api';
@@ -7,7 +8,7 @@ export async function createAlmacen(data={}) {
 }
 
 export async function getAlmacenesByUser() { 
-    return fetchWithAuth(`${BASE}/almacen/almacenes`)
+    return fetchServer(`${BASE}/almacen/almacenes`)
 }
 
 export async function getAlmacenesByTienda(tiendaId) {
