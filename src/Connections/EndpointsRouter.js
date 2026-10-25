@@ -11,8 +11,7 @@ const BASE_IMAGES = BASE_URL_SPRING + '/api/imagenes';
 export const CAJA_ENDPOINTS = {
   getCajas: () => `${BASE_CAJA_2}`,
   getAllCajasByTienda: (tiendaId) => `${BASE_CAJA}?tiendaId=${tiendaId}`,
-  getCajaByTienda: (tiendaId, idCaja) =>
-    `${BASE_CAJA}/${idCaja}?tiendaId=${tiendaId}`,
+  getCajaByTienda: (tiendaId, idCaja) =>`${BASE_CAJA}/${idCaja}?tiendaId=${tiendaId}`,
   createCaja: () => BASE_CAJA,
   updateCaja: (cajaId, tiendaId) =>
     `${BASE_CAJA}/${cajaId}?tiendaId=${tiendaId}`,

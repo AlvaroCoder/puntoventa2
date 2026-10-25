@@ -14,6 +14,8 @@ export default function ProductosPage() {
   const [page, setPage] = useState(1);
   const [favoritos, setFavoritos] = useState(new Set());
   const [showSort, setShowSort] = useState(false);
+  const [filtrarStockBajo, setFiltrarStockBajo] = useState(false);
+  const [soloFavoritos, setSoloFavoritos] = useState(false);
 
   const handleQuery = (val) => {
     setQuery(val);
@@ -38,6 +40,15 @@ export default function ProductosPage() {
       return next;
     });
 
+  const stockBajoCount = useMemo(
+    () => (productos || []).filter((p) => (p.stockTotal ?? 0) > 0 && (p.stockTotal ?? 0) <= 5).length,
+    [productos],
+  );
+  const agotadoCount = useMemo(
+    () => (productos || []).filter((p) => (p.stockTotal ?? 0) === 0).length,
+    [productos],
+  );
+
   const filtered = useMemo(() => {
     let list = productos || [];
     if (query.trim()) {
@@ -48,6 +59,8 @@ export default function ProductosPage() {
           p.codigo.toLowerCase().includes(q),
       );
     }
+    if (filtrarStockBajo) list = list.filter((p) => (p.stockTotal ?? 0) <= 5);
+    if (soloFavoritos)    list = list.filter((p) => favoritos.has(p.id));
     return [...list].sort((a, b) => {
       switch (sort) {
         case "nombre_za":
@@ -62,7 +75,7 @@ export default function ProductosPage() {
           return a.nombre.localeCompare(b.nombre);
       }
     });
-  }, [query, sort, productos]); 
+  }, [query, sort, productos, filtrarStockBajo, soloFavoritos, favoritos]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -90,6 +103,12 @@ export default function ProductosPage() {
       end={end}
       favoritos={favoritos}
       toggleFav={toggleFav}
+      stockBajoCount={stockBajoCount}
+      filtrarStockBajo={filtrarStockBajo}
+      setFiltrarStockBajo={setFiltrarStockBajo}
+      soloFavoritos={soloFavoritos}
+      setSoloFavoritos={setSoloFavoritos}
+      agotadoCount={agotadoCount}
     />
   );
 }
