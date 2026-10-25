@@ -1,6 +1,6 @@
 import React from 'react'
-import CardProducto from '../app/dashboard/inventario/productos/crear/components/CardProducto';
 import { AlertTriangle, Box } from 'lucide-react';
+import CardProducto from './CardProducto';
 
 export default function PanelProductos({ products, onDelete }) {
   const units = products.reduce(

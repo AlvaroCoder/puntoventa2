@@ -39,9 +39,28 @@ export const inventarioService = {
       return raw?.data?.content || [];
   },
   async getTiendas() {
-    const res = await fetch('/api/tienda', { method: 'GET' });
-    if (!res.ok) throw new Error("Error al obtener tiendas");
-    const data = await res.json();
+    const response = await fetch('/api/tienda', { method: 'GET' });
+    if (!response.ok) throw new Error("Error al obtener tiendas");
+    const data = await response.json();
     return data?.data || [];
+  },
+  async createProducto(body) {
+    const response = await fetch("/api/producto", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) throw new Error("Error al crear la categoria");
+    const data = await response.json();
+    return data;
+  },
+  async getAlmacenes() {
+    const response = await fetch('/api/almacenes', {
+      method: 'GET'
+    });
+
+    if (!response.ok) throw new Error('Error al cargar los almacenes');
+    const data = await response.json();
+    return data?.data || []
   }
 };

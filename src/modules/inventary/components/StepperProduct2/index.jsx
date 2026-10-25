@@ -1,111 +1,39 @@
-"use client";
-import Title2 from "@/components/Titles/Title2";
-import { Calendar, File, Plus, RefreshCcw, Warehouse } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
-import SeccionVariantes from "./SeccionVariantes";
-import PanelProductos from "@/elements/PanelProductos";
-import Field from "@/elements/Field";
-import ConfigAvanzada from "@/elements/ConfigAvanzada";
-import Switch from "@/elements/Switch";
-import { getCategorias } from "@/Connections/productos";
-import SearchableSelect from "../../../components/SearchableSelect";
-import { IconInput } from "@/components/Inputs/IconInput";
-import SwitcherLoader from "@/components/Navigation/SwitcherLoader";
-function Info({ icon, label, value, sub }) {
-  return (
-    <div>
-      <span
-        className="text-[10px] uppercase tracking-wide"
-        style={{ color: "rgba(31,47,87,0.45)" }}
-      >
-        {label}
-      </span>
-      <div className="flex min-h-11 items-center gap-3 rounded-lg bg-[#E1E7F0]/55 px-3">
-        <span className="text-azulClaro [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
-        <div>
-          <div className="text-[15px] font-bold">{value}</div>
-          {sub && <div className="text-xs text-[#1F2F57]/55">{sub}</div>}
-        </div>
-      </div>
-    </div>
-  );
-}
-const initial = (code) => ({
-  nombre: "",
-  codigo: code,
-  categoria: "",
-  stock_inicial: 0,
-  unidad: "Unidad",
-  precio_venta: "",
-  precio_compra: "",
-  tiene_variantes: false,
-  variantes: [],
-  barras: "",
-  descripcion: "",
-  igv: true,
-  temporada: "Todo el año",
-  genero: "Unisex",
-  stock_minimo: 0,
-});
-export default function Stepper2({ almacenSeleccionado, handlePayload }) {
-  const [reference, setReference] = useState("LOTE-20260922-001");
-  const [form, setForm] = useState(
-    initial(
-      `PROD-${String(Math.floor(Math.random() * 999999) + 1).padStart(6, "0")}`,
-    ),
-  );
-  const [productos, setProductos] = useState([]);
-  const [shake, setShake] = useState(false);
-  const [categorias, setCategorias] = useState([]);
-  const [loading, setLoading] = useState(true);
+import Title2 from '@/components/Titles/Title2';
+import Field from '@/shared/components/Field';
+import InputMoney from '@/shared/components/InputMoney';
+import SearchableSelect from '@/shared/components/SearchableSelect';
+import SwitcherLoader from '@/shared/components/SwitcherLoader';
+import { Calendar, Plus, RefreshCcw, Warehouse, File } from 'lucide-react';
+import React from 'react'
+import { useStepper2 } from './useStepper2';
+import Info from '@/shared/components/Info';
+import { IconInput } from '@/shared/components/IconInput';
+import SeccionVariantes from '../SeccionVariantesProductos';
+import ConfigAvanzada from '../ConfigAvanzada';
+import PanelProductos from '../PanelProductos';
+import Switch from '../Switch';
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await getCategorias();
-        setCategorias(response?.data?.data || []);
-      } catch (err) {
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  const priceRef = useRef(null);
-
-  const stock = form.tiene_variantes
-    ? form.variantes.reduce((a, v) => a + (Number(v.stock) || 0), 0)
-    : Number(form.stock_inicial) || 0;
-  const missingPrice = stock > 0 && !form.precio_venta;
-  const change = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-
-  function deleteProducto(id) {
-    setProductos((prev) => prev.filter((p) => p.id !== id));
-  }
-
-  function submit() {
-    const producto = { ...form, id: Date.now(), stock_inicial: stock };
-    const nuevosProductos = [...productos, producto];
-    setProductos(nuevosProductos);
-   
-    const payload = {
-      referencia_lote: reference,
-      almacen_id: almacenSeleccionado?.id,
-      almacen_nombre: almacenSeleccionado?.nombre,
-      fecha_registro: new Date().toISOString(),
-      productos: nuevosProductos,
-    };
-    handlePayload(payload);
-    setForm(
-      initial(
-        `PROD-${String(Math.floor(Math.random() * 999999) + 1).padStart(6, "0")}`,
-      ),
-    );
-  }
-
-  const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-
+export default function StepperProduct2({
+    almacenSeleccionado,
+    handlePayload
+}) {
+    const {
+      reference,
+      setReference,
+      form,
+      change,
+      set,
+      productos,
+      deleteProducto,
+      categorias,
+      loading,
+      shake,
+      priceRef,
+      stock,
+      missingPrice,
+      submit,
+      regenerarCodigo,
+    } = useStepper2({ almacenSeleccionado, handlePayload });
   return (
     <section className="mx-auto max-w-[1440px] px-5 py-6 lg:px-8">
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(360px,2fr)]">
@@ -168,10 +96,7 @@ export default function Stepper2({ almacenSeleccionado, handlePayload }) {
                   type="button"
                   className="mt-[26px] flex h-11 items-center justify-center gap-2 rounded-lg border border-[#3960A9] font-bold text-[#3960A9] hover:bg-[#3960A9] hover:text-white"
                   onClick={() =>
-                    change(
-                      "codigo",
-                      `PROD-${String(Math.floor(Math.random() * 999999) + 1).padStart(6, "0")}`,
-                    )
+                    regenerarCodigo()
                   }
                 >
                   <RefreshCcw size={18} />
@@ -228,7 +153,7 @@ export default function Stepper2({ almacenSeleccionado, handlePayload }) {
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <Field label="Precio de venta *">
                   <div ref={priceRef} className={shake ? "animate-shake" : ""}>
-                    <MoneyInput
+                    <InputMoney
                       value={form.precio_venta}
                       onChange={(v) => change("precio_venta", v)}
                       warning={missingPrice}
@@ -241,7 +166,7 @@ export default function Stepper2({ almacenSeleccionado, handlePayload }) {
                   </div>
                 </Field>
                 <Field label="Precio de compra (opcional)">
-                  <MoneyInput
+                  <InputMoney
                     value={form.precio_compra}
                     onChange={(v) => change("precio_compra", v)}
                   />
@@ -283,26 +208,5 @@ export default function Stepper2({ almacenSeleccionado, handlePayload }) {
         <PanelProductos products={productos} onDelete={deleteProducto} />
       </div>
     </section>
-  );
-}
-
-function MoneyInput({ value, onChange, warning }) {
-  return (
-    <div
-      className={`flex h-11 overflow-hidden rounded-lg border bg-white ${warning ? "border-2 border-[#E8A020]" : "border-[#1F2F57]/20"}`}
-    >
-      <span className="grid w-11 place-items-center bg-[#E1E7F0]/65 font-bold">
-        S/
-      </span>
-      <input
-        type="number"
-        min="0"
-        step="0.01"
-        className="min-w-0 flex-1 px-3 outline-none"
-        placeholder="0.00"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </div>
   );
 }

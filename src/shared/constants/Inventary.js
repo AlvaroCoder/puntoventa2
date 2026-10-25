@@ -11,3 +11,5 @@ export const SORT_OPTIONS = [
   { key: "precio_desc", label: "Precio (mayor a menor)" },
   { key: "stock_asc", label: "Stock (menor a mayor)" },
 ];
+
+export const PASOS = ["Seleccionar almacén", "Ingresar productos"];

@@ -1,6 +1,5 @@
 'use client'
-//import { Switch } from '@/components/ui/switch'
-import TablaVariantes from './TablaVariantes'
+import TablaVariantes from './TablaVariantes.js'
 
 /**
  * SeccionVariantes — toggle + tabla de variantes.
