@@ -10,7 +10,6 @@ export async function GET() {
         }
         const empresaId = session.empresa_id;
         const response = await getTiendasByEmpresa(empresaId);
-        console.log("Response from getTiendasByEmpresa:", response);
         return NextResponse.json(response?.data);
     } catch (error) {
         return NextResponse.json({error : true, message : error.message}, {status : 500});

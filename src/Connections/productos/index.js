@@ -42,7 +42,7 @@ export async function deleteProducto(id) {
 }
 
 export async function createCategoriasProducto(data) {
-    return fetchWithAuth(ENDPOINTS_PRODUCTO.createCategoria(), {method : 'POST', body : data})
+    return fetchServer(ENDPOINTS_PRODUCTO.createCategoria(), {method : 'POST', body : data})
 }
 
 export async function getCategorias() {

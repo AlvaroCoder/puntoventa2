@@ -1,6 +1,7 @@
+import { fetchServer } from '@/lib/fetchServer'
 import { fetchWithAuth } from '@/lib/fetchwithAuth'
 
-const BASE = 'http://localhost:8085/api/ordenes-compra'
+const BASE = '/api/logistica'
 
 export async function createOrdenCompra(data = {}) {
     return fetchWithAuth(BASE, { method: 'POST', body: data })
@@ -11,7 +12,7 @@ export async function enviarOrdenCompra(id) {
 }
 
 export async function getOrdenesByEmpresa(empresaId) {
-    return fetchWithAuth(`${BASE}?empresaId=${empresaId}`)
+    return fetchServer(`${BASE}/ordenes-compra/empresa/${empresaId}`);
 }
 
 export async function getOrdenById(id) {

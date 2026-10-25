@@ -1,6 +1,3 @@
-import { getCategorias , getProductosByEmpresa} from "@/Connections/productos";
-import { getTiendasByEmpresa } from "@/Connections/tiendas";
-import { getSession } from "@/lib/authentication";
 function agregarPath(categorias) {
   const mapa = new Map(categorias.map((cat) => [cat.id, cat]));
 
@@ -20,27 +17,31 @@ function agregarPath(categorias) {
 
 export const inventarioService = {
   async getCategorias() {
-    const response = await getCategorias();
-    const raw = response?.data?.data || [];
-    return agregarPath(raw);
+    const response = await fetch('/api/categoria', { method: 'GET' });
+    if (!response.ok) throw new Error("Error al obtener categorias");
+    const raw = await response.json();
+    return agregarPath(raw?.data || []);
+  },
+  async createCategoria(body) {
+    const response = await fetch("/api/categoria", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!response.ok) throw new Error("Error al crear la categoria");
+    const data = await response.json();
+    return data
   },
   async getProductos() {
-      const session = await getSession();
-      if (!session) throw new Error("No autorizado");
-      const empresaId = session.empresa_id;
-      const res = await getProductosByEmpresa(empresaId);
-      if (!res.ok) throw new Error("Error al obtener productos");
-      const data = res?.data;
-      return data?.content || [];
+    const response = await fetch('/api/producto', { method: 'GET' });
+    if (!response.ok) throw new Error("Error al obtener productos");
+    const raw = await response.json();
+      return raw?.data?.content || [];
   },
   async getTiendas() {
-    const session = await getSession();
-    if (!session) throw new Error("No autorizado");
-    const empresaId = session.empresa_id;
-    const res = await getTiendasByEmpresa(empresaId);
-    console.log("Response from getTiendasByEmpresa:", res);
+    const res = await fetch('/api/tienda', { method: 'GET' });
     if (!res.ok) throw new Error("Error al obtener tiendas");
-    const data = res?.data;
+    const data = await res.json();
     return data?.data || [];
   }
 };
