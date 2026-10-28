@@ -1,7 +1,7 @@
 import Text from '@/shared/components/Text';
 import { Title } from '@/shared/components/Title';
 import React from 'react'
-import { Search, Store } from 'lucide-react'
+import { Store } from 'lucide-react'
 import CreateLinkButton from '@/shared/components/CreateLinkButton';
 import SkeletonCard from '@/shared/components/SkeletonCard';
 import { AnimatePresence } from 'framer-motion';
