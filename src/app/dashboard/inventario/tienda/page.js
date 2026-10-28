@@ -5,7 +5,7 @@ import { deleteTienda, updateTienda } from '@/Connections/tiendas'
 import PageTienda from '@/modules/inventary/PageTienda'
 import useTienda from '@/modules/inventary/hooks/useTienda'
 export default function Page() {
-    const { tiendas, loading, error, setTiendas } = useTienda();
+    const { tiendas, loading,  setTiendas } = useTienda();
     const [query, setQuery]       = useState('')
     const [tiendaEdit, setTiendaEdit] = useState(null)
 

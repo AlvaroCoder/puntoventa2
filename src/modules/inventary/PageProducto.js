@@ -8,13 +8,13 @@ import {
   AlignJustify,
   ChevronDown,
   LayoutGrid,
-  Search,
   Star,
   TriangleAlert,
 } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import NewProductCard from './components/NewProductCard';
+import InputSearch from '@/shared/components/InputSearch';
 
 export default function PageProducto({
   query,
@@ -30,8 +30,6 @@ export default function PageProducto({
   totalPages,
   page,
   setShowSort,
-  start,
-  end,
   favoritos,
   toggleFav,
   stockBajoCount,
@@ -41,6 +39,7 @@ export default function PageProducto({
   setSoloFavoritos,
   agotadoCount,
 }) {
+  const [modeVisible, setModeVisible] = useState('grid');
   return (
     <div className="p-6 flex flex-col gap-5 bg-[#E1E7F0] min-h-full">
 
@@ -62,43 +61,17 @@ export default function PageProducto({
             Ingreso en lote
           </Link>
           <CreateLinkButton href="/dashboard/inventario/productos/crear">
-            + Nuevo producto
+            Nuevo producto
           </CreateLinkButton>
         </div>
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <div
-          className="flex items-center gap-2 px-3 rounded-lg h-9 min-w-[220px]"
-          style={{
-            background: '#fff',
-            border: '0.5px solid rgba(31,47,87,0.18)',
-          }}
-        >
-          <Search size={14} color="rgba(31,47,87,0.4)" />
-          <input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
-            placeholder="Nombre, codigo o escanear..."
-            className="bg-transparent outline-none text-xs flex-1 placeholder:text-[rgba(31,47,87,0.35)]"
-            style={{ color: '#1F2F57' }}
-          />
-        </div>
-
-        <button
-          className="flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-medium"
-          style={{
-            background: '#fff',
-            border: '0.5px solid rgba(31,47,87,0.18)',
-            color: 'rgba(31,47,87,0.65)',
-          }}
-        >
-          Todos los almacenes
-          <ChevronDown size={13} color="rgba(31,47,87,0.4)" />
-        </button>
+        <InputSearch
+          setQuery={setQuery}
+          setPage={setPage}
+          query={query}
+        />
 
         <button
           className="flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-medium"
@@ -229,6 +202,7 @@ export default function PageProducto({
               className="w-8 h-8 flex items-center justify-center transition-colors hover:bg-[rgba(31,47,87,0.04)]"
               aria-label="Vista lista"
               style={{ borderRight: '0.5px solid rgba(31,47,87,0.12)' }}
+              onClick={()=>setModeVisible("table")}
             >
               <AlignJustify size={14} color="rgba(31,47,87,0.45)" />
             </button>
@@ -236,6 +210,7 @@ export default function PageProducto({
               className="w-8 h-8 flex items-center justify-center transition-colors"
               aria-label="Vista cuadricula"
               style={{ backgroundColor: '#1F2F57' }}
+              onClick={()=>setModeVisible("grid")}
             >
               <LayoutGrid size={14} color="#fff" />
             </button>
@@ -243,7 +218,6 @@ export default function PageProducto({
         </div>
       </div>
 
-      {/* ── Grid de tarjetas ── */}
       <SwitcherLoader loading={loading}>
         {paginated.length === 0 ? (
           <div

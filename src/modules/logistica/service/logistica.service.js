@@ -3,8 +3,6 @@ import { getOrdenesByEmpresa } from "@/Connections/logistica";
 import { getSession } from "@/lib/authentication";
 
 export const logisticaService = {
-    
-
     async getOrdenesByEmpresa() { 
         try {
             const session = await getSession();

@@ -1,5 +1,6 @@
 import { ArrowRight, ImageIcon, MoreVertical, Star } from "lucide-react";
 import React from "react";
+import ImageArea from "./ImageArea";
 
 function stockStatus(stockTotal) {
   if (stockTotal === 0)
@@ -7,35 +8,6 @@ function stockStatus(stockTotal) {
   if (stockTotal <= 5)
     return { label: "Stock bajo", bg: "#FEF3C7", color: "#D97706" };
   return { label: "En stock", bg: "#D1FAE5", color: "#059669" };
-}
-
-function ImageArea({ imagenUrl, nombre, status }) {
-  return (
-    <div className="relative w-full h-28 rounded-xl overflow-hidden mb-2.5"
-      style={{ border: "0.5px solid rgba(31,47,87,0.08)" }}>
-      {imagenUrl ? (
-        <img
-          src={imagenUrl}
-          alt={nombre}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ backgroundColor: "rgba(31,47,87,0.05)" }}
-        >
-          <ImageIcon size={28} color="rgba(31,47,87,0.2)" strokeWidth={1.5} />
-        </div>
-      )}
-      {/* Badge de estado overlay */}
-      <span
-        className="absolute bottom-2 left-2 text-[10px] font-semibold px-2 py-0.5 rounded-full"
-        style={{ backgroundColor: status.bg, color: status.color }}
-      >
-        {status.label}
-      </span>
-    </div>
-  );
 }
 
 export default function NewProductCard({
@@ -62,7 +34,6 @@ export default function NewProductCard({
       className="bg-white rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow"
       style={{ border: "0.5px solid rgba(31,47,87,0.12)" }}
     >
-      {/* Top bar: star + 3-dot */}
       <div className="flex items-center justify-between px-3 pt-3 pb-1.5">
         <button
           onClick={() => onToggleFav(producto.id)}
@@ -84,16 +55,13 @@ export default function NewProductCard({
         </button>
       </div>
 
-      {/* Cuerpo */}
       <div className="px-3 flex flex-col flex-1">
-        {/* Imagen con badge de estado */}
         <ImageArea
           imagenUrl={producto.imagenUrl}
           nombre={producto.nombre}
           status={status}
         />
 
-        {/* Categoría */}
         {categoriaNombre && (
           <p
             className="text-[10px] uppercase tracking-wide font-medium mb-0.5"
@@ -103,7 +71,6 @@ export default function NewProductCard({
           </p>
         )}
 
-        {/* Nombre */}
         <p
           className="text-sm font-semibold leading-tight line-clamp-2 mb-1"
           style={{ color: "#1F2F57" }}
@@ -111,12 +78,10 @@ export default function NewProductCard({
           {producto.nombre}
         </p>
 
-        {/* Código + variantes */}
         <p className="text-[11px] mb-2" style={{ color: "rgba(31,47,87,0.45)" }}>
           {producto.codigo} · {variantesText}
         </p>
 
-        {/* Precio + stock */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-bold" style={{ color: "#1F2F57" }}>
             S/ {precioStr}
@@ -127,7 +92,6 @@ export default function NewProductCard({
         </div>
       </div>
 
-      {/* Footer */}
       <div
         className="flex items-center justify-between px-3 py-2.5"
         style={{ borderTop: "0.5px solid rgba(31,47,87,0.08)" }}

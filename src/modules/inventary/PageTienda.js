@@ -26,35 +26,9 @@ export default function PageTienda({
           </Text>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="relative min-w-[300px]">
-            <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: "rgba(31,47,87,0.35)" }}
-            />
-            <input
-              placeholder="Buscar por nombre, código o responsable..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-9 pl-9 pr-3 rounded-lg text-xs outline-none bg-white transition-all"
-              style={{
-                border: "0.5px solid rgba(31,47,87,0.18)",
-                color: "#1F2F57",
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = "#3960A9";
-                e.target.style.boxShadow = "0 0 0 3px rgba(57,96,169,0.1)";
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = "rgba(31,47,87,0.18)";
-                e.target.style.boxShadow = "none";
-              }}
-            />
-        </div>
-            <CreateLinkButton href="/dashboard/inventario/tienda/create" >
-                Nueva Tieda
-            </CreateLinkButton>
-       
+          <CreateLinkButton href="/dashboard/inventario/tienda/create" >
+            Nueva Tieda
+          </CreateLinkButton>
         </div>
       </div>
 
