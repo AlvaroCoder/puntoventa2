@@ -16,6 +16,7 @@ export default function RootLayout({ children }) {
         links={[
           { href: "/dashboard/ventas", label: "Resumen" },
           { href: "/dashboard/ventas/caja", label: "Caja" },
+          {href : "/dashboard/ventas/clientes", label : "Clientes"},
           {href : "/dashboard/ventas/reportes", label : "Reportes"}
         ]}
       >

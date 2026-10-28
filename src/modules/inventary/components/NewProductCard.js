@@ -1,6 +1,7 @@
 import { ArrowRight, ImageIcon, MoreVertical, Star } from "lucide-react";
 import React from "react";
 import ImageArea from "./ImageArea";
+import { useRouter } from "next/navigation";
 
 function stockStatus(stockTotal) {
   if (stockTotal === 0)
@@ -28,7 +29,7 @@ export default function NewProductCard({
 
   const accionColor = stockNum === 0 ? "#DC2626" : "#1F2F57";
   const accionLabel = stockNum === 0 ? "Reponer" : "Vender";
-
+  const router = useRouter();
   return (
     <div
       className="bg-white rounded-xl overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow"
@@ -78,7 +79,10 @@ export default function NewProductCard({
           {producto.nombre}
         </p>
 
-        <p className="text-[11px] mb-2" style={{ color: "rgba(31,47,87,0.45)" }}>
+        <p
+          className="text-[11px] mb-2"
+          style={{ color: "rgba(31,47,87,0.45)" }}
+        >
           {producto.codigo} · {variantesText}
         </p>
 
@@ -99,6 +103,7 @@ export default function NewProductCard({
         <button
           className="flex items-center gap-1 text-xs font-medium"
           style={{ color: "#3960A9" }}
+          onClick={() => router.push(`/dashboard/inventario/productos/${producto?.id}`)}
         >
           Ver detalle
           <ArrowRight size={12} strokeWidth={2} />

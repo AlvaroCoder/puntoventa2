@@ -80,6 +80,23 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 - Skeleton: `animate-pulse` con `backgroundColor: 'rgba(31,47,87,0.06)'`
 - Títulos de sección: `text-xs uppercase tracking-wide` color `rgba(31,47,87,0.55)`
 
+## Pantalla Detalle Producto (arquitectura hexagonal)
+- Hook: `src/modules/inventary/hooks/useProductoDetalle.js` — retorna `{ producto, loading, error }`, mock con delay 400ms
+- UI pura: `src/modules/inventary/PageProductoDetalle.js` — recibe todas las props del controller, sin estado propio
+- Controller: `src/app/dashboard/inventario/productos/[id]/page.js` — usa `useParams()`, sincroniza `alertaMinimo` y `visibleEnCaja` via `useEffect` cuando carga el producto
+- Patrón cardHeader: componente `CardHeader({ title, action })` reutilizable dentro del page
+- Tabla matriz stock: `border-separate` + `borderSpacing: '2px'` para el efecto de celdas separadas
+- `cellStyle(value, minimo)`: 0 → rojo, ≤ mínimo → ámbar, > mínimo → texto normal
+- Switch reutilizado de `@/modules/inventary/components/Switch` (props: `on`, `toggle`)
+
+## Módulo Trabajadores (arquitectura hexagonal)
+- Hook: `src/modules/trabajadores/hooks/useTrabajadores.js` — mock 500ms, retorna `{ trabajadores, loading, error, setTrabajadores }`
+- Card: `src/modules/trabajadores/components/TrabajadorCard.js` — motion.div, menu ⋮ con MenuDesplegable (cierre por click fuera), badges rol+tienda, footer condicional (caja vs último acceso)
+- UI pura: `src/modules/trabajadores/PageTrabajadores.js` — InviteCard dashed al final del grid, sección ROLES_INFO con 3 cards, estado vacío
+- Controller: `src/app/dashboard/trabajadores/page.js` — handleInvitar/handleEditar/handleEliminar, router.push
+- Color badges rol: Administrador #3960A9, Cajero #0E9090, Almacenero #B87A10
+- InviteCard: hover cambia borderColor via onMouseEnter/onMouseLeave (no via Tailwind)
+
 ## Archivos clave
 - `src/hooks/useGenerarCodigo.js` — generación de códigos de producto
 - `src/hooks/useInventarioResumen.js` — resumen de inventario con mock fallback
@@ -91,3 +108,10 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 - `src/app/dashboard/inventario/components/` — AlertasBanner, OperacionesPendientes, TarjetaOperacion, ResumenStock, TarjetaMetrica, ListaStockBajo, ItemStockBajo
 - `src/app/dashboard/inventario/crear/page.js` — reescrito con componentes separados
 - `src/app/dashboard/logistica/ordenes-compra/crear/page.js` — nuevo
+- `src/modules/inventary/hooks/useProductoDetalle.js` — nuevo, detalle producto
+- `src/modules/inventary/PageProductoDetalle.js` — nuevo, UI detalle producto
+- `src/app/dashboard/inventario/productos/[id]/page.js` — reescrito (controller detalle)
+- `src/modules/trabajadores/hooks/useTrabajadores.js` — nuevo
+- `src/modules/trabajadores/components/TrabajadorCard.js` — nuevo
+- `src/modules/trabajadores/PageTrabajadores.js` — nuevo
+- `src/app/dashboard/trabajadores/page.js` — reescrito (controller)

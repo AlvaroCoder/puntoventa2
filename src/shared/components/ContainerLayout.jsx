@@ -26,7 +26,7 @@ export default function ContainerLayout({
         </div>
         <div className="flex items-center gap-2 px-3 rounded-lg h-9 min-w-[200px]">
           {links.map(({href, label}) => (
-            <WrapperLink href={href}>
+            <WrapperLink key={href} href={href}>
               {label}
             </WrapperLink>
           ))}

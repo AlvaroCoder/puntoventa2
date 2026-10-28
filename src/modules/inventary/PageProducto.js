@@ -41,7 +41,7 @@ export default function PageProducto({
 }) {
   const [modeVisible, setModeVisible] = useState('grid');
   return (
-    <div className="p-6 flex flex-col gap-5 bg-[#E1E7F0] min-h-full">
+    <div className="p-6 flex flex-col gap-5 bg-[#E1E7F0] min-h-screen">
 
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
