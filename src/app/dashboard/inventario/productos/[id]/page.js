@@ -1,14 +1,15 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import useProductoDetalle from '@/modules/inventary/hooks/useProductoDetalle';
 import PageProductoDetalle from '@/modules/inventary/PageProductoDetalle';
 
 export default function Page() {
   const { id } = useParams();
+  const { tiendaId } = useSearchParams();
   const router = useRouter();
 
-  const { producto, loading, error } = useProductoDetalle(id);
+  const { producto, loading, error } = useProductoDetalle(id, tiendaId);
 
   const [alertaMinimo, setAlertaMinimo] = useState(2);
   const [visibleEnCaja, setVisibleEnCaja] = useState(true);

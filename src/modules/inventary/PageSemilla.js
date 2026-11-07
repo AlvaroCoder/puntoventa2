@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { ImageIcon, Search, ChevronDown, X, ArrowLeft, Check } from 'lucide-react';
 
-// ─── Catálogo mock ────────────────────────────────────────────────────────────
 const CATALOGO = [
   { id: 1,  nombre: 'Zapatilla urbana',      categoria: 'Zapatillas', tallas: '37-42', precioRef: 159.90 },
   { id: 2,  nombre: 'Zapatilla running',      categoria: 'Zapatillas', tallas: '37-43', precioRef: 199.00 },

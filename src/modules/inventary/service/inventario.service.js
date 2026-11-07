@@ -38,6 +38,12 @@ export const inventarioService = {
     const raw = await response.json();
       return raw?.data?.content || [];
   },
+  async getProductoById(idProducto) {
+    const response = await fetch(`/api/producto/${idProducto}`, { method: 'GET' });
+    if (!response.ok) throw new Error("Error al obtener producto");
+    const raw = await response.json();
+    return raw?.data?.content || [];
+  },
   async getTiendas() {
     const response = await fetch('/api/tienda', { method: 'GET' });
     if (!response.ok) throw new Error("Error al obtener tiendas");

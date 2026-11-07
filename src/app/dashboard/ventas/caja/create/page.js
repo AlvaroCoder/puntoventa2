@@ -2,13 +2,13 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronRight, RefreshCw } from 'lucide-react'
-import InputFillable from '@/app/dashboard/inventario/productos/crear/components/InputFillable'
 import SwitcherLoader from '@/components/Navigation/SwitcherLoader'
-import SearchableSelect from '@/app/dashboard/inventario/components/SearchableSelect'
 import { useAuth } from '@/Context/AuthContext'
 import { createCaja, abrirCaja } from '@/Connections/caja'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import { toast } from 'react-toastify'
+import InputFillable from '@/shared/components/InputFillable'
+import SearchableSelect from '@/shared/components/SearchableSelect'
 
 function generarCodigo(nombre) {
     const prefix = nombre.trim().slice(0, 3).toUpperCase().replace(/\s/g, '') || 'CAJ'

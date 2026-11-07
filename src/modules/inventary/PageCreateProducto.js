@@ -2,7 +2,7 @@ import Stepper from '@/shared/components/Stepper';
 import React from 'react'
 import StepperProduct1 from './components/StepperProduct1';
 import { Check, Loader2, Save } from 'lucide-react';
-import StepperProduct2 from './components/StepperProduct2';
+import StepperProduct2 from './components/StepperProduct2/index';
 
 export default function PageCreateProducto({
     pasoActual,
@@ -54,8 +54,8 @@ export default function PageCreateProducto({
 
       {pasoActual === 2 && (
         <StepperProduct2
-          almacenSeleccionado={almacenActual}
-          handlePayload={setPayload}
+          almacenSeleccionado={almacenSeleccionado}
+          handlePayload={handleConfirmar}
         />
       )}
 

@@ -4,7 +4,9 @@ import Image from 'next/image';
 import { ImageIcon } from 'lucide-react';
 import FieldRow from './FieldRow';
 
-export default function CardMetricas() {
+export default function CardMetricas({
+  producto
+}) {
   return (
     <div
       className="bg-white rounded-2xl overflow-hidden"

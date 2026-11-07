@@ -1,516 +1,586 @@
-'use client';
-import React from 'react';
-import Link from 'next/link';
-import {
-  ArrowLeft,
-  ChevronRight,
-  Pencil,
-  PackagePlus,
-  ShoppingCart,
-  SlidersHorizontal,
-  ImageIcon,
-  Info,
-  ArrowRight,
-} from 'lucide-react';
-import Switch from '@/modules/inventary/components/Switch';
-import Image from 'next/image';
-import CardMetricas from '@/shared/components/CardMetricas';
+"use client";
+import React, { useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowLeft, Pencil, ImageIcon, Info, ChevronDown } from "lucide-react";
+import Switch from "@/modules/inventary/components/Switch";
 
-function fmt(n) {
-  return typeof n === 'number' ? n.toFixed(2) : '—';
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+
+const soles = (n) =>
+  typeof n === "number"
+    ? `S/ ${n.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : "—";
+
+const solesCorto = (n) =>
+  typeof n === "number"
+    ? `S/ ${n.toLocaleString("es-PE", { maximumFractionDigits: 0 })}`
+    : "—";
+
+/** "Par" -> "pares", "Unidad" -> "unidades", "Kg" -> "kg" */
+function unidadTexto(unidad, cantidad) {
+  const u = (unidad || "unidad").toLowerCase();
+  if (cantidad === 1 || u.length <= 2) return u;
+  return /[aeiou]$/.test(u) ? `${u}s` : `${u}es`;
 }
 
 function calcMargen(precio, costo) {
-  if (!precio || !costo || precio === 0) return null;
+  if (!precio || costo == null) return null;
   return Math.round(((precio - costo) / precio) * 100);
 }
 
-function stockBadgeStyle(estado) {
-  if (estado === 'Agotado')
-    return { bg: '#FEE2E2', color: '#DC2626' };
-  if (estado === 'Stock bajo')
-    return { bg: '#FEF3C7', color: '#D97706' };
-  return { bg: '#D1FAE5', color: '#059669' };
+function estadoStock(p) {
+  if (!p.stockTotal)
+    return { label: "Agotado", cls: "bg-[#FEE2E2] text-[#B91C1C]" };
+  if (p.enBajoStock)
+    return { label: "Stock bajo", cls: "bg-[#FDE7CF] text-[#B45309]" };
+  return { label: "En stock", cls: "bg-[#D1FAE5] text-[#047857]" };
 }
 
-function cellStyle(value, minimo) {
-  if (value === 0)
-    return { background: '#FEF2F2', color: '#EF4444', fontWeight: 600 };
-  if (value <= minimo)
-    return { background: '#FFFBEB', color: '#D97706', fontWeight: 500 };
-  return { color: '#1F2F57', fontWeight: 500 };
+function tiempoRelativo(fecha) {
+  if (!fecha) return "";
+  const d = new Date(fecha);
+  if (isNaN(d)) return fecha;
+  const dias = Math.round((d - new Date()) / 86400000);
+  if (dias === 0)
+    return `hoy ${d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}`;
+  if (dias >= -6)
+    return new Intl.RelativeTimeFormat("es", { numeric: "auto" }).format(
+      dias,
+      "day",
+    );
+  return d.toLocaleDateString("es-PE", { day: "2-digit", month: "short" });
 }
 
-function MovimientoIcon({ tipo }) {
-  const props = { size: 14, strokeWidth: 2 };
-  if (tipo === 'venta') return <ShoppingCart {...props} />;
-  if (tipo === 'ingreso') return <PackagePlus {...props} />;
-  return <SlidersHorizontal {...props} />;
+const COLORES_HEX = {
+  negro: "#111827",
+  blanco: "#FFFFFF",
+  rojo: "#B91C1C",
+  azul: "#1D4ED8",
+  verde: "#15803D",
+  gris: "#6B7280",
+  marron: "#78350F",
+  marrón: "#78350F",
+  beige: "#D6C6A8",
+  rosado: "#EC4899",
+  amarillo: "#EAB308",
+};
+
+const ordenTalla = (a, b) => {
+  const na = Number(a),
+    nb = Number(b);
+  if (!isNaN(na) && !isNaN(nb)) return na - nb;
+  const orden = ["XS", "S", "M", "L", "XL", "XXL"];
+  const ia = orden.indexOf(a),
+    ib = orden.indexOf(b);
+  if (ia !== -1 && ib !== -1) return ia - ib;
+  return String(a).localeCompare(String(b));
+};
+
+/** Convierte variantes[] en tallas, colores y matriz[color][talla] */
+function useMatrizVariantes(variantes = []) {
+  return useMemo(() => {
+    const tallas = [
+      ...new Set(variantes.map((v) => v.talla).filter(Boolean)),
+    ].sort(ordenTalla);
+    const colores = [...new Set(variantes.map((v) => v.color).filter(Boolean))];
+    const matriz = {};
+    variantes.forEach((v) => {
+      matriz[v.color] ??= {};
+      matriz[v.color][v.talla] = v;
+    });
+    const totalColor = (c) =>
+      tallas.reduce((s, t) => s + (matriz[c]?.[t]?.stock ?? 0), 0);
+    return { tallas, colores, matriz, totalColor };
+  }, [variantes]);
 }
 
-function movimientoIconColor(tipo) {
-  if (tipo === 'venta') return '#DC2626';
-  if (tipo === 'ingreso') return '#059669';
-  return '#6366F1';
-}
+const MOV = {
+  SALIDA: { label: "Salida", signo: -1, cls: "bg-[#FEE2E2] text-[#B91C1C]" },
+  ENTRADA: { label: "Ingreso", signo: 1, cls: "bg-[#D1FAE5] text-[#047857]" },
+  AJUSTE: { label: "Ajuste", signo: 0, cls: "bg-[#E1E7F0] text-[#1F2F57]" },
+};
 
-function CardHeader({ title, action }) {
+// ─────────────────────────────────────────────
+// Bloques base
+// ─────────────────────────────────────────────
+
+function Card({ title, action, children, className = "" }) {
   return (
-    <div
-      className="flex items-center justify-between px-5 py-3.5"
-      style={{ borderBottom: '0.5px solid rgba(31,47,87,0.07)' }}
+    <section
+      className={`rounded-2xl bg-white p-6 shadow-[0_1px_2px_rgba(31,47,87,.04)] ${className}`}
     >
-      <span className="text-sm font-semibold" style={{ color: '#1F2F57' }}>
-        {title}
-      </span>
-      {action && action}
-    </div>
+      {(title || action) && (
+        <div className="mb-4 flex items-center justify-between gap-3">
+          {title && (
+            <h2 className="text-lg font-bold text-[#1F2F57]">{title}</h2>
+          )}
+          {action}
+        </div>
+      )}
+      {children}
+    </section>
   );
 }
 
-function FieldRow({ label, value }) {
+function Dato({ label, children }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span
-        className="text-[10px] uppercase tracking-wide font-medium"
-        style={{ color: 'rgba(31,47,87,0.45)' }}
-      >
-        {label}
-      </span>
-      <span className="text-sm" style={{ color: '#1F2F57' }}>
-        {value || '—'}
-      </span>
-    </div>
+    <>
+      <dt className="text-sm text-[#1F2F57]/60">{label}</dt>
+      <dd className="text-sm font-medium text-[#1F2F57]">{children ?? "—"}</dd>
+    </>
   );
 }
+
+// ─────────────────────────────────────────────
+// Columna izquierda
+// ─────────────────────────────────────────────
 
 function CardInfoGeneral({ producto }) {
+  const imagenes =
+    producto.imagenes ?? (producto.imagenUrl ? [producto.imagenUrl] : []);
+  const [activa, setActiva] = React.useState(0);
+
   return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden"
-      style={{ border: '0.5px solid rgba(31,47,87,0.08)' }}
-    >
-      <CardHeader title="Información general" />
-      <div className="p-5 flex gap-5">
-        <div className="flex flex-col gap-2 shrink-0">
-          <div
-            className="w-[130px] h-[130px] rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(31,47,87,0.04)', border: '0.5px solid rgba(31,47,87,0.10)' }}
-          >
-            {producto.imagenUrl ? (
-              <Image
-                src={producto.imagenUrl}
-                alt={producto.nombre}
-                className="w-full h-full object-cover rounded-xl"
+    <section className="flex flex-col gap-6 rounded-2xl bg-white p-6 md:flex-row">
+      <div className="flex shrink-0 flex-col gap-3 md:w-[300px]">
+        <div className="relative aspect-[300/260] w-full overflow-hidden rounded-xl bg-[#E1E7F0]/60">
+          {imagenes[activa] ? (
+            <Image
+              src={imagenes[activa]}
+              alt={producto.nombre}
+              fill
+              sizes="300px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="grid h-full place-items-center">
+              <ImageIcon
+                size={48}
+                strokeWidth={1.25}
+                className="text-[#1F2F57]/30"
               />
-            ) : (
-              <ImageIcon size={32} color="rgba(31,47,87,0.2)" strokeWidth={1.5} />
-            )}
-          </div>
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{
-                  background: 'rgba(31,47,87,0.03)',
-                  border: '0.5px solid rgba(31,47,87,0.09)',
-                }}
-              >
-                <ImageIcon size={12} color="rgba(31,47,87,0.18)" strokeWidth={1.5} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-4 content-start">
-          <FieldRow label="Nombre" value={producto.nombre} />
-          <FieldRow label="Categoría" value={producto.categoria} />
-          <FieldRow label="Marca" value={producto.marca} />
-          <FieldRow label="Código de barras" value={producto.codigoBarras} />
-          <div className="col-span-2">
-            <FieldRow label="Descripción" value={producto.descripcion} />
-          </div>
-          <FieldRow label="Unidad" value={producto.unidadMedida} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CardPrecio({ producto }) {
-  const ganancia = producto.precioVenta - producto.costoUnitario;
-  const margen = calcMargen(producto.precioVenta, producto.costoUnitario);
-
-  return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden"
-      style={{ border: '0.5px solid rgba(31,47,87,0.08)' }}
-    >
-      <CardHeader title="Precio y ganancia" />
-      <div className="p-5 flex flex-col gap-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="flex flex-col gap-1">
-            <span
-              className="text-[10px] uppercase tracking-wide font-medium"
-              style={{ color: 'rgba(31,47,87,0.45)' }}
-            >
-              Precio de venta
-            </span>
-            <span className="text-xl font-bold" style={{ color: '#1F2F57' }}>
-              S/ {fmt(producto.precioVenta)}
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <span
-              className="text-[10px] uppercase tracking-wide font-medium"
-              style={{ color: 'rgba(31,47,87,0.45)' }}
-            >
-              Costo
-            </span>
-            <span className="text-xl font-bold" style={{ color: '#1F2F57' }}>
-              S/ {fmt(producto.costoUnitario)}
-            </span>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <span
-              className="text-[10px] uppercase tracking-wide font-medium"
-              style={{ color: 'rgba(31,47,87,0.45)' }}
-            >
-              Ganancia por {producto.unidadMedida?.toLowerCase() ?? 'unidad'}
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold" style={{ color: '#059669' }}>
-                S/ {fmt(ganancia)}
-              </span>
-              {margen !== null && (
-                <span
-                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
-                  style={{ background: '#D1FAE5', color: '#059669' }}
-                >
-                  Margen {margen}%
-                </span>
-              )}
             </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <span
-              className="text-[10px] uppercase tracking-wide font-medium"
-              style={{ color: 'rgba(31,47,87,0.45)' }}
+          )}
+        </div>
+        <div className="flex gap-2">
+          {(imagenes.length ? imagenes : [null, null]).map((src, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiva(i)}
+              className={`relative grid h-16 w-16 place-items-center overflow-hidden rounded-lg bg-[#E1E7F0]/60 transition ${
+                i === activa
+                  ? "ring-2 ring-[#1F2F57]"
+                  : "hover:ring-1 hover:ring-[#1F2F57]/30"
+              }`}
             >
-              IGV
+              {src ? (
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+              ) : (
+                <ImageIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-[#1F2F57]/35"
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <h2 className="mb-4 text-lg font-bold text-[#1F2F57]">
+          Información general
+        </h2>
+        <dl className="grid grid-cols-[140px_minmax(0,1fr)] gap-x-6 gap-y-3">
+          <Dato label="Nombre">{producto.nombre}</Dato>
+          <Dato label="Categoría">
+            {producto.categoria?.nombre ?? producto.categoria}
+          </Dato>
+          <Dato label="Marca">{producto.marca}</Dato>
+          <Dato label="Código de barras">{producto.codigoBarras}</Dato>
+          <Dato label="Descripción">
+            <span className="font-normal text-[#1F2F57]/75">
+              {producto.descripcion ?? "—"}
             </span>
-            <span className="text-sm font-medium" style={{ color: '#1F2F57' }}>
-              {producto.aplicaIgv ? 'Incluido en el precio' : 'No aplica'}
-            </span>
-            {producto.aplicaIgv && (
-              <span
-                className="text-[10px]"
-                style={{ color: 'rgba(31,47,87,0.5)' }}
-              >
-                Gravado {producto.impuestoPorcentaje}%
+          </Dato>
+          <Dato label="Unidad">{producto.unidadMedida ?? "Unidad"}</Dato>
+          <Dato label="Almacén">
+            {producto.almacen?.nombre}
+            {producto.almacen?.codigo && (
+              <span className="ml-1.5 font-normal text-[#1F2F57]/50">
+                {producto.almacen.codigo}
               </span>
             )}
-          </div>
-        </div>
-
-        {producto.notaPrecioVariante && (
-          <div
-            className="flex items-start gap-2 px-3 py-2.5 rounded-xl"
-            style={{ background: 'rgba(57,96,169,0.06)', border: '0.5px solid rgba(57,96,169,0.15)' }}
-          >
-            <Info size={13} color="#3960A9" strokeWidth={2} className="mt-0.5 shrink-0" />
-            <span className="text-xs" style={{ color: '#3960A9' }}>
-              {producto.notaPrecioVariante}
-            </span>
-          </div>
-        )}
+          </Dato>
+        </dl>
       </div>
+    </section>
+  );
+}
+
+function Metrica({ label, children, sub, className = "" }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-sm font-semibold text-[#1F2F57]/80">{label}</span>
+      <span
+        className={`text-[26px] font-bold leading-tight text-[#1F2F57] ${className}`}
+      >
+        {children}
+      </span>
+      {sub && <span className="text-xs text-[#1F2F57]/60">{sub}</span>}
     </div>
   );
 }
 
-function CardStock({ producto }) {
-  const { colores, tallas, stockMatrix, stockMinimoPorTalla, unidadMedida } = producto;
-
-  const totalPorTalla = tallas.reduce((acc, t) => {
-    acc[t] = colores.reduce((sum, c) => sum + (stockMatrix[c]?.[t] ?? 0), 0);
-    return acc;
-  }, {});
-
-  const totalPorColor = colores.reduce((acc, c) => {
-    acc[c] = tallas.reduce((sum, t) => sum + (stockMatrix[c]?.[t] ?? 0), 0);
-    return acc;
-  }, {});
-
-  const totalGeneral = colores.reduce((sum, c) => sum + totalPorColor[c], 0);
+function CardPrecio({ producto, unidad }) {
+  const ganancia =
+    producto.ganancia ?? producto.precioVenta - producto.precioCompra;
+  const margen = calcMargen(producto.precioVenta, producto.precioCompra);
+  const aplicaIgv = (producto.impuestoPorcentaje ?? 0) > 0;
 
   return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden"
-      style={{ border: '0.5px solid rgba(31,47,87,0.08)' }}
-    >
-      <CardHeader
-        title="Stock por talla y color"
-        action={
-          <button
-            className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-[11px] font-medium transition-colors hover:opacity-80"
-            style={{
-              background: '#1F2F57',
-              color: '#fff',
-            }}
-          >
-            Ajustar stock
-            <ArrowRight size={11} strokeWidth={2} />
-          </button>
-        }
-      />
-
-      <div className="px-5 py-3 flex items-center justify-between flex-wrap gap-2">
-        <span className="text-xs" style={{ color: 'rgba(31,47,87,0.55)' }}>
-          Total {totalGeneral} {totalGeneral === 1 ? unidadMedida?.toLowerCase() : `${unidadMedida?.toLowerCase()}s`} en 2 almacenes · mínimo {stockMinimoPorTalla} {unidadMedida?.toLowerCase()}
-        </span>
-        <button
-          className="flex items-center gap-1 h-7 px-2.5 rounded-lg text-[11px] font-medium"
-          style={{
-            background: 'rgba(31,47,87,0.05)',
-            color: 'rgba(31,47,87,0.7)',
-            border: '0.5px solid rgba(31,47,87,0.12)',
-          }}
+    <Card title="Precio y ganancia">
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+        <Metrica label="Precio de venta">{soles(producto.precioVenta)}</Metrica>
+        <Metrica label="Costo">{soles(producto.precioCompra)}</Metrica>
+        <Metrica
+          label={`Ganancia por ${unidadTexto(unidad, 1)}`}
+          className="text-[#1F7A4D]"
+          sub={
+            margen !== null ? `Margen ${margen}% · se calcula solo` : undefined
+          }
         >
-          Todos los almacenes
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          {soles(ganancia)}
+        </Metrica>
+        <div className="flex flex-col gap-1">
+          <span className="text-sm font-semibold text-[#1F2F57]/80">IGV</span>
+          <span className="text-base font-bold text-[#1F2F57]">
+            {aplicaIgv ? "Incluido en el precio" : "No aplica"}
+          </span>
+          {aplicaIgv && (
+            <span className="text-xs text-[#1F2F57]/60">
+              Gravado {producto.impuestoPorcentaje}%
+            </span>
+          )}
+        </div>
+      </div>
+
+      {producto.notaPrecioVariante && (
+        <div className="mt-5 flex items-center gap-2 rounded-xl bg-[#E1E7F0]/55 px-4 py-3 text-sm text-[#1F2F57]/80">
+          <Info size={15} className="shrink-0" />
+          {producto.notaPrecioVariante}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function celdaCls(variante, minimo) {
+  const stock = variante?.stock ?? 0;
+  if (!variante || stock === 0) return "bg-[#FDE2E2] text-[#B91C1C]";
+  if (variante.enBajoStock || stock <= minimo)
+    return "bg-[#FDEBD3] text-[#B45309]";
+  return "bg-transparent text-[#1F2F57]";
+}
+
+function CardStock({ producto, unidad, onAjustar }) {
+  const { tallas, colores, matriz, totalColor } = useMatrizVariantes(
+    producto.variantes,
+  );
+  const total = producto.stockTotal ?? 0;
+  const sinVariantes = colores.length === 0;
+
+  return (
+    <Card>
+      <h2 className="text-lg font-bold text-[#1F2F57]">
+        {sinVariantes ? "Stock" : "Stock por talla y color"}
+      </h2>
+      <p className="mt-1 text-sm text-[#1F2F57]/65">
+        Total {total} {unidadTexto(unidad, total)} en{" "}
+        {producto.almacen?.nombre ?? "el almacén"}. El stock cambia con
+        ingresos, ventas o ajustes, no se escribe a mano.
+      </p>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <div className="relative">
+          <select className="h-11 appearance-none rounded-lg border border-[#1F2F57]/20 bg-white pl-4 pr-10 text-sm text-[#1F2F57] outline-none focus:border-[#3960A9]">
+            <option>Todos los almacenes</option>
+            {producto.almacen && <option>{producto.almacen.nombre}</option>}
+          </select>
+          <ChevronDown
+            size={16}
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#1F2F57]/55"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={onAjustar}
+          className="h-11 rounded-lg border border-[#1F2F57]/20 bg-white px-4 text-sm font-bold text-[#1F2F57] transition hover:bg-[#E1E7F0]/50"
+        >
+          Ajustar stock
         </button>
       </div>
 
-      <div className="px-5 pb-5 overflow-x-auto">
-        <table className="w-full text-xs border-separate" style={{ borderSpacing: '2px' }}>
-          <thead>
-            <tr>
-              <th
-                className="text-left px-2 py-2 rounded-lg text-[10px] uppercase tracking-wide font-semibold"
-                style={{ color: 'rgba(31,47,87,0.45)', minWidth: 64 }}
-              >
-                Color
-              </th>
-              {tallas.map((t) => (
-                <th
-                  key={t}
-                  className="text-center px-2 py-2 rounded-lg text-[10px] uppercase tracking-wide font-semibold"
-                  style={{ color: 'rgba(31,47,87,0.45)', minWidth: 44 }}
-                >
-                  {t}
+      {sinVariantes ? (
+        <div className="mt-5 rounded-xl bg-[#E1E7F0]/45 p-4 text-sm text-[#1F2F57]">
+          <span className="text-2xl font-bold">{total}</span>{" "}
+          {unidadTexto(unidad, total)} disponibles
+        </div>
+      ) : (
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[480px] text-sm">
+            <thead>
+              <tr className="border-b border-[#1F2F57]/10 text-[#1F2F57]/70">
+                <th className="py-2.5 pr-3 text-left text-xs font-semibold">
+                  Color \ Talla
                 </th>
-              ))}
-              <th
-                className="text-center px-2 py-2 rounded-lg text-[10px] uppercase tracking-wide font-semibold"
-                style={{ color: 'rgba(31,47,87,0.45)', minWidth: 44 }}
-              >
-                Total
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {colores.map((color) => (
-              <tr key={color}>
-                <td
-                  className="px-2 py-2 rounded-lg font-medium"
-                  style={{ color: '#1F2F57' }}
-                >
-                  {color}
-                </td>
-                {tallas.map((talla) => {
-                  const val = stockMatrix[color]?.[talla] ?? 0;
-                  const cs = cellStyle(val, stockMinimoPorTalla);
-                  return (
-                    <td
-                      key={talla}
-                      className="text-center px-2 py-2 rounded-lg"
-                      style={cs}
-                    >
-                      {val}
-                    </td>
-                  );
-                })}
-                <td
-                  className="text-center px-2 py-2 rounded-lg font-semibold"
-                  style={{ color: '#1F2F57', background: 'rgba(31,47,87,0.04)' }}
-                >
-                  {totalPorColor[color]}
-                </td>
+                {tallas.map((t) => (
+                  <th
+                    key={t}
+                    className="px-2 py-2.5 text-center text-xs font-semibold"
+                  >
+                    {t}
+                  </th>
+                ))}
+                <th className="py-2.5 pl-2 text-center text-xs font-semibold">
+                  Total
+                </th>
               </tr>
-            ))}
-            <tr>
-              <td
-                className="px-2 py-2 rounded-lg text-[10px] uppercase tracking-wide font-semibold"
-                style={{ color: 'rgba(31,47,87,0.5)', background: 'rgba(31,47,87,0.04)' }}
-              >
-                Total
-              </td>
-              {tallas.map((t) => (
-                <td
-                  key={t}
-                  className="text-center px-2 py-2 rounded-lg font-semibold text-[11px]"
-                  style={{ color: '#1F2F57', background: 'rgba(31,47,87,0.04)' }}
+            </thead>
+            <tbody>
+              {colores.map((color) => (
+                <tr
+                  key={color}
+                  className="border-b border-[#1F2F57]/10 last:border-0"
                 >
-                  {totalPorTalla[t]}
-                </td>
+                  <td className="py-3 pr-3">
+                    <span className="flex items-center gap-2 font-bold text-[#1F2F57]">
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-full border border-[#1F2F57]/40"
+                        style={{
+                          background:
+                            COLORES_HEX[color.toLowerCase()] ?? "#CBD5E1",
+                        }}
+                      />
+                      {color}
+                    </span>
+                  </td>
+                  {tallas.map((t) => {
+                    const v = matriz[color]?.[t];
+                    return (
+                      <td key={t} className="px-2 py-3 text-center">
+                        <span
+                          title={
+                            v ? `${color} ${t}: ${v.stock}` : "Sin variante"
+                          }
+                          className={`inline-grid h-8 min-w-10 place-items-center rounded-md px-2 font-semibold tabular-nums ${celdaCls(v, producto.stockMinimo ?? 0)}`}
+                        >
+                          {v ? v.stock : "–"}
+                        </span>
+                      </td>
+                    );
+                  })}
+                  <td className="py-3 pl-2 text-center font-bold tabular-nums text-[#1F2F57]">
+                    {totalColor(color)}
+                  </td>
+                </tr>
               ))}
-              <td
-                className="text-center px-2 py-2 rounded-lg font-bold text-[11px]"
-                style={{ color: '#1F2F57', background: 'rgba(31,47,87,0.07)' }}
-              >
-                {totalGeneral}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
 
-        <div className="flex items-center gap-4 mt-3">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ background: '#EF4444' }} />
-            <span className="text-[10px]" style={{ color: 'rgba(31,47,87,0.55)' }}>
-              Agotado
+          <div className="mt-4 flex items-center gap-5 text-xs text-[#1F2F57]/65">
+            <span className="flex items-center gap-2">
+              <span className="h-3 w-5 rounded bg-[#FDE2E2]" /> Agotado
             </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ background: '#D97706' }} />
-            <span className="text-[10px]" style={{ color: 'rgba(31,47,87,0.55)' }}>
-              Bajo el mínimo
+            <span className="flex items-center gap-2">
+              <span className="h-3 w-5 rounded bg-[#FDEBD3]" /> Bajo el mínimo
             </span>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-// ─────────────────────────────────────────────
-// Sección Derecha — Card: Alertas y venta
-// ─────────────────────────────────────────────
-
-function CardAlertas({ alertaMinimo, setAlertaMinimo, visibleEnCaja, setVisibleEnCaja, unidadMedida }) {
-  return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden"
-      style={{ border: '0.5px solid rgba(31,47,87,0.08)' }}
-    >
-      <CardHeader title="Alertas y venta" />
-      <div className="p-5 flex flex-col gap-4">
-        {/* Alerta de mínimo */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs" style={{ color: 'rgba(31,47,87,0.7)' }}>
-            Avisarme cuando queden menos de
-          </span>
-          <input
-            type="number"
-            min={0}
-            value={alertaMinimo}
-            onChange={(e) => setAlertaMinimo(Number(e.target.value))}
-            className="w-12 h-7 text-center text-sm font-semibold rounded-lg outline-none"
-            style={{
-              border: '1px solid rgba(31,47,87,0.18)',
-              color: '#1F2F57',
-              background: 'rgba(31,47,87,0.03)',
-            }}
-          />
-          <span className="text-xs" style={{ color: 'rgba(31,47,87,0.7)' }}>
-            {unidadMedida?.toLowerCase() ?? 'unidad'}s por talla
-          </span>
-        </div>
-
-        {/* Separador */}
-        <div style={{ borderTop: '0.5px solid rgba(31,47,87,0.08)' }} />
-
-        {/* Visible en caja */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-medium" style={{ color: '#1F2F57' }}>
-              Visible en caja
-            </span>
-            <span className="text-[11px]" style={{ color: 'rgba(31,47,87,0.45)' }}>
-              {visibleEnCaja ? 'Disponible para ventas' : 'No aparece en el POS'}
-            </span>
-          </div>
-          <Switch on={visibleEnCaja} toggle={() => setVisibleEnCaja((v) => !v)} />
-        </div>
-      </div>
-    </div>
+      )}
+    </Card>
   );
 }
 
 // ─────────────────────────────────────────────
-// Sección Derecha — Card: Movimientos
+// Columna derecha
 // ─────────────────────────────────────────────
 
-function CardMovimientos({ movimientos }) {
+function CardUltimos30({ producto, unidad }) {
+  const vendidos = producto.stats?.unidadesVendidasUltimos30Dias ?? 0;
+  const entradas = producto.stats?.unidadesEntradasUltimos30Dias ?? 0;
+  const porDia = vendidos / 30;
+  const diasRestantes =
+    porDia > 0 ? Math.round((producto.stockTotal ?? 0) / porDia) : null;
+  const ingresos = vendidos * (producto.precioVenta ?? 0);
+
   return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden"
-      style={{ border: '0.5px solid rgba(31,47,87,0.08)' }}
-    >
-      <CardHeader
-        title="Movimientos"
-        action={
-          <button className="flex items-center gap-0.5 text-xs font-medium" style={{ color: '#3960A9' }}>
+    <Card title="Últimos 30 días">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl bg-[#E1E7F0]/55 p-3.5">
+          <span className="text-xs text-[#1F2F57]/65">Vendidos</span>
+          <p className="text-xl font-bold text-[#1F2F57]">
+            {vendidos} {unidadTexto(unidad, vendidos)}
+          </p>
+        </div>
+        <div className="rounded-xl bg-[#E1E7F0]/55 p-3.5">
+          <span className="text-xs text-[#1F2F57]/65">Ventas aprox.</span>
+          <p className="text-xl font-bold text-[#1F2F57]">
+            {solesCorto(ingresos)}
+          </p>
+        </div>
+      </div>
+      <p className="mt-3 text-sm text-[#1F2F57]/65">
+        Entraron {entradas} {unidadTexto(unidad, entradas)} en este periodo.
+      </p>
+      {diasRestantes !== null && (
+        <p
+          className={`mt-1 text-sm ${diasRestantes <= 14 ? "text-[#B45309]" : "text-[#1F2F57]/65"}`}
+        >
+          A este ritmo, el stock alcanza para ~{diasRestantes} días.
+        </p>
+      )}
+    </Card>
+  );
+}
+
+function CardAlertas({
+  alertaMinimo,
+  setAlertaMinimo,
+  visibleEnCaja,
+  setVisibleEnCaja,
+  unidad,
+  porTalla,
+}) {
+  return (
+    <Card title="Alertas y venta">
+      <p className="text-sm font-semibold text-[#1F2F57]/80">
+        Avisarme cuando queden menos de
+      </p>
+      <div className="mt-1.5 flex items-center gap-2">
+        <input
+          type="number"
+          min={0}
+          value={alertaMinimo ?? ""}
+          onChange={(e) => setAlertaMinimo(Number(e.target.value))}
+          className="h-9 w-16 rounded-lg border border-[#1F2F57]/20 text-center text-sm font-bold text-[#1F2F57] outline-none focus:border-[#3960A9] focus:ring-1 focus:ring-[#3960A9] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <span className="text-sm font-bold text-[#1F2F57]">
+          {unidadTexto(unidad, alertaMinimo)}
+          {porTalla ? " por talla" : ""}
+        </span>
+      </div>
+
+      <div className="my-4 border-t border-[#1F2F57]/10" />
+
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-[#1F2F57]">Visible en caja</p>
+          <p className="text-xs text-[#1F2F57]/60">
+            Apagado = no aparece al vender
+          </p>
+        </div>
+        <Switch on={visibleEnCaja} toggle={() => setVisibleEnCaja((v) => !v)} />
+      </div>
+    </Card>
+  );
+}
+
+function CardMovimientos({ movimientos = [], verTodosHref }) {
+  return (
+    <Card
+      title="Movimientos"
+      action={
+        verTodosHref && (
+          <Link
+            href={verTodosHref}
+            className="text-sm font-semibold text-[#3960A9] underline-offset-2 hover:underline"
+          >
             Ver todos
-            <ArrowRight size={12} strokeWidth={2} />
-          </button>
-        }
-      />
-      <div className="px-5 py-3 flex flex-col divide-y" style={{ '--tw-divide-opacity': 1 }}>
-        {movimientos.map((m, idx) => {
-          const iconColor = movimientoIconColor(m.tipo);
-          const cantidadPositivo = m.cantidad > 0;
-          return (
-            <div
-              key={m.id}
-              className="flex items-center gap-3 py-3"
-              style={{ borderColor: 'rgba(31,47,87,0.06)' }}
-            >
-              {/* Ícono tipo */}
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: `${iconColor}14` }}
-              >
-                <span style={{ color: iconColor }}>
-                  <MovimientoIcon tipo={m.tipo} />
+          </Link>
+        )
+      }
+    >
+      {movimientos.length === 0 ? (
+        <p className="py-4 text-center text-sm text-[#1F2F57]/55">
+          Sin movimientos todavía.
+        </p>
+      ) : (
+        <ul className="divide-y divide-[#1F2F57]/10">
+          {movimientos.map((m, i) => {
+            const cfg = MOV[m.tipoMovimiento] ?? MOV.AJUSTE;
+            const cantidad =
+              cfg.signo === 0 ? m.cantidad : Math.abs(m.cantidad) * cfg.signo;
+            const cls =
+              cfg.signo === 0
+                ? cfg.cls
+                : cantidad < 0
+                  ? MOV.SALIDA.cls
+                  : MOV.ENTRADA.cls;
+            return (
+              <li key={m.id ?? i} className="flex items-center gap-3 py-3">
+                <span
+                  className={`inline-grid h-7 min-w-12 place-items-center rounded-full px-2 text-xs font-bold tabular-nums ${cls}`}
+                >
+                  {cantidad > 0 ? `+${cantidad}` : cantidad}
                 </span>
-              </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm text-[#1F2F57]">
+                    {cfg.label}
+                    {m.concepto ? ` · ${m.concepto}` : ""}
+                  </p>
+                  <p className="truncate text-xs text-[#1F2F57]/55">
+                    {tiempoRelativo(m.fechaMovimiento)}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Card>
+  );
+}
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p
-                  className="text-[11px] font-medium truncate"
-                  style={{ color: '#1F2F57' }}
-                >
-                  {m.tipo.charAt(0).toUpperCase() + m.tipo.slice(1)} · {m.referencia}
-                </p>
-                <p
-                  className="text-[10px] truncate"
-                  style={{ color: 'rgba(31,47,87,0.45)' }}
-                >
-                  {m.detalle} · {m.tiempo}
-                </p>
-              </div>
+// ─────────────────────────────────────────────
+// Skeleton
+// ─────────────────────────────────────────────
 
-              <span
-                className="text-xs font-bold tabular-nums shrink-0"
-                style={{ color: cantidadPositivo ? '#059669' : '#DC2626' }}
-              >
-                {cantidadPositivo ? '+' : ''}{m.cantidad}
-              </span>
-            </div>
-          );
-        })}
+function Skeleton() {
+  const b = "animate-pulse rounded-2xl bg-[#1F2F57]/[.07]";
+  return (
+    <div className="mx-auto flex w-full max-w-[1312px] flex-col gap-5 px-6 py-6">
+      <div className={`${b} h-4 w-24 rounded-md`} />
+      <div className={`${b} h-8 w-80 rounded-lg`} />
+      <div className="grid gap-5 lg:grid-cols-3">
+        <div className="flex flex-col gap-5 lg:col-span-2">
+          <div className={`${b} h-80`} />
+          <div className={`${b} h-52`} />
+          <div className={`${b} h-72`} />
+        </div>
+        <div className="flex flex-col gap-5">
+          <div className={`${b} h-44`} />
+          <div className={`${b} h-44`} />
+          <div className={`${b} h-72`} />
+        </div>
       </div>
     </div>
   );
 }
+
+// ─────────────────────────────────────────────
+// Página
+// ─────────────────────────────────────────────
 
 export default function PageProductoDetalle({
   producto,
@@ -521,132 +591,108 @@ export default function PageProductoDetalle({
   setVisibleEnCaja,
   handleReponer,
   handleEditar,
+  handleAjustar,
 }) {
-  if (loading) {
+  if (loading)
     return (
-      <div className="p-6 bg-[#E1E7F0] min-h-full flex flex-col gap-4">
-        {/* Skeleton header */}
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded animate-pulse" style={{ background: 'rgba(31,47,87,0.1)' }} />
-          <div className="w-24 h-4 rounded-lg animate-pulse" style={{ background: 'rgba(31,47,87,0.1)' }} />
-        </div>
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="w-64 h-7 rounded-xl animate-pulse" style={{ background: 'rgba(31,47,87,0.1)' }} />
-            <div className="w-48 h-3 rounded-lg animate-pulse" style={{ background: 'rgba(31,47,87,0.07)' }} />
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className={`h-40 rounded-2xl animate-pulse ${i <= 2 ? 'col-span-2' : 'col-span-1'}`}
-              style={{ background: 'rgba(31,47,87,0.08)' }}
-            />
-          ))}
-        </div>
+      <div className="min-h-full bg-[#E1E7F0]">
+        <Skeleton />
       </div>
     );
-  }
-
   if (!producto) return null;
 
-  const stockBadge = stockBadgeStyle(producto.estadoStock);
-  const ganancia = producto.precioVenta - producto.costoUnitario;
+  const unidad = producto.unidadMedida ?? "Unidad";
+  const estado = estadoStock(producto);
+  const tieneVariantes = (producto.variantes?.length ?? 0) > 0;
 
   return (
-    <div className="p-6 bg-[#E1E7F0] min-h-full flex flex-col gap-5">
-
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5">
-        <Link
-          href="/dashboard/inventario/productos"
-          className="flex items-center gap-1 text-xs transition-opacity hover:opacity-70"
-          style={{ color: 'rgba(31,47,87,0.55)' }}
-        >
-          <ArrowLeft size={13} strokeWidth={2} />
-          Productos
-        </Link>
-        <ChevronRight size={12} color="rgba(31,47,87,0.3)" />
-        <span className="text-xs font-medium" style={{ color: '#1F2F57' }}>
-          {producto.nombre}
-        </span>
-      </div>
-
-      {/* Header de página */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold" style={{ color: '#1F2F57' }}>
-              {producto.nombre}
-            </h1>
-            {/* Badge estado stock */}
-            <span
-              className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-              style={{ background: stockBadge.bg, color: stockBadge.color }}
-            >
-              {producto.estadoStock}
-            </span>
-            {/* Badge activo en venta */}
-            {producto.activoEnVenta && (
-              <span
-                className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                style={{ background: '#D1FAE5', color: '#059669' }}
-              >
-                Activo en venta
-              </span>
-            )}
-          </div>
-          <p className="text-xs" style={{ color: 'rgba(31,47,87,0.5)' }}>
-            {producto.codigo} · {producto.categoria} · actualizado {producto.ultimaEdicion}
-          </p>
-        </div>
-
-        {/* Acciones */}
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={handleReponer}
-            className="h-9 px-4 rounded-xl text-sm font-medium transition-opacity hover:opacity-80"
-            style={{
-              background: 'rgba(31,47,87,0.08)',
-              color: '#1F2F57',
-              border: '0.5px solid rgba(31,47,87,0.15)',
-            }}
-          >
-            Reponer stock
-          </button>
-          <button
-            onClick={handleEditar}
-            className="flex items-center gap-1.5 h-9 px-4 rounded-xl text-sm font-medium text-white transition-opacity hover:opacity-85"
-            style={{ background: '#3960A9' }}
-          >
-            <Pencil size={13} strokeWidth={2} />
-            Editar producto
-          </button>
-        </div>
-      </div>
-
-      {/* Grid principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-
-        {/* Columna izquierda (col-span-2) */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
-          <CardInfoGeneral producto={producto} />
-          <CardPrecio producto={producto} />
-          <CardStock producto={producto} />
-        </div>
-
-        {/* Columna derecha (col-span-1) */}
+    <div className="min-h-full bg-[#E1E7F0]">
+      <div className="mx-auto flex w-full max-w-[1312px] flex-col gap-5 px-6 py-6">
+        {/* Encabezado */}
         <div className="flex flex-col gap-4">
-          <CardMetricas producto={producto} />
-          <CardAlertas
-            alertaMinimo={alertaMinimo}
-            setAlertaMinimo={setAlertaMinimo}
-            visibleEnCaja={visibleEnCaja}
-            setVisibleEnCaja={setVisibleEnCaja}
-            unidadMedida={producto.unidadMedida}
-          />
-          <CardMovimientos movimientos={producto.movimientos} />
+          <Link
+            href="/dashboard/inventario/productos"
+            className="flex w-fit items-center gap-1 text-sm font-semibold text-[#1F2F57] underline underline-offset-2 hover:text-[#3960A9]"
+          >
+            <ArrowLeft size={14} strokeWidth={2.25} />
+            Productos
+          </Link>
+
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-bold text-[#1F2F57]">
+                  {producto.nombre}
+                </h1>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-bold ${estado.cls}`}
+                >
+                  {estado.label}
+                </span>
+                {visibleEnCaja && (
+                  <span className="rounded-full bg-[#1F2F57]/[.06] px-2.5 py-1 text-xs font-bold text-[#1F2F57]/80">
+                    Activo en venta
+                  </span>
+                )}
+              </div>
+              <p className="mt-1.5 text-sm text-[#1F2F57]/65">
+                {[
+                  producto.codigo,
+                  producto.categoria?.nombre ?? producto.categoria,
+                  producto.almacen?.nombre,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={handleReponer}
+                className="h-11 rounded-lg border border-[#1F2F57]/15 bg-white px-5 text-sm font-bold text-[#1F2F57] transition hover:bg-[#F5F7FB]"
+              >
+                Reponer stock
+              </button>
+              <button
+                type="button"
+                onClick={handleEditar}
+                className="flex h-11 items-center gap-2 rounded-lg bg-[#1F2F57] px-5 text-sm font-bold text-white transition hover:bg-[#3960A9]"
+              >
+                <Pencil size={15} strokeWidth={2.25} />
+                Editar producto
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenido */}
+        <div className="grid items-start gap-5 lg:grid-cols-3">
+          <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
+            <CardInfoGeneral producto={producto} />
+            <CardPrecio producto={producto} unidad={unidad} />
+            <CardStock
+              producto={producto}
+              unidad={unidad}
+              onAjustar={handleAjustar}
+            />
+          </div>
+
+          <div className="flex flex-col gap-5 lg:sticky lg:top-6">
+            <CardUltimos30 producto={producto} unidad={unidad} />
+            <CardAlertas
+              alertaMinimo={alertaMinimo ?? producto.stockMinimo}
+              setAlertaMinimo={setAlertaMinimo}
+              visibleEnCaja={visibleEnCaja}
+              setVisibleEnCaja={setVisibleEnCaja}
+              unidad={unidad}
+              porTalla={tieneVariantes}
+            />
+            <CardMovimientos
+              movimientos={producto.ultimosMovimientos}
+              verTodosHref={`/dashboard/inventario/productos/${producto.id}/movimientos`}
+            />
+          </div>
         </div>
       </div>
     </div>

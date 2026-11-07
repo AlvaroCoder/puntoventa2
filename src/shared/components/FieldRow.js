@@ -1,6 +1,9 @@
 import React from 'react'
 
-export default function FieldRow() {
+export default function FieldRow({
+    label,
+    value
+}) {
   return (
       <div className='flex flex-col gap-0.5'>
           <span

@@ -2,12 +2,13 @@ import { fetchWithAuth } from '@/lib/fetchwithAuth'
 import { PRODUCTO_ENDPOINTS, INVENTARIO_ENDPOINTS, VARIANTES_ENDPOINTS } from '../EndpointsRouter'
 import { fetchServer } from '@/lib/fetchServer';
 
-const BASE_PRODUCTO  = '/api/producto'
+const BASE_PRODUCTO  = '/api/productos'
 const BASE_CATEGORIA = '/api/categoria'
 
 const ENDPOINTS_PRODUCTO = PRODUCTO_ENDPOINTS;
 const ENDPOINTS_INVENTARIO = INVENTARIO_ENDPOINTS;
 const ENDPOINTS_VARIANTES = VARIANTES_ENDPOINTS;
+
 
 export async function getProductosByEmpresa(empresaId) {
     return fetchServer(ENDPOINTS_PRODUCTO.getAllProductosByIdEmpresa(empresaId))
@@ -17,8 +18,20 @@ export async function getProductosByTienda(tiendaId) {
     return fetchWithAuth(`http://localhost:8085/api/productos/tienda/${tiendaId}`)
 }
 
+export async function getProductoByIdAndTiendaId(id,tiendaId) {
+    return fetchServer(
+      `${BASE_PRODUCTO}/${id}/detalle?tiendaId=${tiendaId}`,
+      { method: "GET" },
+      "spring",
+    );
+}
+
 export async function getProductoById(id) {
-    return fetchWithAuth(`${BASE_PRODUCTO}/${id}`)
+    return fetchServer(
+        `${BASE_PRODUCTO}/${id}`,
+        { method: 'GET' },
+        "spring"
+    )
 }
 
 export async function getProductosBajoStock(empresaId) {

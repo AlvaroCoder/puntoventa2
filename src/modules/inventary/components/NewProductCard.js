@@ -56,13 +56,13 @@ export default function NewProductCard({
         </button>
       </div>
 
-      <div className="px-3 flex flex-col flex-1">
+      <div className="px-3 flex flex-col  flex-1">
         <ImageArea
           imagenUrl={producto.imagenUrl}
           nombre={producto.nombre}
           status={status}
         />
-
+        <div className="h-2" />
         {categoriaNombre && (
           <p
             className="text-[10px] uppercase tracking-wide font-medium mb-0.5"

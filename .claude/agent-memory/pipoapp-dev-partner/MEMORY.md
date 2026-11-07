@@ -97,6 +97,18 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 - Color badges rol: Administrador #3960A9, Cajero #0E9090, Almacenero #B87A10
 - InviteCard: hover cambia borderColor via onMouseEnter/onMouseLeave (no via Tailwind)
 
+## Módulo Ventas — Resumen (arquitectura hexagonal)
+- Controller: `src/app/dashboard/ventas/page.js` — exporta `VentasController` (no `PageVentas` para evitar colisión de nombre con el import)
+- UI pura: `src/modules/ventas/PageVentas.js` — recibe `{ tiendas, loading, metrics }`
+- `metrics`: `{ totalVentasHoy, totalTransacciones, cajasAbiertas, totalCajas, efectivoEnCajas }` calculados con `useMemo` a partir de `todasCajas`
+- `todasCajas = tiendas.flatMap(t => t.cajas)` — dato derivado de las tiendas ya procesadas
+- Selector de tienda (dropdown): visible solo si `tiendas.length > 1`, filtra `tiendasFiltradas`
+- Layout: columna principal flex-1 + panel actividad w-72 sticky (hidden en mobile, lg:block)
+- Panel `ActividadHoy`: usa `MOCK_ACTIVIDAD` (datos hardcodeados hasta integrar API de ventas)
+- Cromática: teal #198E7B (ventas), blue #3960A9 (transacciones), navy #1F2F57 (cajas), orange #FF821E (efectivo)
+- Estado vacío caja: card dashed con hover `onMouseEnter/onMouseLeave` para `borderColor`
+- `CajaCard` importado desde `@/components/Cards/CajaCard` — NO modificar, ya tiene toda la lógica
+
 ## Archivos clave
 - `src/hooks/useGenerarCodigo.js` — generación de códigos de producto
 - `src/hooks/useInventarioResumen.js` — resumen de inventario con mock fallback
@@ -115,3 +127,5 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 - `src/modules/trabajadores/components/TrabajadorCard.js` — nuevo
 - `src/modules/trabajadores/PageTrabajadores.js` — nuevo
 - `src/app/dashboard/trabajadores/page.js` — reescrito (controller)
+- `src/modules/ventas/PageVentas.js` — reescrito (UI pura ventas)
+- `src/app/dashboard/ventas/page.js` — reescrito (controller VentasController)

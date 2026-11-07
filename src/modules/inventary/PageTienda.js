@@ -17,7 +17,7 @@ export default function PageTienda({
     handleToggleEstado
 }) {
   return (
-    <div className="p-6 flex flex-col gap-6 bg-[#E1E7F0] min-h-full">
+    <div className="p-6 flex flex-col gap-6 bg-[#E1E7F0] min-h-screen">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <Title>Gestión de la Tienda</Title>
