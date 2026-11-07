@@ -1,6 +1,7 @@
 "use client";
 import { Package, Trash2 } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 const COLOR_HEX = {
   Negro: '#1F2F57', Blanco: '#E5E7EB', Marrón: '#92400E',
@@ -33,10 +34,22 @@ export default function CardProducto({ product, onDelete }) {
       <div className="flex gap-3">
         {/* Avatar */}
         <div
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-sm font-extrabold text-white"
+          className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg"
           style={{ background: '#3960A9' }}
         >
-          {initials || <Package size={16} />}
+          {product.imagen_preview ? (
+            <Image
+              src={product.imagen_preview}
+              alt={product.nombre}
+              fill
+              sizes="40px"
+              className="object-cover"
+            />
+          ) : (
+            <span className="grid h-full w-full place-items-center text-sm font-extrabold text-white">
+              {initials || <Package size={16} />}
+            </span>
+          )}
         </div>
 
         <div className="min-w-0 flex-1">

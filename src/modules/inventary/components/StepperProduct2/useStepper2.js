@@ -20,33 +20,40 @@ export function useStepper2({almacenSeleccionado, handlePayload}) {
         }, []);
 
         const stock = form.tiene_variantes
-          ? form.variantes.reduce((a, v) => a + (Number(v.stock) || 0), 0)
+          ? form.variantes.reduce((a, v) => a + (Number(v.stock_inicial) || 0), 0)
           : Number(form.stock_inicial) || 0;
 
         const missingPrice = stock > 0 && !form.precio_venta;
 
         const change = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-        const set = (k, v) => setForm((p) => ({ ...p, [k]: v })); 
+        const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
         const deleteProducto = (id) =>
           setProductos((prev) => prev.filter((p) => p.id !== id));
 
         const regenerarCodigo = () => change("codigo", generateCodigo());
 
         const submit = () => {
-          const producto = { ...form, id: Date.now(), stock_inicial: stock };
-          const nuevosProductos = [...productos, producto];
-          setProductos(nuevosProductos);
+          if (missingPrice) {
+            setShake(true);
+            setTimeout(() => setShake(false), 600);
+            priceRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            return false;
+          }
 
+          const producto = { ...form, id: Date.now(), stock_inicial: stock };
+          setProductos((prev) => [...prev, producto]);
+          setForm(initial(generateCodigo()));
+          return true;
+        };
+
+        const confirmar = () => {
           handlePayload({
             referencia_lote: reference,
             almacen_id: almacenSeleccionado?.id,
             almacen_nombre: almacenSeleccionado?.nombre,
             fecha_registro: new Date().toISOString(),
-            productos: nuevosProductos,
+            productos,
           });
-
-            setForm(initial(generateCodigo()));
-            
         };
        return {
          reference,
@@ -63,6 +70,7 @@ export function useStepper2({almacenSeleccionado, handlePayload}) {
          stock,
          missingPrice,
          submit,
+         confirmar,
          regenerarCodigo,
        };
 }

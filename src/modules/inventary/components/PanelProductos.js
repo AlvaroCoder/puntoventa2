@@ -45,7 +45,7 @@ export default function PanelProductos({ products, onDelete, onConfirmar }) {
                 Aún no hay productos
               </h3>
               <p className="mx-auto mt-1 max-w-[200px] text-xs" style={{ color: 'rgba(31,47,87,0.5)' }}>
-                Completa el formulario y haz clic en "Agregar al lote y seguir".
+                Completa el formulario y haz clic en Agregar al lote y seguir.
               </p>
             </div>
           </div>

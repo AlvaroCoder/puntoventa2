@@ -60,6 +60,10 @@ export const inventarioService = {
     const data = await response.json();
     return data;
   },
+  async guardarImagen() {
+    const response = await fetch("/api/image", { method: 'POST' });
+
+  },
   async getAlmacenes() {
     const response = await fetch('/api/almacenes', {
       method: 'GET'

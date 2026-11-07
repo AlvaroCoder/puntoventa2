@@ -49,6 +49,7 @@ export default function PageCreateProducto({
           filteredAlmacenes={filteredAlmacenes}
           loading={loading}
           almacenSeleccionado={almacenSeleccionado}
+          
         />
       )}
 

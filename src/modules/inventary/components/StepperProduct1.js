@@ -65,8 +65,8 @@ export default function StepperProduct1({
                 <AlmacenCard
                   key={alm.id}
                   almacen={alm}
-                  selected={almacenSeleccionado === alm.id}
-                  onSelect={() => setAlmacenSel(alm.id)}
+                  selected={almacenSeleccionado?.id === alm.id}
+                  onSelect={() => setAlmacenSel(alm)}
                 />
               ))}
             </div>

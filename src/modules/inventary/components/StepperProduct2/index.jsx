@@ -17,7 +17,7 @@ import {
 
 import Field from "@/shared/components/Field";
 import InputMoney from "@/shared/components/InputMoney";
-import SearchableSelect from "@/shared/components/SearchableSelect";
+import SearchableSelect from "@/shared/components/Selectables/SearchableSelect";
 import SwitcherLoader from "@/shared/components/SwitcherLoader";
 import Info from "@/shared/components/Info";
 import { IconInput } from "@/shared/components/IconInput";
@@ -28,21 +28,8 @@ import ConfigAvanzada from "../ConfigAvanzada";
 import PanelProductos from "../PanelProductos";
 import ImageUpload from "../ImageUpload";
 import FieldLegend from "../FieldLegend";
-
-// Estilo compartido para los select nativos
-const selectStyle = `
-  h-[42px] w-full min-w-0
-  appearance-none rounded-[10px]
-  border border-[#1F2F57]/[0.13]
-  bg-white px-3.5 pr-10
-  text-[13px] font-medium text-[#1F2F57]
-  outline-none
-  transition-all duration-200
-  hover:border-[#3960A9]/35
-  focus:border-[#3960A9]/70
-  focus:ring-[3px] focus:ring-[#3960A9]/[0.09]
-`;
-
+import Title2 from "@/shared/components/Title2";
+import CustomSelect from "@/shared/components/Selectables/CustomSelect";
 
 export default function StepperProduct2({
   almacenSeleccionado,
@@ -66,6 +53,7 @@ export default function StepperProduct2({
     stock,
     missingPrice,
     submit,
+    confirmar,
     regenerarCodigo,
   } = useStepper2({
     almacenSeleccionado,
@@ -89,7 +77,6 @@ export default function StepperProduct2({
       xl:px-8
     "
     >
-      {/* CABECERA PRINCIPAL */}
       <div className="mb-6">
         <div
           className="
@@ -109,16 +96,7 @@ export default function StepperProduct2({
               GESTIÓN DE INVENTARIO
             </div>
 
-            <h1
-              className="
-              text-[22px] font-extrabold
-              tracking-[-0.025em]
-              text-[#1F2F57]
-              sm:text-[25px]
-            "
-            >
-              Registro de productos
-            </h1>
+            <Title2>Registro de productos</Title2>
 
             <p
               className="
@@ -166,26 +144,24 @@ export default function StepperProduct2({
         </div>
       </div>
 
-      {/* INFORMACIÓN DEL LOTE */}
       <div
         className="
-        mb-5 rounded-[14px]
-        border border-[#1F2F57]/[0.09]
+        mb-5 
+         border-[#1F2F57]/[0.09]
         bg-white
-        px-4 py-4
+        px-4 py-2
         shadow-[0_2px_10px_rgba(31,47,87,0.035)]
         sm:px-5
+        rounded-lg
+
       "
       >
         <div
           className="
-          grid grid-cols-1 items-center
-          gap-4
-          sm:grid-cols-2
-          xl:grid-cols-[1fr_1fr_1.3fr]
+          flex flex-row items-center justify-between gap-4 
         "
         >
-          <div className="min-w-0">
+          <div className="flex-1 min-w-0">
             <Info
               icon={<Warehouse />}
               label="Almacén"
@@ -196,6 +172,7 @@ export default function StepperProduct2({
 
           <div
             className="
+            flex-1
             min-w-0
             sm:border-l
             sm:border-[#1F2F57]/[0.08]
@@ -211,6 +188,7 @@ export default function StepperProduct2({
 
           <div
             className="
+            flex-1
             min-w-0
             sm:col-span-2
             xl:col-span-1
@@ -219,16 +197,7 @@ export default function StepperProduct2({
             xl:pl-5
           "
           >
-            <label
-              className="
-              mb-1.5 block
-              text-[11px] font-semibold
-              text-[#1F2F57]/60
-            "
-            >
-              Referencia del lote
-            </label>
-
+            <Info label="Referencia del lote" />
             <IconInput
               icon={FileText}
               value={reference}
@@ -336,6 +305,7 @@ export default function StepperProduct2({
                       onChange={(v) => {
                         setImagen(v);
                         change("imagen", v?.file ?? null);
+                        change("imagen_preview", v?.preview ?? null);
                       }}
                     />
                   </Field>
@@ -368,6 +338,7 @@ export default function StepperProduct2({
                       className="
                         flex h-[42px] items-center
                         justify-center gap-2
+                        py-2
                         self-end rounded-[10px]
                         border border-[#3960A9]/25
                         bg-[#3960A9]/[0.04]
@@ -398,7 +369,6 @@ export default function StepperProduct2({
                 </div>
               </fieldset>
 
-              {/* STOCK Y PRECIO */}
               <fieldset className="min-w-0 mt-5">
                 <FieldLegend
                   icon={<BarChart3 />}
@@ -436,36 +406,12 @@ export default function StepperProduct2({
 
                     <Field label="Unidad de medida">
                       <div className="relative">
-                        <select
-                          className={selectStyle}
+                        <CustomSelect
                           value={form.unidad}
-                          onChange={(e) => change("unidad", e.target.value)}
-                        >
-                          {[
-                            "Unidad",
-                            "Par",
-                            "Kg",
-                            "Litro",
-                            "Docena",
-                            "Caja",
-                          ].map((item) => (
-                            <option key={item} value={item}>
-                              {item}
-                            </option>
-                          ))}
-                        </select>
-
-                        <ChevronDown
-                          size={15}
-                          strokeWidth={1.8}
-                          aria-hidden="true"
-                          className="
-                            pointer-events-none
-                            absolute right-3.5 top-1/2
-                            -translate-y-1/2
-                            text-[#3960A9]/65
-                          "
+                          onChange={(v) => change("unidad", v)}
+                          options={["Unidad", "Par", "Kg", "Litro", "Docena", "Caja"]}
                         />
+                        
                       </div>
                     </Field>
                   </div>
@@ -546,8 +492,8 @@ export default function StepperProduct2({
               <button
                 type="button"
                 onClick={() => {
-                  submit();
-                  setImagen(null);
+                  const ok = submit();
+                  if (ok) setImagen(null);
                 }}
                 disabled={!form.nombre.trim() || !form.codigo.trim()}
                 title={
@@ -557,9 +503,11 @@ export default function StepperProduct2({
                   flex h-[46px] w-full
                   items-center justify-center
                   gap-2.5
-                  rounded-[10px]
-                  bg-[#1F2F57]
+                  bg-azulMarino
                   px-4
+                  py-2
+                  rounded-lg
+                  mb-2
                   text-[13px] font-bold
                   text-white
                   shadow-[0_3px_8px_rgba(31,47,87,0.12)]
@@ -576,9 +524,9 @@ export default function StepperProduct2({
                 "
               >
                 <Plus size={17} strokeWidth={2} />
-                Agregar al lote y seguir
+                Agregar al lote
               </button>
-
+            
               <p
                 className="
                 mt-2.5 text-center
@@ -598,7 +546,10 @@ export default function StepperProduct2({
             <PanelProductos
               products={productos}
               onDelete={deleteProducto}
-              onConfirmar={onConfirmar}
+              onConfirmar={() => {
+                confirmar();
+                onConfirmar?.();
+              }}
             />
           </div>
         </aside>

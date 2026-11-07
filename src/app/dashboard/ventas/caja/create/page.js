@@ -8,7 +8,7 @@ import { createCaja, abrirCaja } from '@/Connections/caja'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import { toast } from 'react-toastify'
 import InputFillable from '@/shared/components/InputFillable'
-import SearchableSelect from '@/shared/components/SearchableSelect'
+import SearchableSelect from '@/shared/components/Selectables/SearchableSelect'
 
 function generarCodigo(nombre) {
     const prefix = nombre.trim().slice(0, 3).toUpperCase().replace(/\s/g, '') || 'CAJ'

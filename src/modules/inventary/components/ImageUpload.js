@@ -17,7 +17,7 @@ return (
       onClick={() => inputRef.current?.click()}
       className="relative flex items-center justify-center rounded-xl cursor-pointer transition-all overflow-hidden"
       style={{
-        height: value ? 120 : 88,
+        height: value ? 400 : 88,
         border: value ? "none" : "1.5px dashed rgba(31,47,87,0.2)",
         background: value ? "transparent" : "rgba(31,47,87,0.02)",
       }}
@@ -33,7 +33,9 @@ return (
           <Image
             src={value.preview}
             alt="preview"
-            className="w-full h-full object-cover rounded-xl"
+            fill           
+            sizes="200px"
+            className="object-cover rounded-xl"
           />
           <button
             onClick={clear}
@@ -62,7 +64,7 @@ return (
     <input
       ref={inputRef}
       type="file"
-      accept="image/*"
+      accept="image/png, image/jpeg"
       className="hidden"
       onChange={(e) => handleFile(e.target.files?.[0])}
     />

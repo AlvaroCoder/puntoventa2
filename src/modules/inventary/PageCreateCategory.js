@@ -1,7 +1,7 @@
 import ButtonLinkSimple from '@/shared/components/ButtonLinkSimple';
 import Field from '@/shared/components/Field';
 import InputFillable from '@/shared/components/InputFillable';
-import SearchableSelect from '@/shared/components/SearchableSelect';
+import SearchableSelect from '@/shared/components/Selectables/SearchableSelect';
 import SwitcherLoader from '@/shared/components/SwitcherLoader';
 import Toggle from '@/shared/components/Toggle';
 import { ChevronRight } from 'lucide-react';
