@@ -11,8 +11,9 @@ export default function ImageArea({ imagenUrl, nombre, status }) {
         <Image
           src={imagenUrl}
           alt={nombre}
-          objectFit="cover"
-          className="w-full h-full object-cover"
+          fill
+          sizes="200px"
+          className="object-cover rounded-xl"
         />
       ) : (
         <div

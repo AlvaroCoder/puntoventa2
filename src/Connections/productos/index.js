@@ -42,6 +42,10 @@ export async function createProducto(data = {}) {
     return fetchServer(ENDPOINTS_PRODUCTO.createProducto(), {method:'POST', body : data})
 }
 
+export async function createVariantesProducto(data = {}) { 
+    return fetchServer()
+}
+
 export async function createVariante(data={}) {
     return fetchWithAuth(ENDPOINTS_VARIANTES.createVariante(), { method: 'POST', body : data})
 }

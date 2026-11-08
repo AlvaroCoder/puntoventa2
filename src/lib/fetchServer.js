@@ -21,14 +21,15 @@ export async function fetchServer(
   const url = Object.keys(params).length
     ? `${base}?${new URLSearchParams(params).toString()}`
     : base;
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
   const response = await fetch(url, {
     method,
     headers: {
-      "Content-Type": "application/json",
+      ...(!isFormData ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    ...(body !== null ? { body: JSON.stringify(body) } : {}),
-    cache: "no-store", 
+    ...(body !== null ? { body: isFormData ? body : JSON.stringify(body) } : {}),
+    cache: "no-store",
   });
 
   let json = null;

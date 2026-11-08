@@ -37,7 +37,7 @@ export const PRODUCTO_ENDPOINTS = {
     createProducto: () => `${BASE_PRODUCTO}`,
     getAllProductosByIdEmpresa : (empresaId)=>`${BASE_PRODUCTO}/empresa/${empresaId}` ,
     getAllCategoriesByUser: () => `${BASE_CATEGORIA}`,
-    createCategoria : ()=>`${BASE_CATEGORIA}`
+  createCategoria: () => `${BASE_CATEGORIA}`,
 }
 
 export const VARIANTES_ENDPOINTS = {

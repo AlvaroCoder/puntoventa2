@@ -249,7 +249,6 @@ export default function LoginPage() {
                         </button>
 
                     </form>
-
                     <p className="text-center text-xs text-gray-400 mt-8">
                         ¿No tienes cuenta?{' '}
                         <Link href="/signup" className="text-azulClaro font-semibold hover:underline">

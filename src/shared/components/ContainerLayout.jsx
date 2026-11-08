@@ -1,13 +1,15 @@
 import React from 'react'
 import { Title } from './Title';
 import WrapperLink from '@/components/Navigation/WrapperLink';
+import Link from 'next/link';
 
 export default function ContainerLayout({
   icon : Icon,
   title,
   links = [],
   actions,
-  children
+  children,
+  hrefPrincipal="/dashboard"
 }) {
   const IconLayout = Icon
   return (
@@ -21,11 +23,16 @@ export default function ContainerLayout({
         }}
       >
         <div className="flex items-center gap-2">
-          {Icon && <IconLayout size={18} color="#3960A9" />}
-          <Title>{title}</Title>
+          <Link
+            href={hrefPrincipal}
+            className="flex items-center gap-2 px-3 rounded-lg py-2 min-w-[200px] hover:bg-grisClaro transition-colors"
+          >
+            {Icon && <IconLayout size={18} color="#3960A9" />}
+            <Title>{title}</Title>
+          </Link>
         </div>
         <div className="flex items-center gap-2 px-3 rounded-lg h-9 min-w-[200px]">
-          {links.map(({href, label}) => (
+          {links.map(({ href, label }) => (
             <WrapperLink key={href} href={href}>
               {label}
             </WrapperLink>

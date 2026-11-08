@@ -5,7 +5,7 @@ import useAlmacen from "@/modules/inventary/hooks/useAlmacen";
 import useTrabajador from "@/modules/trabajador/hooks/useTrabajador";
 import { toast } from "react-toastify";
 import { inventarioService } from "@/modules/inventary/service/inventario.service";
-
+import {useRouter} from 'next/navigation'
 export default function LotePage() {
   const { almacen: almacenes, loading } = useAlmacen();
   const { trabajador, loading: loadingTrabajador } = useTrabajador();
@@ -17,8 +17,9 @@ export default function LotePage() {
   const [guardando, setGuardando] = useState(false);
   const [payload, setPayload] = useState(null);
 
-  const almacenActual =
-    almacenes?.find((a) => a.id === almacenSeleccionado) ?? null;
+  const router = useRouter();
+
+  const almacenActual = almacenes?.find((a) => a.id === almacenSeleccionado) ?? null;
 
   const filteredAlmacenes = useMemo(
     () =>
@@ -37,7 +38,6 @@ export default function LotePage() {
   const handleConfirmar = async () => {
     if (hayErrores) return;
 
-    console.log("Payload a enviar:", payload);
     const productos = payload?.productos;
      const almacenId = payload?.almacen_id ?? almacenActual?.id ?? null;
 
@@ -57,8 +57,7 @@ export default function LotePage() {
                const imgRes = await inventarioService.guardarImagen(
                  producto.imagen,
                );
-               imagenUrl =
-                 imgRes?.url ?? imgRes?.data?.url ?? imgRes?.data ?? null;
+               imagenUrl = imgRes?.url ?? imgRes?.data?.url ?? imgRes?.data ?? null;
              } catch (e) {
                console.warn(
                  `No se pudo subir la imagen de "${producto.nombre}":`,
@@ -98,7 +97,7 @@ export default function LotePage() {
            return inventarioService.createProducto(body);
          }),
        );
-
+       console.log("Resultados de la creación de productos:", resultados);
        const exitosos = resultados.filter(
          (r) => r.status === "fulfilled",
        ).length;
@@ -117,7 +116,6 @@ export default function LotePage() {
          router.push("/dashboard/inventario/productos");
        }
      } catch (err) {
-       console.error("Error al confirmar lote:", err);
        toast.error("Error al confirmar el lote");
      } finally {
        setGuardando(false);

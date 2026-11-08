@@ -8,7 +8,7 @@ import useInventario from "@/modules/inventary/hooks/useInventario";
 const PAGE_SIZE = 24
 
 export default function ProductosPage() {
-    const { productos, loading } = useInventario();
+   const { productos, loading } = useInventario();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("nombre_az");
   const [page, setPage] = useState(1);

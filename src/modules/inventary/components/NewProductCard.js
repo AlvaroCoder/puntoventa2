@@ -18,8 +18,7 @@ export default function NewProductCard({
   categoriaNombre,
 }) {
   const status = stockStatus(producto.stockTotal ?? 0);
-  const variantesText =
-    producto.tieneVariantes === true ? "Con variantes" : "Sin variantes";
+  const variantesText = producto.tieneVariantes === true ? "Con variantes" : "Sin variantes";
   const stockNum = producto.stockTotal ?? 0;
   const unidad = producto.unidadMedida ?? "Unidad";
   const stockLabel = `${stockNum} ${stockNum === 1 ? unidad : `${unidad}s`}`;

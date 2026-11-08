@@ -7,6 +7,7 @@ import ContainerLayout from '@/shared/components/ContainerLayout'
 export default function InventarioLayout({ children }) {
   return (
     <ContainerLayout
+      hrefPrincipal="/dashboard/inventario"
       icon={Package}
       title={"Inventario"}
       links={[

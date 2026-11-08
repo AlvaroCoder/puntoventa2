@@ -62,7 +62,7 @@ export const inventarioService = {
   },
   async guardarImagen(file) {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('archivo', file);
     const response = await fetch('/api/image', { method: 'POST', body: formData });
     if (!response.ok) throw new Error('Error al subir la imagen');
     const data = await response.json();
