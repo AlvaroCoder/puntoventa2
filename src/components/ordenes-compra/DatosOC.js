@@ -48,6 +48,7 @@ export default function DatosOC({
 }) {
     const esTipoAbierta = form.tipo_oc === 'ABIERTA'
 
+    
     return (
         <div className="space-y-5">
 
