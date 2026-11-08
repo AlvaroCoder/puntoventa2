@@ -5,7 +5,7 @@ import {ArrowRight, ArrowLeft, Loader2,
 import Link from "next/link";
 import Image from "next/image";
 import { validateEmail } from "@/lib/validation";
-import { getVerificarDocumento, getVerificarEmail } from "../../../API/user/getConnections";
+//import { getVerificarDocumento, getVerificarEmail } from "../../../API/user/getConnections";
 import { REGISTER_USER, CREATE_COMPANY } from "@/conexion/apiconexion";
 import { login } from "@/lib/authentication";
 import { useRouter } from "next/navigation";
@@ -71,12 +71,14 @@ export default function SignUpPage() {
           } else if (formData.password !== formData.confirmPassword) {
             setErrors((p) => ({ ...p, confirmPassword: "Las contraseñas no coinciden" })); hasError = true;
           }
-          if (!hasError) {
+          /**
+           * if (!hasError) {
             const emailStatus = await getVerificarEmail(formData.email);
             if (emailStatus === 404) {
               setErrors((p) => ({ ...p, email: "Este correo ya está registrado" })); hasError = true;
             }
           }
+           */
           break;
         }
 

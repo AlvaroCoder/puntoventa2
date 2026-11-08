@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { Input } from '@/components/ui/input'
-import Field from '@/elements/Field'
+import Field from '@/shared/components/Field'
 
 /**
  * DatosOC — columna izquierda del formulario de orden de compra.
@@ -51,7 +51,6 @@ export default function DatosOC({
     return (
         <div className="space-y-5">
 
-            {/* Proveedor */}
             <Field label="Proveedor" required error={errors.proveedor_id}>
                 {loadingProveedores ? (
                     <div className="h-9 bg-gray-100 rounded-lg animate-pulse" />

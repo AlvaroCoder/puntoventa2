@@ -7,7 +7,7 @@ import { useAuth } from '@/Context/AuthContext'
 import { createAlmacen } from '@/Connections/almacen'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import SwitcherLoader from '@/components/Navigation/SwitcherLoader'
-import SearchableSelect from '../../components/SearchableSelect'
+import SearchableSelect from "@/shared/components/Selectables/SearchableSelect";
 
 const TIPO_ALMACEN = ['VITRINA', 'PRINCIPAL', 'DEPOSITO', 'TRANSITO', 'VIRTUAL']
 

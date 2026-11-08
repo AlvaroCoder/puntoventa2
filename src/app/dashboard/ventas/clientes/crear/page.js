@@ -2,11 +2,11 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Search } from 'lucide-react'
-import InputFillable from '@/app/dashboard/inventario/productos/crear/components/InputFillable'
 import SwitcherLoader from '@/components/Navigation/SwitcherLoader'
 import { useAuth } from '@/Context/AuthContext'
 import { createCliente } from '@/Connections/clientes'
 import { toast } from 'react-toastify'
+import InputFillable from '@/shared/components/InputFillable'
 
 const TIPOS_DOCUMENTO = [
     { label: 'DNI',       value: 1 },
