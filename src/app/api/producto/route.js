@@ -24,13 +24,16 @@ export async function POST(request) {
               { status: 401 },
             );
         };
-        const body = await request?.json()
+        const body = await request?.json();
+        console.log("Body recibido en POST /api/producto:", body);
         const response = await createProducto(body);
+        console.log("Respuesta de createProducto:", response);
         if (!response.ok) {
             throw new Error("No se pudo crear el producto");
         }
         return NextResponse.json(response);
     } catch (error) {
+        console.log("Error en POST /api/producto:", error);
         return NextResponse.json(
           { error: true, message: error.message },
           { status: 500 },

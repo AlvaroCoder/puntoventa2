@@ -41,7 +41,18 @@ export function useStepper2({almacenSeleccionado, handlePayload}) {
           }
 
           const producto = { ...form, id: Date.now(), stock_inicial: stock };
-          setProductos((prev) => [...prev, producto]);
+          const nuevosProductos = [...productos, producto];
+
+          setProductos(nuevosProductos);
+
+          handlePayload({
+            referencia_lote: reference,
+            almacen_id: almacenSeleccionado?.id,
+            almacen_nombre: almacenSeleccionado?.nombre,
+            fecha_registro: new Date().toISOString(),
+            productos: nuevosProductos,
+          });
+
           setForm(initial(generateCodigo()));
           return true;
         };

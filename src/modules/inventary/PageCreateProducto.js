@@ -4,7 +4,8 @@ import StepperProduct1 from './components/StepperProduct1';
 import { Check, Loader2, Save } from 'lucide-react';
 import StepperProduct2 from './components/StepperProduct2/index';
 
-export default function PageCreateProducto({
+export default function
+  PageCreateProducto({
     pasoActual,
     setPasoActual,
     filteredAlmacenes,
@@ -17,7 +18,8 @@ export default function PageCreateProducto({
   almacenSeleccionado,
   almacenActual,
   setPayload,
-    hayErrores
+  hayErrores,
+    payload
 }) {
   return (
     <div className="min-h-screen bg-[#E1E7F0] pb-24">
@@ -49,14 +51,14 @@ export default function PageCreateProducto({
           filteredAlmacenes={filteredAlmacenes}
           loading={loading}
           almacenSeleccionado={almacenSeleccionado}
-          
         />
       )}
 
       {pasoActual === 2 && (
         <StepperProduct2
           almacenSeleccionado={almacenSeleccionado}
-          handlePayload={handleConfirmar}
+          handlePayload={setPayload}
+          onConfirmar={handleConfirmar}
         />
       )}
 
@@ -83,7 +85,14 @@ export default function PageCreateProducto({
                 Cancelar
               </button>
               <button
-                onClick={() => setPasoActual(2)}
+                onClick={() => {
+                  setPasoActual(2);
+                  setPayload((prev) => ({
+                    ...prev,
+                    almacen_id: almacenSeleccionado?.id,
+                    almacen_nombre: almacenSeleccionado?.nombre,
+                  }));
+                }}
                 disabled={!almacenSeleccionado}
                 className="flex items-center gap-1.5 text-xs font-bold px-5 py-2 rounded-lg text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: "#1F2F57" }}

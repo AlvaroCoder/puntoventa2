@@ -39,7 +39,7 @@ export async function getProductosBajoStock(empresaId) {
 }
 
 export async function createProducto(data = {}) {
-    return fetchWithAuth(ENDPOINTS_PRODUCTO.createProducto(), {method:'POST', body : data})
+    return fetchServer(ENDPOINTS_PRODUCTO.createProducto(), {method:'POST', body : data})
 }
 
 export async function createVariante(data={}) {

@@ -59,7 +59,6 @@ export default function StepperProduct2({
     almacenSeleccionado,
     handlePayload,
   });
-
   const ordinal = productos.length + 1;
 
   const fechaRegistro = new Date().toLocaleDateString("es-PE", {
