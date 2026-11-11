@@ -87,6 +87,14 @@ export const inventarioService = {
     if (!response.ok) throw new Error("Error al crear la categoria");
     const data = await response.json();
     return data;
+  },
+  async getBajoStock(tiendaId) {
+    const response = await fetch(`/api/producto/bajo-stock/${tiendaId}`, {
+      method: 'GET'
+    });
+    if (!response.ok) throw new Error("Error al cargar los almacenes");
+    const data = await response.json();
+    return data?.data || [];
   }
   
 };

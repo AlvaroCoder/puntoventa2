@@ -1,12 +1,13 @@
 'use client'
 import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Loader2 } from 'lucide-react'
-import { useAuth } from '@/Context/AuthContext'
-import { getAlmacenesByUser } from '@/Connections/almacen'
-import { getProductosBajoStock, getProductosByEmpresa } from '@/Connections/productos'
+import { Loader2 } from 'lucide-react'
 import MetricCard from '@/components/Cards/MetricCard'
-import CreateLinkButton from '@/shared/components/CreateLinkButton'
+import CreateLinkButton from '@/shared/components/CreateLinkButton';
+import useInventario from '@/modules/inventary/hooks/useInventario';
+import useTienda from '@/modules/inventary/hooks/useTienda';
+import PageLoader from '@/components/Loading/PageLoader'
+import { inventarioService } from '@/modules/inventary/service/inventario.service';
 
 const fmtMoney = (v) =>
   new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0)
@@ -29,77 +30,63 @@ function StatusBadge({ stock }) {
 
 export default function PageInventarioResumen() {
   const router = useRouter();
-  const { user } = useAuth();
 
-  const [almacenes, setAlmacenes] = useState([]);
-  const [productos, setProductos] = useState([]);
-  const [bajoStock, setBajoStock] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [ultimaActualizacion, setUltima] = useState(null);
+  const { productos, loading: loadingProductos } = useInventario();
+  const { tiendas, loading: loadingTiendas } = useTienda();
+  const [bajoStockPorTienda, setBajoStockPorTienda] = useState({});
+  const [loadingBajoStock, setLoadingBajoStock] = useState(false);
 
   useEffect(() => {
-    if (!user?.empresa_id) return;
-    let cancelado = false;
-    async function fetchAll() {
-      setLoading(true);
-      try {
-        const [resAlm, resProds, resBajo] = await Promise.all([
-          getAlmacenesByUser(),
-          getProductosByEmpresa(user.empresa_id),
-          getProductosBajoStock(user.empresa_id),
-        ]);
-        if (cancelado) return;
-        setAlmacenes(resAlm?.data ?? []);
-        setProductos(resProds?.data?.data ?? resProds?.data ?? []);
-        setBajoStock(resBajo?.data?.data ?? resBajo?.data ?? []);
-        setUltima(new Date());
-      } catch (e) {
-        console.error("Error cargando inventario:", e);
-      } finally {
-        if (!cancelado) setLoading(false);
-      }
-    }
-    fetchAll();
-    return () => {
-      cancelado = true;
-    };
-  }, [user?.empresa_id]);
+    if (!tiendas.length) return;
+    setLoadingBajoStock(true);
+    Promise.all(
+      tiendas.map(async (tienda) => {
+        try {
+          const data = await inventarioService.getBajoStock(tienda.id);
+          return { tienda, productos: Array.isArray(data) ? data : [] };
+        } catch {
+          return { tienda, productos: [] };
+        }
+      })
+    )
+      .then((resultados) => {
+        const agrupado = {};
+        resultados.forEach(({ tienda, productos }) => {
+          if (productos.length > 0) {
+            agrupado[tienda.id] = { tienda, productos };
+          }
+        });
+        setBajoStockPorTienda(agrupado);
+      })
+      .finally(() => setLoadingBajoStock(false));
+  }, [tiendas]);
 
   const totalProductos = productos.length;
-  /**
-   * const totalUnidades   = useMemo(
-    () => productos?.reduce((s, p) => s + Number(p.stock_total ?? p.stock ?? 0), 0),
-    [productos],
-  )
-   */
-  const totalUnidades = 10;
 
-  /**
- * const valorInventario = useMemo(
+  const totalUnidades = useMemo(
+    () => productos?.reduce((s, p) => s + Number(p.stockTotal ?? p.stock ?? 0), 0),
+    [productos],
+  );
+
+  const valorInventario = useMemo(
     () =>
       productos?.reduce(
-        (s, p) =>
-          s +
-          Number(p.precio_venta ?? 0) * Number(p.stock_total ?? p.stock ?? 0),
+        (s, p) => s + Number(p.precioVenta ?? 0) * Number(p.stockTotal ?? p.stock ?? 0),
         0,
       ),
     [productos],
   );
- */
 
-  const valorInventario = 1000;
-  const paraReponer = bajoStock.length;
+  const paraReponer = useMemo(
+    () => Object.values(bajoStockPorTienda).reduce((s, { productos }) => s + productos.length, 0),
+    [bajoStockPorTienda],
+  );
 
-  const subtitleTime = ultimaActualizacion
-    ? (() => {
-        const min = Math.floor(
-          (Date.now() - ultimaActualizacion.getTime()) / 60000,
-        );
-        return min === 0
-          ? "Actualizado hace unos segundos"
-          : `Actualizado hace ${min} minutos`;
-      })()
-    : null;
+  const loading = loadingProductos || loadingTiendas;
+
+  if (loading) {
+    return <PageLoader />
+  }
 
   return (
     <div className="p-6 flex flex-col gap-6 bg-[#E1E7F0] min-h-screen">
@@ -109,137 +96,116 @@ export default function PageInventarioResumen() {
             ¿Cómo está tu inventario hoy?
           </h1>
           <p className="text-xs mt-1" style={{ color: "rgba(31,47,87,0.5)" }}>
-            {subtitleTime ?? "Cargando..."}
-            {almacenes.length > 0 && (
-              <>
-                {" "}
-                · {almacenes.length} almacén{almacenes.length !== 1 ? "es" : ""}
-              </>
-            )}
+            {tiendas.length} tienda{tiendas.length !== 1 ? 's' : ''} activa{tiendas.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <CreateLinkButton
-          href="/dashboard/inventario/productos/crear/lote"
-        >
+        <CreateLinkButton href="/dashboard/inventario/productos/crear/lote">
           Ingresar Productos
         </CreateLinkButton>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <Loader2
-            size={22}
-            className="animate-spin"
-            style={{ color: "rgba(31,47,87,0.4)" }}
-          />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <MetricCard
+          label="Productos registrados"
+          value={totalProductos}
+          sub={`${totalUnidades} unidades en total`}
+        />
+        <MetricCard
+          label="Tu inventario vale"
+          value={fmtMoney(valorInventario)}
+          sub="A precio de venta"
+        />
+        <MetricCard
+          accent
+          label="Tienes que reponer"
+          value={`${paraReponer} ${paraReponer === 1 ? 'producto' : 'productos'}`}
+          sub="Ver cuáles"
+          onSubClick={() =>
+            document.getElementById('tabla-bajo-stock')?.scrollIntoView({ behavior: 'smooth' })
+          }
+        />
+      </div>
+
+      <div
+        id="tabla-bajo-stock"
+        className="bg-white rounded-xl overflow-hidden"
+        style={{ border: '0.5px solid rgba(31,47,87,0.1)' }}
+      >
+        <div
+          className="flex items-center justify-between px-6 py-4"
+          style={{ borderBottom: '0.5px solid rgba(31,47,87,0.08)' }}
+        >
+          <span className="text-sm font-bold" style={{ color: '#1F2F57' }}>
+            Productos por agotarse
+          </span>
+          <CreateLinkButton href="/dashboard/inventario/productos/crear/lote">
+            Ingresar productos
+          </CreateLinkButton>
         </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <MetricCard
-              label="Productos registrados"
-              value={totalProductos}
-              sub={`${totalUnidades.toLocaleString("es-PE")} unidades en total`}
-            />
-            <MetricCard
-              label="Tu inventario vale"
-              value={fmtMoney(valorInventario)}
-              sub="A precio de venta"
-            />
-            <MetricCard
-              accent
-              label="Tienes que reponer"
-              value={`${paraReponer} ${paraReponer === 1 ? "producto" : "productos"}`}
-              sub="Ver cuáles"
-              onSubClick={() =>
-                document
-                  .getElementById("tabla-bajo-stock")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            />
+
+        {loadingBajoStock ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 size={20} className="animate-spin" style={{ color: 'rgba(31,47,87,0.4)' }} />
           </div>
-
-          <div
-            id="tabla-bajo-stock"
-            className="bg-white rounded-xl overflow-hidden"
-            style={{ border: "0.5px solid rgba(31,47,87,0.1)" }}
-          >
-            <div
-              className="flex items-center justify-between px-6 py-4"
-              style={{ borderBottom: "0.5px solid rgba(31,47,87,0.08)" }}
-            >
-              <span className="text-sm font-bold" style={{ color: "#1F2F57" }}>
-                Productos por agotarse
-              </span>
-                <CreateLinkButton
-                  href="/dashboard/inventario/productos/crear/lote"
+        ) : Object.keys(bajoStockPorTienda).length === 0 ? (
+          <div className="py-12 flex items-center justify-center">
+            <p className="text-sm font-semibold" style={{ color: 'rgba(31,47,87,0.4)' }}>
+              Todos tus productos tienen suficiente stock
+            </p>
+          </div>
+        ) : (
+          Object.values(bajoStockPorTienda).map(({ tienda, productos: items }, grupoIdx) => (
+            <div key={tienda.id}>
+              <div
+                className="px-6 py-2 flex items-center gap-2"
+                style={{
+                  background: 'rgba(31,47,87,0.03)',
+                  borderTop: grupoIdx === 0 ? 'none' : '0.5px solid rgba(31,47,87,0.08)',
+                  borderBottom: '0.5px solid rgba(31,47,87,0.08)',
+                }}
+              >
+                <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'rgba(31,47,87,0.5)' }}>
+                  {tienda.nombre ?? `Tienda ${tienda.id}`}
+                </span>
+                <span
+                  className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                  style={{ background: 'rgba(31,47,87,0.08)', color: 'rgba(31,47,87,0.6)' }}
                 >
-                  Ingresar productos
-              </CreateLinkButton>
-            </div>
-
-            {bajoStock.length === 0 ? (
-              <div className="py-12 flex items-center justify-center">
-                <p
-                  className="text-sm font-semibold"
-                  style={{ color: "rgba(31,47,87,0.4)" }}
-                >
-                  Todos tus productos tienen suficiente stock
-                </p>
+                  {items.length} producto{items.length !== 1 ? 's' : ''}
+                </span>
               </div>
-            ) : (
+
               <table className="w-full">
                 <thead>
-                  <tr
-                    style={{ borderBottom: "0.5px solid rgba(31,47,87,0.08)" }}
-                  >
-                    {["Producto", "Almacén", "Quedan", "Estado", ""].map(
-                      (h) => (
-                        <th
-                          key={h}
-                          className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider"
-                          style={{ color: "rgba(31,47,87,0.4)" }}
-                        >
-                          {h}
-                        </th>
-                      ),
-                    )}
+                  <tr style={{ borderBottom: '0.5px solid rgba(31,47,87,0.06)' }}>
+                    {['Producto', 'Quedan', 'Estado', ''].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider"
+                        style={{ color: 'rgba(31,47,87,0.4)' }}
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {bajoStock.map((item, i) => {
-                    const stock = Number(item.stock_actual ?? item.stock ?? 0);
-                    const unidad = item.unidad_medida ?? item.unidad ?? "und";
-                    const almacen =
-                      item.almacen_nombre ?? item.almacen?.nombre ?? "—";
+                  {items.map((item, i) => {
+                    const stock = Number(item.stockActual ?? item.stock_actual ?? item.stock ?? 0);
+                    const unidad = item.unidadMedida ?? item.unidad_medida ?? item.unidad ?? 'und';
                     return (
                       <tr
                         key={item.id ?? i}
                         style={{
-                          borderTop:
-                            i === 0
-                              ? "none"
-                              : "0.5px solid rgba(31,47,87,0.06)",
+                          borderTop: i === 0 ? 'none' : '0.5px solid rgba(31,47,87,0.05)',
                         }}
                       >
                         <td className="px-6 py-3.5">
-                          <span
-                            className="text-sm font-semibold"
-                            style={{ color: "#1F2F57" }}
-                          >
+                          <span className="text-sm font-semibold" style={{ color: '#1F2F57' }}>
                             {item.nombre}
                           </span>
                         </td>
-                        <td
-                          className="px-6 py-3.5 text-sm"
-                          style={{ color: "rgba(31,47,87,0.6)" }}
-                        >
-                          {almacen}
-                        </td>
-                        <td
-                          className="px-6 py-3.5 text-sm font-medium"
-                          style={{ color: "#1F2F57" }}
-                        >
+                        <td className="px-6 py-3.5 text-sm font-medium" style={{ color: '#1F2F57' }}>
                           {stock} {unidad}
                         </td>
                         <td className="px-6 py-3.5">
@@ -253,7 +219,7 @@ export default function PageInventarioResumen() {
                               )
                             }
                             className="text-xs font-semibold hover:underline"
-                            style={{ color: "#3960A9" }}
+                            style={{ color: '#3960A9' }}
                           >
                             Reponer
                           </button>
@@ -263,10 +229,10 @@ export default function PageInventarioResumen() {
                   })}
                 </tbody>
               </table>
-            )}
-          </div>
-        </>
-      )}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

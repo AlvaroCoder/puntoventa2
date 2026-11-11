@@ -26,7 +26,6 @@ const INITIAL_FORM = {
     observaciones:       '',
 }
 
-// ─── Página ──────────────────────────────────────────────────────────────────
 export default function CrearOrdenCompraPage() {
     const { user } = useAuth()
     const router = useRouter()
@@ -123,7 +122,6 @@ export default function CrearOrdenCompraPage() {
         , 0)
     , [lineas])
 
-    // ── Validación ────────────────────────────────────────────────────────
     const validate = () => {
         const e = {}
         if (!form.proveedor_id) e.proveedor_id = 'Selecciona un proveedor'

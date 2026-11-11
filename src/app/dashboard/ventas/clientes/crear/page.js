@@ -9,8 +9,8 @@ import { toast } from 'react-toastify'
 import InputFillable from '@/shared/components/InputFillable'
 
 const TIPOS_DOCUMENTO = [
-    { label: 'DNI',       value: 1 },
-    { label: 'RUC',       value: 2 },
+    { label: 'DNI', value: 1 },
+    { label: 'RUC', value: 2 },
     { label: 'Carnet de extranjería', value: 3 },
     { label: 'Pasaporte', value: 4 },
 ]

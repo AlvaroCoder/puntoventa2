@@ -14,6 +14,7 @@ import StepOneSignUp from "@/components/Stepper/StepOneSignUp";
 import StepThreSignUp from "@/components/Stepper/StepThreSignUp";
 import { createTrabajador } from "@/Connections/trabajadores";
 import {toast} from 'react-toastify'
+import PageLoader from "@/components/Loading/PageLoader";
 
 const URL_LOGO = "https://res.cloudinary.com/dabyqnijl/image/upload/v1787804947/LOGO/positivo_co0kxc.png";
 const URL_LOGO_FULL = "https://res.cloudinary.com/dabyqnijl/image/upload/v1788581897/01_bl0vpw.png";
@@ -236,90 +237,93 @@ export default function SignUpPage() {
   };
 
 
-  return (
-    <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-6 font-sans">
-      <div
-        className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-100"
-        style={{ minHeight: "680px" }}
-      >
-        <div className="flex-1 flex flex-col">
-          <div className="md:hidden px-6 pt-5 pb-0">
-            <div className="flex items-center justify-between mb-1.5">
-              <Image src={URL_LOGO} alt="PV360" width={60} height={24} />
-              <span className="text-xs font-semibold text-gray-400">
-                Paso {currentStep} de 4
-              </span>
+  if (isLoading) {
+    return <PageLoader/>
+  }
+    return (
+      <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-6 font-sans">
+        <div
+          className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-100"
+          style={{ minHeight: "680px" }}
+        >
+          <div className="flex-1 flex flex-col">
+            <div className="md:hidden px-6 pt-5 pb-0">
+              <div className="flex items-center justify-between mb-1.5">
+                <Image src={URL_LOGO} alt="PV360" width={60} height={24} />
+                <span className="text-xs font-semibold text-gray-400">
+                  Paso {currentStep} de 4
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#FE811F] rounded-full transition-all duration-300"
+                  style={{ width: `${(currentStep / 4) * 100}%` }}
+                />
+              </div>
             </div>
-            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#FE811F] rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / 4) * 100}%` }}
+
+            <div className="hidden md:block px-10 pt-8 pb-0">
+              <HorizontalStepper currentStep={currentStep} />
+              <Image
+                src={URL_LOGO_FULL}
+                width={200}
+                height={80}
+                alt="Imagen del logo FULL"
               />
             </div>
-          </div>
 
-          <div className="hidden md:block px-10 pt-8 pb-0">
-            <HorizontalStepper currentStep={currentStep} />
-            <Image
-              src={URL_LOGO_FULL}
-              width={200}
-              height={80}
-              alt="Imagen del logo FULL"
-            />
-          </div>
+            <div className="flex-1 px-8 md:px-10 py-4 overflow-y-auto">
+              {renderStepContent()}
+            </div>
 
-          <div className="flex-1 px-8 md:px-10 py-4 overflow-y-auto">
-            {renderStepContent()}
-          </div>
+            <div className="px-8 md:px-10 pb-3 text-center">
+              <p className="text-xs text-gray-400">
+                Al registrarte aceptas nuestros{" "}
+                <Link
+                  href="/terms"
+                  className="font-bold text-[#1F4363] hover:underline"
+                >
+                  Términos de Uso
+                </Link>{" "}
+                y{" "}
+                <Link
+                  href="/privacy"
+                  className="font-bold text-[#1F4363] hover:underline"
+                >
+                  Privacidad
+                </Link>
+                . <br /> ¿Ya tienes cuenta?{" "}
+                <Link
+                  href="/login"
+                  className="font-bold text-[#FE811F] hover:underline"
+                >
+                  Iniciar Sesión
+                </Link>
+              </p>
+            </div>
 
-          <div className="px-8 md:px-10 pb-3 text-center">
-            <p className="text-xs text-gray-400">
-              Al registrarte aceptas nuestros{" "}
-              <Link
-                href="/terms"
-                className="font-bold text-[#1F4363] hover:underline"
-              >
-                Términos de Uso
-              </Link>{" "}
-              y{" "}
-              <Link
-                href="/privacy"
-                className="font-bold text-[#1F4363] hover:underline"
-              >
-                Privacidad
-              </Link>
-              . <br /> ¿Ya tienes cuenta?{" "}
-              <Link
-                href="/login"
-                className="font-bold text-[#FE811F] hover:underline"
-              >
-                Iniciar Sesión
-              </Link>
-            </p>
-          </div>
-
-          <div className="px-8 md:px-10 py-4 border-t border-gray-100 flex justify-between items-center">
-            <button
-              onClick={() => changeStep("prev")}
-              disabled={currentStep === 1 || isLoading}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors
+            <div className="px-8 md:px-10 py-4 border-t border-gray-100 flex justify-between items-center">
+              <button
+                onClick={() => changeStep("prev")}
+                disabled={currentStep === 1 || isLoading}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors
                 ${currentStep === 1 ? "text-gray-300 cursor-not-allowed" : "text-[#1F4363] hover:bg-gray-50"}`}
-            >
-              <ArrowLeft size={16} />
-              Atrás
-            </button>
+              >
+                <ArrowLeft size={16} />
+                Atrás
+              </button>
 
-            <button
-              onClick={handleClickSubmit}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-7 py-2.5 rounded-xl font-bold text-sm bg-verdeAgua text-white hover:bg-verdeAgua/90 shadow-md shadow-orange-500/20 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-wait"
-            >
-              {currentStep === 2 ? "Finalizar" : "Continuar"}
-              {!isLoading && <ArrowRight size={16} />}
-            </button>
+              <button
+                onClick={handleClickSubmit}
+                disabled={isLoading}
+                className="flex items-center gap-2 px-7 py-2.5 rounded-xl font-bold text-sm bg-verdeAgua text-white hover:bg-verdeAgua/90 shadow-md shadow-orange-500/20 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-wait"
+              >
+                {currentStep === 2 ? "Finalizar" : "Continuar"}
+                {!isLoading && <ArrowRight size={16} />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 }

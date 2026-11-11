@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Punto de Venta 360",
-  description: "Página de gestión interna para PIPO S.A.C",
+  description: "Página de gestión para tu retail, de manera rápida y sencilla",
 };
 
 export default function RootLayout({ children }) {

@@ -35,7 +35,7 @@ export async function getProductoById(id) {
 }
 
 export async function getProductosBajoStock(empresaId) {
-    return fetchWithAuth(`${BASE_PRODUCTO}/bajo-stock/${empresaId}`)
+    return fetchServer(`${BASE_PRODUCTO}/bajo-stock/${empresaId}`)
 }
 
 export async function createProducto(data = {}) {
