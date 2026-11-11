@@ -11,10 +11,10 @@ export default function RootLayout({ children }) {
   </div>;
     return (
       <ContainerLayout
+        href="/dashboard/ventas"
         icon={TrendingUp}
         title={"Punto de venta"}
         links={[
-          { href: "/dashboard/ventas", label: "Resumen" },
           { href: "/dashboard/ventas/caja", label: "Caja" },
           {href : "/dashboard/ventas/clientes", label : "Clientes"},
           {href : "/dashboard/ventas/reportes", label : "Reportes"}

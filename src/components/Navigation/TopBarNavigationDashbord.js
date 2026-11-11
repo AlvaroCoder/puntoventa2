@@ -258,7 +258,7 @@ export default function TopBarNavigationDashbord() {
     }, [])
 
     return (
-        <nav className="w-full h-16 bg-azulMarino sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
+        <nav className="w-full h-16 z-10 bg-azulMarino sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
 
             <Link href="/dashboard" className="flex items-center gap-2.5">
                 <Image
@@ -266,6 +266,7 @@ export default function TopBarNavigationDashbord() {
                     alt="Logo Punto de Venta 360"
                     width={44}
                     height={44}
+                    loading='eager'
                 />
                 <span className="text-sm font-bold text-grisClaro tracking-wide">
                     Punto de Venta <span className="text-verdeAgua">360</span>

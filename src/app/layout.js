@@ -29,10 +29,10 @@ export default function RootLayout({ children }) {
       >
         <GoogleProvider>
           <AuthProvider>
-            <TopBar/>
-            {children}
-            <ToastContainer/>
-            <Footer/>
+              <TopBar />
+              {children}
+              <ToastContainer />
+              <Footer />
           </AuthProvider>
         </GoogleProvider>
       </body>

@@ -30,7 +30,7 @@ function formatearCaja(caja) {
         hora_apertura: formatearHora(caja.hora_apertura),
         monto_traspaso: Number(caja.monto_traspaso ?? 0),
       };
-    default: // CERRADA
+    default:
       return {
         ...base,
         ultimo_cierre: caja.ultimo_cierre ?? "Sin registros",

@@ -3,7 +3,7 @@
 export default function PageLoader({ message = "Preparando tu tienda..." }) {
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center"
       style={{ background: "#1A2845" }}
     >
       <style>{`
@@ -18,7 +18,6 @@ export default function PageLoader({ message = "Preparando tu tienda..." }) {
         }
       `}</style>
 
-      {/* Logo */}
       <svg
         width="130"
         height="130"
@@ -26,7 +25,6 @@ export default function PageLoader({ message = "Preparando tu tienda..." }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Outer arc — gap at ~1 o'clock */}
         <circle
           cx="60"
           cy="60"
@@ -38,7 +36,6 @@ export default function PageLoader({ message = "Preparando tu tienda..." }) {
           strokeLinecap="round"
           transform="rotate(126 60 60)"
         />
-        {/* P letter */}
         <text
           x="60"
           y="78"
@@ -52,7 +49,6 @@ export default function PageLoader({ message = "Preparando tu tienda..." }) {
         </text>
       </svg>
 
-      {/* Brand name */}
       <h1
         className="font-bold text-3xl mt-4 mb-7 tracking-tight"
         style={{ color: "white" }}
@@ -60,7 +56,6 @@ export default function PageLoader({ message = "Preparando tu tienda..." }) {
         PuntoVenta 360
       </h1>
 
-      {/* Progress bar */}
       <div
         className="w-72 rounded-full"
         style={{
@@ -74,20 +69,23 @@ export default function PageLoader({ message = "Preparando tu tienda..." }) {
         />
       </div>
 
-      {/* Message */}
-      <p
-        className="text-sm mt-3"
-        style={{ color: "rgba(255,255,255,0.6)" }}
-      >
+      <p className="text-sm mt-3" style={{ color: "rgba(255,255,255,0.6)" }}>
         {message}
       </p>
 
-      {/* Footer */}
       <p
         className="absolute bottom-8 text-xs"
         style={{ color: "rgba(255,255,255,0.28)" }}
       >
-        Versión 1.0 · Hecho en Perú
+        Versión 1.0 · Hecho en Perú{" "}
+        <a
+          href="https://www.alvaco.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "rgba(255,255,255,0.6)" }}
+        >
+          Develop by @alvaco.dev
+        </a>
       </p>
     </div>
   );

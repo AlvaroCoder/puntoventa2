@@ -9,9 +9,6 @@ import InventoryIcon     from '@mui/icons-material/Inventory'
 import ReceiptLongIcon   from '@mui/icons-material/ReceiptLong'
 import BadgeIcon         from '@mui/icons-material/Badge'
 
-// ---------------------------------------------------------------------------
-// Data
-// ---------------------------------------------------------------------------
 
 const MODULES = [
   {
@@ -25,8 +22,8 @@ const MODULES = [
   },
   {
     id: 'ventas',
-    title: 'Punto de Venta',
-    subtitle: 'Gestiona tu Punto de venta',
+    title: 'Mi negocio',
+    subtitle: 'Gestiona tu negocio y ventas',
     href: '/dashboard/ventas',
     Icon: ShoppingCartIcon,
     bg: '#FE811F',
@@ -93,10 +90,6 @@ const STEPS = [
   },
 ]
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
 const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
@@ -106,13 +99,9 @@ function formatDate(d) {
   return `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}  ·  ${hh}:${mm}`
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
-
 export default function Page() {
-  const router       = useRouter()
-  const { user }     = useAuth()
+  const router = useRouter()
+  const { user } = useAuth()
   const [now, setNow] = useState(new Date())
 
   useEffect(() => {
@@ -127,9 +116,6 @@ export default function Page() {
   return (
     <div className="p-6 max-w-5xl mx-auto flex flex-col gap-8">
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Header                                                              */}
-      {/* ------------------------------------------------------------------ */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold" style={{ color: '#1F4363' }}>
@@ -154,9 +140,6 @@ export default function Page() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Primeros pasos                                                      */}
-      {/* ------------------------------------------------------------------ */}
       <div
         className="bg-white rounded-2xl p-6"
         style={{ border: '0.5px solid rgba(31,67,99,0.1)' }}
@@ -201,7 +184,6 @@ export default function Page() {
                   : '1px solid rgba(31,67,99,0.12)',
               }}
             >
-              {/* Indicator */}
               {step.done ? (
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
@@ -222,7 +204,6 @@ export default function Page() {
                 </div>
               )}
 
-              {/* Text */}
               <div className="flex flex-col gap-1 flex-1">
                 <p className="text-sm font-bold leading-tight" style={{ color: '#1F4363' }}>
                   {step.title}
@@ -232,7 +213,6 @@ export default function Page() {
                 </p>
               </div>
 
-              {/* CTA for active step */}
               {step.active && (
                 <button
                   onClick={() => step.href && router.push(step.href)}
@@ -247,9 +227,6 @@ export default function Page() {
         </div>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Módulos                                                             */}
-      {/* ------------------------------------------------------------------ */}
       <div className="flex flex-col gap-4">
         <h2 className="text-base font-bold" style={{ color: '#1F4363' }}>Módulos</h2>
         <div className="grid grid-cols-5 gap-4">

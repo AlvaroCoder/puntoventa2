@@ -6,7 +6,7 @@ import PageTienda from '@/modules/inventary/PageTienda'
 import useTienda from '@/modules/inventary/hooks/useTienda'
 export default function Page() {
     const { tiendas, loading,  setTiendas } = useTienda();
-    const [query, setQuery]       = useState('')
+    const [query, setQuery] = useState('')
     const [tiendaEdit, setTiendaEdit] = useState(null)
 
     const filtered = useMemo(() => {
