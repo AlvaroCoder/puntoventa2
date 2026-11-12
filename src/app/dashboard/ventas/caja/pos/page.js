@@ -80,7 +80,6 @@ function POSContent() {
         setSelectedIdx(null)
         setBuffer('')
     }
-  console.log('cajaSesion', cajaSesion);
     return (
       <div
         className="flex h-[calc(100vh-4rem)] overflow-hidden"

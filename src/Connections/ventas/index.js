@@ -1,7 +1,11 @@
 import { fetchWithAuth } from '@/lib/fetchwithAuth'
-
+import { fetchServer } from '@/lib/fetchServer'
 const BASE_VENTAS  = '/api/ventas'
 const BASE_DETALLES = '/api/venta-detalles'
+
+export async function getVentas() {
+    return fetchServer(`${BASE_VENTAS}`, { method: "GET" }, type_api = "express");
+}
 
 export async function getVentasByEmpresa(empresaId, params = {}) {
     return fetchWithAuth(`${BASE_VENTAS}/empresa/${empresaId}`, { params })

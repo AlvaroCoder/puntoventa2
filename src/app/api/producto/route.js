@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createProducto, getProductosByEmpresa } from "@/Connections/productos";
 import { getSession } from "@/lib/authentication";
-export async function GET() {
+export async function GET(request) {
     try {
         const session = await getSession();
         if(!session) {
@@ -9,6 +9,7 @@ export async function GET() {
         }
         const empresaId = session.empresa_id;
         const data = await getProductosByEmpresa(empresaId);
+
         return NextResponse.json(data);
     } catch (error) {
         return NextResponse.json({error : true, message : error.message}, {status : 500});
