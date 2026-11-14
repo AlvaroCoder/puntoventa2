@@ -219,7 +219,7 @@ export default function StepperProduct2({
         <div className="min-w-0">
           <div
             className="
-            overflow-hidden rounded-[14px]
+            overflow-hidden rounded-md
             border border-[#1F2F57]/[0.09]
             bg-white
             shadow-[0_2px_12px_rgba(31,47,87,0.04)]
@@ -317,7 +317,6 @@ export default function StepperProduct2({
                     />
                   </Field>
 
-                  {/* Código */}
                   <div
                     className="
                     grid grid-cols-1 gap-3

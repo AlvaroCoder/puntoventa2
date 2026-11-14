@@ -2,8 +2,7 @@
 import { ArrowLeft, Banknote, CreditCard, Smartphone, Building2, Check, Receipt, FileText } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { createVenta } from '@/Connections/ventas';
-import { createMovimiento } from "@/Connections/caja";
+import { ventasService } from '@/modules/ventas/service/ventas.service';
 
 const fmt = (v) =>
   new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
@@ -14,10 +13,10 @@ const COMPROBANTES = [
 ];
 
 const METODOS = [
-  { id: 'EFECTIVO',     label: 'Efectivo',     icon: Banknote,     color: '#198E7B' },
-  { id: 'TARJETA',      label: 'Tarjeta',       icon: CreditCard,   color: '#3960A9' },
-  { id: 'YAPE',         label: 'Yape',          icon: Smartphone,   color: '#6B21A8' },
-  { id: 'PLIN',         label: 'Plin',          icon: Smartphone,   color: '#0EA5E9' },
+  { id: 'EFECTIVO', label: 'Efectivo', icon: Banknote,     color: '#198E7B' },
+  { id: 'TARJETA', label: 'Tarjeta', icon: CreditCard,   color: '#3960A9' },
+  { id: 'YAPE', label: 'Yape', icon: Smartphone,   color: '#6B21A8' },
+  { id: 'PLIN', label: 'Plin', icon: Smartphone,   color: '#0EA5E9' },
   { id: 'TRANSFERENCIA',label: 'Transferencia', icon: Building2,    color: '#FF821E' },
 ];
 
@@ -42,8 +41,8 @@ export default function PosPaymentPanel({
     0,
   );
   const descuentoAmt = Math.min(subtotal, Math.max(0, parseFloat(descuento) || 0));
-  const total        = subtotal - descuentoAmt;
-  const cambio       = metodo === 'EFECTIVO'
+  const total = subtotal - descuentoAmt;
+  const cambio = metodo === 'EFECTIVO'
     ? Math.max(0, (parseFloat(efectivo) || 0) - total)
     : 0;
 
@@ -51,12 +50,19 @@ export default function PosPaymentPanel({
     if (!metodo || loading) return;
     setLoading(true);
     try {
-      const detalles = carrito.map(line => ({
-        productoId:     line.id,
-        cantidad:       line.qty,
-        precioUnitario: line.precio,
-        descuento:      line.descuento,
-      }));
+      const detalles = carrito.map(line => {
+        const descuentoLinea = parseFloat(line.descuento) || 0;
+        const baseImponible  = line.precio * line.qty - descuentoLinea;
+        const igv            = parseFloat((baseImponible * 0.18).toFixed(2));
+        return {
+          productoId:     line.id,
+          varianteId:     line.varianteSeleccionada?.id ?? null,
+          cantidad:       line.qty,
+          precioUnitario: line.precio,
+          descuento:      descuentoLinea,
+          igv,
+        };
+      });
       const dataVenta = {
         empresaId,
         tiendaId,
@@ -67,26 +73,17 @@ export default function PosPaymentPanel({
         tipoComprobante,
         descuento:       descuentoAmt,
         montoRecibido:   metodo === 'EFECTIVO' ? (parseFloat(efectivo) || total) : total,
+        observaciones:   null,
         detalles,
       };
       console.log('dataVenta', dataVenta);
-      const ventaRes = await createVenta(dataVenta);
+      const ventaRes = await  ventasService.createVenta(dataVenta)
       console.log('ventaRes', ventaRes.message);
       if (ventaRes.error) {
         toast.error(ventaRes.message || 'Error al registrar la venta');
         return;
       }
-      console.log("Venta registrada:", ventaRes.data);
-      const ventaId = ventaRes?.data?.id ?? ventaRes?.data?.data?.id;
-      await createMovimiento(cajaId, {
-        cajaSesionId,
-        trabajadorId,
-        tipoMovimiento: 'INGRESO',
-        monto:          total,
-        concepto:       `Venta - ${tipoComprobante}`,
-        referenciaId:   ventaId,
-        referenciaTipo: 'VENTA',
-      });
+      
       toast.success('Venta registrada correctamente');
       onVolver();
     } catch {

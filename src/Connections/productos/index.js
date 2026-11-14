@@ -15,7 +15,7 @@ export async function getProductosByEmpresa(empresaId) {
 }
 
 export async function getProductosByTienda(tiendaId) {
-    return fetchServer(`/api/inventario/tienda/${tiendaId}`, {method : 'GET'}, type_api = 'spring')
+    return fetchServer(`/api/inventario/tienda/${tiendaId}`, {method : 'GET'}, 'spring')
 }
 
 export async function getProductoByIdAndTiendaId(id,tiendaId) {

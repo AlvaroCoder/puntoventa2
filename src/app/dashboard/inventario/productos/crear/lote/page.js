@@ -70,17 +70,19 @@ export default function LotePage() {
            const body = {
              nombre: producto.nombre,
              codigo: producto.codigo || null,
+             imagenUrl,
              categoriaId: producto.categoria || null,
              precioVenta: parseFloat(producto.precio_venta) || null,
              precioCompra: parseFloat(producto.precio_compra) || null,
              unidadMedida: producto.unidad || "UNIDAD",
+             impuestoPorcentaje: parseFloat(producto.impuesto_porcentaje) || 18.00,
+             aplicaIgv: producto.aplica_igv ?? true,
              tieneVariantes: variantes.length > 0,
-             trabajadorId: trabajador?.id,
              stockInicial: parseInt(producto.stock_inicial) || 0,
              stockMinimo: parseInt(producto.stock_minimo) || 0,
              almacenId:
                (parseInt(producto.stock_inicial) || 0) > 0 ? almacenId : null,
-             imagenUrl,
+             trabajadorId: trabajador?.id,
              variantes:
                variantes.length > 0
                  ? variantes.map((v) => ({
@@ -88,9 +90,9 @@ export default function LotePage() {
                      color: v.color || null,
                      codigoVariante: v.codigo || null,
                      codigoBarras: v.codigo_barras || null,
+                     descripcion: [v.talla, v.color].filter(Boolean).join(" ") || null,
                      precioAdicional: parseFloat(v.precio_adicional) || 0,
                      stockInicial: parseInt(v.stock_inicial) || 0,
-                     stockMinimo: parseInt(v.stock_minimo) || 0,
                    }))
                  : null,
            };

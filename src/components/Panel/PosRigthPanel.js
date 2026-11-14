@@ -31,7 +31,6 @@ function esColorClaro(nombre) {
     return COLORES_CLAROS.has(normalizar(nombre ?? ''));
 }
 
-// ─── Popup selector de variante ───────────────────────────────────────────────
 function VarianteSelector({ producto, onClose, onAgregar }) {
     const variantes = producto?.variantes ?? [];
 
@@ -50,14 +49,13 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
     const [colorSel, setColorSel] = useState(colores[0] ?? null);
     const [tallaSel, setTallaSel] = useState(null);
 
-    // Tallas con stock para el color activo
     const tallasPorColor = useMemo(() => {
         return tallas.map(talla => {
             const v = variantes.find(v =>
                 (!tieneColores || (v.color === colorSel)) &&
                 (v.talla === talla || v.size === talla),
             );
-            const stock = v ? Number(v.stockActual ?? v.stock_actual ?? v.stock ?? 0) : 0;
+            const stock = v ? Number(v.stockInicial ?? v.stock_actual ?? v.stock ?? 0) : 0;
             return { talla, stock };
         });
     }, [variantes, colorSel, tallas, tieneColores]);
@@ -76,7 +74,6 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
 
     return (
         <>
-            {/* Overlay invisible para cerrar al hacer click fuera */}
             <div className="fixed inset-0 z-40" onClick={onClose} />
 
             <div
@@ -87,7 +84,6 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
                     maxHeight: '80vh',
                 }}
             >
-                {/* Header */}
                 <div className="flex items-start justify-between px-5 pt-4 pb-3 shrink-0">
                     <div className="flex-1 min-w-0 pr-3">
                         <h3
@@ -113,7 +109,6 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
                 </div>
 
                 <div className="overflow-y-auto px-5 pb-5 flex flex-col gap-4" style={{ scrollbarWidth: 'none' }}>
-                    {/* Colores */}
                     {tieneColores && (
                         <div>
                             <p className="text-xs font-semibold mb-2" style={{ color: '#1F2F57' }}>
@@ -153,7 +148,6 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
                         </div>
                     )}
 
-                    {/* Tallas */}
                     {tieneTallas && (
                         <div>
                             <p className="text-xs font-semibold mb-2" style={{ color: '#1F2F57' }}>
@@ -194,7 +188,6 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
                         </div>
                     )}
 
-                    {/* Botón agregar */}
                     <button
                         onClick={handleAgregar}
                         disabled={!puedeAgregar}
@@ -215,8 +208,6 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
 
 function ProductoCard({ producto, onSelect, isSelected }) {
     const variantes = producto?.variantes ?? [];
-    console.log('producto', producto);
-    console.log('variantes', variantes);
     const colores = [...new Set(variantes.map(v => v.color).filter(Boolean))];
     const tallas = [...new Set(variantes.map(v => v.talla ?? v.size).filter(Boolean))];
     const stockTotal = Number(producto.stockTotal ?? producto.stock ?? 0);
@@ -232,7 +223,6 @@ function ProductoCard({ producto, onSelect, isSelected }) {
                     : '1px solid rgba(31,47,87,0.1)',
             }}
         >
-            {/* Precio badge */}
             <div className="absolute top-2 right-2 z-10">
                 <span
                     className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
@@ -242,7 +232,6 @@ function ProductoCard({ producto, onSelect, isSelected }) {
                 </span>
             </div>
 
-            {/* Imagen */}
             <div
                 className="relative w-full"
                 style={{ height: '120px', background: '#F4F6FB', flexShrink: 0 }}
@@ -263,7 +252,6 @@ function ProductoCard({ producto, onSelect, isSelected }) {
                 )}
             </div>
 
-            {/* Info */}
             <div className="p-2.5 flex flex-col gap-0.5 flex-1">
                 <p
                     className="text-[11px] font-bold leading-tight line-clamp-2"
@@ -346,7 +334,6 @@ export default function PosRigthPanel({ addProducto, tiendaId }) {
 
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Buscador y filtros */}
             <div
                 className="bg-white px-4 pt-3 pb-0 shrink-0 flex flex-col gap-2"
                 style={{ borderBottom: "0.5px solid rgba(31,47,87,0.1)" }}
@@ -447,7 +434,6 @@ export default function PosRigthPanel({ addProducto, tiendaId }) {
                 </div>
             </SwitcherLoader>
 
-            {/* Popup de variantes */}
             {productoSel && (
                 <VarianteSelector
                     producto={productoSel}

@@ -2,8 +2,7 @@ import React from 'react'
 import { AlertTriangle, Box, CheckCircle2 } from 'lucide-react';
 import CardProducto from './CardProducto';
 
-const fmt = (v) =>
-  new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
+const fmt = (v) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v ?? 0);
 
 export default function PanelProductos({ products, onDelete, onConfirmar }) {
   const units = products.reduce((a, p) => a + (Number(p.stock_inicial) || 0), 0);
@@ -15,8 +14,6 @@ export default function PanelProductos({ products, onDelete, onConfirmar }) {
 
   return (
     <aside className="sticky top-4 flex max-h-[calc(100vh-32px)] min-h-[620px] flex-col overflow-hidden rounded-xl border border-[#1F2F57]/10 bg-white shadow-[0_3px_12px_rgba(31,47,87,.07)]">
-
-      {/* Header */}
       <div className="border-b border-[#1F2F57]/10 p-5">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-base font-extrabold" style={{ color: '#1F2F57' }}>
@@ -31,7 +28,6 @@ export default function PanelProductos({ products, onDelete, onConfirmar }) {
         </div>
       </div>
 
-      {/* Product list */}
       <div className="flex-1 space-y-2.5 overflow-y-auto p-4" style={{ background: 'rgba(225,231,240,0.3)' }}>
         {products.length ? (
           products.map((p) => (
@@ -52,7 +48,6 @@ export default function PanelProductos({ products, onDelete, onConfirmar }) {
         )}
       </div>
 
-      {/* Footer: resumen + CTA */}
       <div className="border-t border-[#1F2F57]/10 bg-white p-4">
         {products.length > 0 && (
           <div className="mb-3 space-y-1.5">

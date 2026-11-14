@@ -28,7 +28,7 @@ export default function CardProducto({ product, onDelete }) {
 
   return (
     <article
-      className={`animate-slide-in rounded-lg bg-white p-3.5 transition-all hover:shadow-sm ${leaving ? 'animate-fade-out' : ''}`}
+      className={`animate-slide-in rounded-lg bg-white p-2 transition-all hover:shadow-sm ${leaving ? 'animate-fade-out' : ''}`}
       style={{ border: '0.5px solid rgba(31,47,87,0.12)' }}
     >
       <div className="flex gap-3">
@@ -52,7 +52,7 @@ export default function CardProducto({ product, onDelete }) {
           )}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 ">
           {/* Name + price row */}
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">

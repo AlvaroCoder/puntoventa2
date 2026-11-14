@@ -18,9 +18,10 @@ export default function useInventario(tiendaId = 1) {
         inventarioService.getProductosByTienda(tiendaId)
       ]),
     )
-      .then(([prods, cats]) => {
+      .then(([prods, cats, prodsByTienda]) => {
         setProductos(prods);
         setCategorias(cats);
+        setProductosByTienda(Array.isArray(prodsByTienda) ? prodsByTienda : prodsByTienda?.data ?? prodsByTienda?.content ?? []);
       })
       .catch(setError)
       .finally(() => setLoading(false));

@@ -2,7 +2,7 @@ import { getProductosByTienda } from "@/Connections/productos";
 import { getSession } from "@/lib/authentication";
 import { NextResponse } from "next/server";
 
-export default async function GET(request) {
+export async function GET(request) {
     try {
         const session = await getSession();
         if(!session) {
@@ -10,9 +10,10 @@ export default async function GET(request) {
         }
         const tiendaId = request.nextUrl.searchParams.get("tiendaId");
         const response = await getProductosByTienda(tiendaId);
-        return NextResponse.json(response?.content);
+        return NextResponse.json(response?.data);
 
     } catch (error) { 
+        console.log('[SERVER] Error : ',error)
         return NextResponse.json(
           { error: true, message: "Error al obtener movimientos" },
           { status: 500 },

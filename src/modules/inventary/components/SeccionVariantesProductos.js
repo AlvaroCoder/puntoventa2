@@ -64,7 +64,9 @@ export default function SeccionVariantes({ setVariantes }) {
 
   const emit = useCallback(
     (tallas, colores, matrix) => {
-      setVariantes(buildVariantes(tallas, colores, matrix));
+      const variants = buildVariantes(tallas, colores, matrix);
+      console.log('VARIANTES : ', variants)
+      setVariantes(variants);
     },
     [setVariantes],
   );

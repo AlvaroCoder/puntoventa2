@@ -4,8 +4,7 @@ import StepperProduct1 from './components/StepperProduct1';
 import { Check, Loader2, Save } from 'lucide-react';
 import StepperProduct2 from './components/StepperProduct2/index';
 
-export default function
-  PageCreateProducto({
+export default function PageCreateProducto({
     pasoActual,
     setPasoActual,
     filteredAlmacenes,

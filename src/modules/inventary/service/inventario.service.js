@@ -42,7 +42,7 @@ export const inventarioService = {
     const response = await fetch(`/api/producto/tienda?tiendaId=${tiendaId}`, {method : 'GET'});
       if (!response.ok) throw new Error("Error al obtener productos");
       const raw = await response.json();
-      return raw || [];
+      return raw?.content || [];
   },
   async getProductoById(idProducto) {
     const response = await fetch(`/api/producto/${idProducto}`, { method: 'GET' });
