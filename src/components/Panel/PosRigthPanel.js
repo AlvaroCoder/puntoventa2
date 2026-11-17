@@ -206,17 +206,18 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
     );
 }
 
-function ProductoCard({ producto, onSelect, isSelected }) {
+function ProductoCard({ producto, onSelect, isSelected, reservado = 0 }) {
     const variantes = producto?.variantes ?? [];
     const colores = [...new Set(variantes.map(v => v.color).filter(Boolean))];
     const tallas = [...new Set(variantes.map(v => v.talla ?? v.size).filter(Boolean))];
-    const stockTotal = Number(producto.stockTotal ?? producto.stock ?? 0);
-    const stockBajo = stockTotal > 0 && stockTotal <= 5;
-
+    const stockTotal = Number(producto.stockTotal ?? 0);
+    const stockEfectivo = Math.max(0, stockTotal - reservado);
+    const stockBajo = stockEfectivo > 0 && stockEfectivo <= 5;
+    const reservadoEnOtras = reservado > 0 && stockEfectivo === 0 && stockTotal > 0;
     return (
         <button
             onClick={() => onSelect(producto)}
-            className="bg-white rounded-2xl overflow-hidden text-left transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-95 relative flex flex-col"
+            className="bg-white rounded-lg overflow-hidden text-left transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-95 relative flex flex-col"
             style={{
                 border: isSelected
                     ? '2px solid #1F2F57'
@@ -291,9 +292,13 @@ function ProductoCard({ producto, onSelect, isSelected }) {
                             </span>
                         )}
                     </div>
+                ) : reservadoEnOtras ? (
+                    <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#EF4444' }}>
+                        Reservado en otra orden
+                    </p>
                 ) : stockBajo ? (
                     <p className="text-[10px] mt-0.5 font-semibold" style={{ color: '#D97706' }}>
-                        Quedan {stockTotal}
+                        Quedan {stockEfectivo}
                     </p>
                 ) : null}
             </div>
@@ -301,7 +306,7 @@ function ProductoCard({ producto, onSelect, isSelected }) {
     );
 }
 
-export default function PosRigthPanel({ addProducto, tiendaId }) {
+export default function PosRigthPanel({ addProducto, tiendaId, reservas = {} }) {
     const [search, setSearch] = useState("");
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [productoSel, setProductoSel] = useState(null);
@@ -418,7 +423,7 @@ export default function PosRigthPanel({ addProducto, tiendaId }) {
                         </div>
                     ) : (
                         <div
-                            className="grid gap-3"
+                            className="grid gap-2"
                             style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}
                         >
                             {productosFiltrados.map(p => (
@@ -427,6 +432,7 @@ export default function PosRigthPanel({ addProducto, tiendaId }) {
                                     producto={p}
                                     onSelect={handleCardClick}
                                     isSelected={productoSel?.id === p.id}
+                                    reservado={reservas[p.id] ?? 0}
                                 />
                             ))}
                         </div>

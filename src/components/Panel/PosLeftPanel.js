@@ -1,6 +1,5 @@
-import { ChevronLeft, ShoppingCart, User, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react'
+import { Plus, ShoppingCart, User, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react'
 const NUMPAD_ROWS = [
   ["1", "2", "3", "CANT"],
   ["4", "5", "6", "DESC"],
@@ -20,18 +19,22 @@ export default function PosLeftPanel({
   setSelectedIdx,
   setBuffer,
   setModo,
-    removeLine,
-    cliente,
-    modo,
-    selectedIdx,
+  removeLine,
+  cliente,
+  modo,
+  selectedIdx,
   setCarrito,
   buffer,
   setCliente,
   setShowClienteModal,
   onCobrar,
+  ordenes = [],
+  ordenActualIdx = 0,
+  onSelectOrden,
+  crearNuevaOrden,
+  eliminarOrden,
 }) {
-
-
+  const [confirmarEliminar, setConfirmarEliminar] = useState(null)
     const subtotal = carrito.reduce(
       (s, l) => s + l.precio * (1 - l.descuento / 100) * l.qty,
       0,
@@ -63,30 +66,111 @@ const handleNumpad = (key) => {
     return updated;
   });
 };
-  const router = useRouter();
   return (
     <div
-      className="w-[360px] shrink-0 flex flex-col bg-white"
+      className="w-[360px] shrink-0 flex flex-col bg-white relative"
       style={{ borderRight: "1px solid rgba(31,47,87,0.1)" }}
     >
+      {/* ── Confirmación eliminar orden ── */}
+      {confirmarEliminar !== null && (
+        <div
+          className="absolute inset-0 z-50 flex items-center justify-center p-5"
+          style={{ background: 'rgba(31,47,87,0.45)', backdropFilter: 'blur(3px)' }}
+        >
+          <div className="bg-white rounded-2xl p-5 w-full flex flex-col gap-4 shadow-2xl">
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#1F2F57' }}>
+                ¿Eliminar Orden {confirmarEliminar + 1}?
+              </p>
+              <p className="text-xs mt-1 leading-relaxed" style={{ color: 'rgba(31,47,87,0.6)' }}>
+                Tiene {ordenes[confirmarEliminar]?.items.length ?? 0} producto(s) agregado(s).
+                El stock reservado quedará disponible para otras órdenes.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmarEliminar(null)}
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all hover:opacity-80"
+                style={{ border: '1px solid rgba(31,47,87,0.2)', color: '#1F2F57' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  eliminarOrden?.(confirmarEliminar)
+                  setConfirmarEliminar(null)
+                }}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white transition-all hover:opacity-90"
+                style={{ background: '#EF4444' }}
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── Orden tabs ── */}
       <div
-        className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: "0.5px solid rgba(31,47,87,0.1)" }}
+        className="flex items-center gap-1 px-2 py-2 overflow-x-auto"
+        style={{ borderBottom: '0.5px solid rgba(31,47,87,0.1)', scrollbarWidth: 'none' }}
       >
+        {ordenes.map((orden, idx) => {
+          const isActive = idx === ordenActualIdx
+          return (
+            <button
+              key={orden.id}
+              onClick={() => onSelectOrden?.(idx)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all"
+              style={
+                isActive
+                  ? { background: '#1F2F57', color: '#fff' }
+                  : { background: 'rgba(31,47,87,0.06)', color: 'rgba(31,47,87,0.5)' }
+              }
+            >
+              Orden {idx + 1}
+              {orden.items.length > 0 && (
+                <span
+                  className="text-[10px] px-1.5 py-0.5 rounded-full leading-none"
+                  style={
+                    isActive
+                      ? { background: 'rgba(255,255,255,0.2)', color: '#fff' }
+                      : { background: 'rgba(31,47,87,0.1)', color: 'rgba(31,47,87,0.6)' }
+                  }
+                >
+                  {orden.items.length}
+                </span>
+              )}
+              {ordenes.length > 1 && (
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (orden.items.length > 0) {
+                      setConfirmarEliminar(idx)
+                    } else {
+                      eliminarOrden?.(idx)
+                    }
+                  }}
+                  className="flex items-center justify-center w-3.5 h-3.5 rounded-full transition-all opacity-40 hover:opacity-100"
+                  style={
+                    isActive
+                      ? { background: 'rgba(255,255,255,0.15)' }
+                      : { background: 'rgba(31,47,87,0.12)' }
+                  }
+                >
+                  <X size={8} />
+                </span>
+              )}
+            </button>
+          )
+        })}
         <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1 text-xs font-medium hover:opacity-70 transition-opacity"
-          style={{ color: "rgba(31,47,87,0.5)" }}
+          onClick={crearNuevaOrden}
+          title="Nueva orden"
+          className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all hover:opacity-80"
+          style={{ background: 'rgba(31,47,87,0.06)', color: 'rgba(31,47,87,0.5)' }}
         >
-          <ChevronLeft size={14} /> Volver
+          <Plus size={13} />
         </button>
-        
-        <span
-          className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
-          style={{ background: "rgba(25,142,123,0.1)", color: "#198E7B" }}
-        >
-          En curso
-        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto">

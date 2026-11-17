@@ -23,8 +23,8 @@ const MONEDAS = [
 ]
 
 const BASE_INPUT_STYLE = {
-    border:     '1px solid rgba(31,47,87,0.18)',
-    color:      '#1F2F57',
+    border: '1px solid rgba(31,47,87,0.18)',
+    color: '#1F2F57',
     background: '#fff',
 }
 const onFocusInput = e => {

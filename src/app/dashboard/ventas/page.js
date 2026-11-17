@@ -1,8 +1,8 @@
 'use client'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { getTiendasByEmpresa } from '@/Connections/tiendas'
 import { useAuth } from '@/Context/AuthContext'
-import { cerrarCaja, getCajaByTienda, getMovimientosByCaja, getSesionesActivas } from '@/Connections/caja'
+import { getCajaByTienda, getSesionesActivas } from '@/Connections/caja'
 import PageVentas from '@/modules/ventas/PageVentas'
 
 
@@ -66,18 +66,6 @@ function unirTiendasConCajas(tiendas = [], cajasPorTienda = []) {
   });
 }
 
-  function fechaArrayADate([anio, mes, dia, h = 0, m = 0, s = 0]) {
-    return new Date(anio, mes - 1, dia, h, m, s);
-  }
-
-  function esDeUnDiaAnterior(fechaArray) {
-    const apertura = fechaArrayADate(fechaArray);
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    return apertura < hoy;
-  }
-
-
 export default function VentasController() {
     const { user } = useAuth();
     const [tiendas, setTiendas] = useState([]);
@@ -132,79 +120,6 @@ export default function VentasController() {
     };
     }, [user?.empresa_id]);
 
-  const sesionesProcesadas = useRef(new Set());
-
-useEffect(() => {
-  if (!cajaSesiones?.porTienda || !user?.trabajador_id) return;
-  
-  let cancelado = false;
-
-  async function validarCierreCaja() {
-    try {
-      setLoading(true)
-          const pendientes = cajaSesiones.porTienda
-            .flatMap((t) => t.sesiones)
-            .filter(
-              (s) =>
-                s.estado === "ABIERTA" &&
-                esDeUnDiaAnterior(s.fechaApertura) &&
-                !sesionesProcesadas.current.has(s.id),
-            );
-
-          if (pendientes.length === 0) return;
-
-          pendientes.forEach((s) => sesionesProcesadas.current.add(s.id));
-
-          const resultados = await Promise.allSettled(
-            pendientes.map(async (sesion) => {
-              const movimientos = await getMovimientosByCaja(sesion.cajaId);
-              const lista = movimientos?.data ?? [];
-
-              const totalMovimientos = lista.reduce(
-                (acc, mov) =>
-                  mov.tipoMovimiento === "EGRESO"
-                    ? acc - mov.monto
-                    : acc + mov.monto,
-                0,
-              );
-
-              const body = {
-                trabajadorId: user.trabajador_id,
-                montoCierreReal: (sesion.montoApertura ?? 0) + totalMovimientos,
-                observaciones: "Cierre automático del sistema",
-              };
-
-              return cerrarCaja(sesion.id, body);
-            }),
-          );
-          
-          if (cancelado) return;
-
-          resultados.forEach((r, i) => {
-            if (r.status === "rejected") {
-              console.error(
-                `Error cerrando sesión ${pendientes[i].id}:`,
-                r.reason,
-              );
-              sesionesProcesadas.current.delete(pendientes[i].id);
-            }
-          });
-    } catch (err) {
-      
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  validarCierreCaja();
-  return () => {
-    cancelado = true;
-  };
-}, [cajaSesiones, user?.trabajador_id]);
-
-  // -------------------------------------------------------------------------
-  // Métricas derivadas del estado
-  // -------------------------------------------------------------------------
   const todasCajas = useMemo(() => tiendas.flatMap(t => t.cajas), [tiendas])
 
   const totalVentasHoy = useMemo(
@@ -229,6 +144,7 @@ useEffect(() => {
     <PageVentas
       tiendas={tiendas}
       loading={loading}
+      cajaSesiones={cajaSesiones}
       metrics={{ totalVentasHoy, totalTransacciones, cajasAbiertas, totalCajas, efectivoEnCajas }}
     />
   )

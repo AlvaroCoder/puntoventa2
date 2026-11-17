@@ -99,7 +99,8 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 
 ## Módulo Ventas — Resumen (arquitectura hexagonal)
 - Controller: `src/app/dashboard/ventas/page.js` — exporta `VentasController` (no `PageVentas` para evitar colisión de nombre con el import)
-- UI pura: `src/modules/ventas/PageVentas.js` — recibe `{ tiendas, loading, metrics }`
+- UI pura: `src/modules/ventas/PageVentas.js` — recibe `{ tiendas, loading, metrics, cajaSesiones }`
+- `cajaSesiones`: `{ total, porTienda: [{ tienda_id, cantidad, sesiones }] }` — pasado desde el controller sin lógica de auto-cierre
 - `metrics`: `{ totalVentasHoy, totalTransacciones, cajasAbiertas, totalCajas, efectivoEnCajas }` calculados con `useMemo` a partir de `todasCajas`
 - `todasCajas = tiendas.flatMap(t => t.cajas)` — dato derivado de las tiendas ya procesadas
 - Selector de tienda (dropdown): visible solo si `tiendas.length > 1`, filtra `tiendasFiltradas`
@@ -108,6 +109,19 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 - Cromática: teal #198E7B (ventas), blue #3960A9 (transacciones), navy #1F2F57 (cajas), orange #FF821E (efectivo)
 - Estado vacío caja: card dashed con hover `onMouseEnter/onMouseLeave` para `borderColor`
 - `CajaCard` importado desde `@/components/Cards/CajaCard` — NO modificar, ya tiene toda la lógica
+
+## Módulo POS — Flujo de pago (arquitectura hexagonal + sessionStorage)
+- `pos/page.js`: al presionar Cobrar → escribe `pos_cart` en sessionStorage → `router.push(.../payment?cajaId=X)`
+- `pos_cart` contiene: `{ carrito, cajaSesionId, tiendaId, trabajadorId, empresaId, cliente }`
+- `payment/page.js`: lee `pos_cart`, al completar → escribe `pos_venta` en sessionStorage → `router.push(.../success?cajaId=X)`
+- `pos_venta` contiene: `{ ...ventaRes.data, carrito, cliente, tipoComprobante, metodo, total, montoRecibido, cambio, opGravada, igv }`
+- `success/page.js`: lee `pos_venta`, "Nueva venta" limpia ambas keys y regresa al POS
+- Stepper compartido: `src/modules/ventas/components/PosSteps.js` — prop `paso` (1=Productos, 2=Cobrar, 3=Comprobante)
+- Cálculo fiscal: `opGravada = total / 1.18`, `igv = total - opGravada`; por línea `igvLinea = baseImponible * 0.18`
+- Pills de efectivo: `roundUp50(total)` → { exacto, +50, +100 }; vuelto solo si `montoEfectivo > total`
+- `ventasService.createVenta(body)` en `src/modules/ventas/service/ventas.service.js` — retorna `{ ok, error, data, message }`
+- Si sessionStorage key falta → `router.replace(...)` al POS (guard en `useEffect` al montar)
+- Background POS cromática: `#E8EDF5` (gray-blue), cards white con `border: 0.5px solid rgba(31,47,87,0.1)`, `border-radius: 16px`
 
 ## Archivos clave
 - `src/hooks/useGenerarCodigo.js` — generación de códigos de producto
@@ -129,3 +143,11 @@ Aplicar siempre — Spring Boot puede usar `content` (paginado), Express usa `da
 - `src/app/dashboard/trabajadores/page.js` — reescrito (controller)
 - `src/modules/ventas/PageVentas.js` — reescrito (UI pura ventas)
 - `src/app/dashboard/ventas/page.js` — reescrito (controller VentasController)
+- `src/modules/ventas/components/PosSteps.js` — nuevo, stepper 3 pasos para el flujo POS
+- `src/modules/ventas/PagePayment.js` — nuevo, pagina cobro (UI hexagonal)
+- `src/modules/ventas/PageSuccess.js` — nuevo, pagina comprobante/ticket (UI hexagonal)
+- `src/app/dashboard/ventas/caja/pos/payment/page.js` — wrapper Suspense + PagePayment
+- `src/app/dashboard/ventas/caja/pos/success/page.js` — wrapper Suspense + PageSuccess
+- `src/app/dashboard/ventas/caja/pos/page.js` — refactorizado: sin PosPaymentPanel, usa handleCobrar con sessionStorage
+- `src/modules/ventas/PageCerrarCaja.js` — nuevo, UI cierre de caja (arqueo + ventas por método)
+- `src/app/dashboard/ventas/caja/cerrar/page.js` — wrapper Suspense + PageCerrarCaja
