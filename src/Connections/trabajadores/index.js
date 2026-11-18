@@ -41,3 +41,11 @@ export async function toggleEstadoTrabajador(id, activo) {
 export async function deleteTrabajador(id) {
     return fetchWithAuth(`${BASE}/${id}`, { method: 'DELETE' })
 }
+
+export async function getTrabajadorRoles(id) {
+    return fetchWithAuth(`${BASE}/${id}/roles`)
+}
+
+export async function updateTrabajadorRoles(id, data = {}) {
+    return fetchWithAuth(`${BASE}/${id}/roles`, { method: 'PUT', body: data })
+}

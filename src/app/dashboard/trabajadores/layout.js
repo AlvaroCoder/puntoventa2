@@ -6,11 +6,8 @@ export default function TrabajadoresLayout({children}) {
   return (
       <ContainerLayout
           icon={Workflow}
-          title={"Trabajadores"}
-          links={[
-              { href: "/dashboard/trabajadores", label: "Resumen General" },
-              {href : "/dashboard/configuracion", label : "Configuración"}
-          ]}
+          title={"Personal"}
+          links={[]}
       >
           {children}
     </ContainerLayout>

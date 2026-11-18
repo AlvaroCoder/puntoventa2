@@ -157,7 +157,36 @@ export default function PagePayment() {
 
       const ventaRes = await ventasService.createVenta(dataVenta)
       if (ventaRes.error) {
-        toast.error(ventaRes.message || 'Error al registrar la venta')
+        const msg = ventaRes.message ?? 'Error al registrar la venta'
+        const esStockError =
+          ventaRes.status === 400 &&
+          /stock|agotado|inventario|disponible/i.test(msg)
+
+        if (esStockError) {
+          // Identificar qué producto causó el error (si el backend lo indica)
+          const productoAfectado = carrito.find((l) =>
+            msg.toLowerCase().includes(l.nombre?.toLowerCase() ?? ''),
+          )
+          toast.error(
+            productoAfectado
+              ? `"${productoAfectado.nombre}" ya no tiene stock disponible. Retíralo del carrito.`
+              : msg,
+            { autoClose: 6000 },
+          )
+          // Limpiar el producto agotado del sessionStorage para cuando el usuario vuelva al POS
+          if (productoAfectado) {
+            try {
+              const raw = sessionStorage.getItem('pos_cart')
+              if (raw) {
+                const parsed = JSON.parse(raw)
+                parsed.carrito = parsed.carrito.filter((l) => l.id !== productoAfectado.id)
+                sessionStorage.setItem('pos_cart', JSON.stringify(parsed))
+              }
+            } catch {}
+          }
+        } else {
+          toast.error(msg)
+        }
         return
       }
 

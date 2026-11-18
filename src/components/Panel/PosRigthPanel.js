@@ -1,8 +1,10 @@
 'use client';
 import { Search, X, ImageIcon } from 'lucide-react';
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import SwitcherLoader from '../Navigation/SwitcherLoader';
 import useInventario from '@/modules/inventary/hooks/useInventario';
+import { useStompInventario } from '@/hooks/useStompInventario'
+import { toast } from 'react-toastify'
 import Image from 'next/image';
 
 const fmt = v => new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(v ?? 0);
@@ -206,24 +208,44 @@ function VarianteSelector({ producto, onClose, onAgregar }) {
     );
 }
 
-function ProductoCard({ producto, onSelect, isSelected, reservado = 0 }) {
+function ProductoCard({ producto, onSelect, isSelected, reservado = 0, stockFinal: stockFinalProp }) {
     const variantes = producto?.variantes ?? [];
     const colores = [...new Set(variantes.map(v => v.color).filter(Boolean))];
     const tallas = [...new Set(variantes.map(v => v.talla ?? v.size).filter(Boolean))];
-    const stockTotal = Number(producto.stockTotal ?? 0);
+    const stockTotal = stockFinalProp !== undefined
+        ? Number(stockFinalProp)
+        : Number(producto.stockTotal ?? 0);
     const stockEfectivo = Math.max(0, stockTotal - reservado);
-    const stockBajo = stockEfectivo > 0 && stockEfectivo <= 5;
-    const reservadoEnOtras = reservado > 0 && stockEfectivo === 0 && stockTotal > 0;
+    const agotado = stockTotal === 0;
+    const stockBajo = !agotado && stockEfectivo > 0 && stockEfectivo <= 5;
+    const reservadoEnOtras = !agotado && reservado > 0 && stockEfectivo === 0;
     return (
         <button
-            onClick={() => onSelect(producto)}
+            onClick={() => !agotado && onSelect(producto)}
+            disabled={agotado}
             className="bg-white rounded-lg overflow-hidden text-left transition-all hover:shadow-md hover:-translate-y-0.5 active:scale-95 relative flex flex-col"
             style={{
                 border: isSelected
                     ? '2px solid #1F2F57'
                     : '1px solid rgba(31,47,87,0.1)',
+                opacity: agotado ? 0.6 : 1,
+                cursor: agotado ? 'not-allowed' : 'pointer',
             }}
         >
+            {/* Overlay Agotado — solo cuando WS reporta stock = 0 */}
+            {agotado && (
+                <div
+                    className="absolute inset-0 z-20 flex items-end justify-start pb-2 px-2 rounded-lg pointer-events-none"
+                    style={{ background: 'rgba(239,68,68,0.06)' }}
+                >
+                    <span
+                        className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
+                        style={{ background: '#EF4444' }}
+                    >
+                        Agotado
+                    </span>
+                </div>
+            )}
             <div className="absolute top-2 right-2 z-10">
                 <span
                     className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
@@ -311,6 +333,22 @@ export default function PosRigthPanel({ addProducto, tiendaId, reservas = {} }) 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [productoSel, setProductoSel] = useState(null);
 
+    /** Overrides de stock recibidos por WebSocket: { [productoId]: nuevoStock } */
+    const [stockOverrides, setStockOverrides] = useState({})
+
+    const handleStockUpdate = useCallback((msg) => {
+        if (msg?.productoId == null) return
+        setStockOverrides(prev => ({ ...prev, [msg.productoId]: msg.nuevoStock ?? 0 }))
+        if (msg.nuevoStock === 0) {
+            toast.info(
+                `"${msg.nombreProducto ?? 'Producto'}" se agotó en tienda`,
+                { position: 'bottom-right', autoClose: 4000 },
+            )
+        }
+    }, [])
+
+    useStompInventario(tiendaId, handleStockUpdate)
+
     const { loading, productosByTienda : productos, categorias } = useInventario(tiendaId);
 
     const productosFiltrados = useMemo(() => {
@@ -325,6 +363,10 @@ export default function PosRigthPanel({ addProducto, tiendaId, reservas = {} }) 
     }, [productos, search, selectedCategory]);
 
     const handleCardClick = (p) => {
+        const stockF = stockOverrides[p.id] !== undefined
+            ? stockOverrides[p.id]
+            : (p.stockTotal ?? 0)
+        if (stockF === 0) return  // bloqueado — el botón ya tiene disabled pero por si acaso
         const tieneVariantes = (p.variantes ?? []).length > 0;
         if (tieneVariantes) {
             setProductoSel(prev => prev?.id === p.id ? null : p);
@@ -433,6 +475,7 @@ export default function PosRigthPanel({ addProducto, tiendaId, reservas = {} }) 
                                     onSelect={handleCardClick}
                                     isSelected={productoSel?.id === p.id}
                                     reservado={reservas[p.id] ?? 0}
+                                    stockFinal={stockOverrides[p.id]}
                                 />
                             ))}
                         </div>
