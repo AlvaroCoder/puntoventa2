@@ -1,5 +1,5 @@
 import InputField from '@/elements/InputField'
-import { Building2, Store } from 'lucide-react'
+import { Building2, Store, Briefcase } from 'lucide-react'
 import React from 'react'
 import GridSelectCardRubro from '../Cards/GridSelectCardRubro'
 
@@ -24,14 +24,27 @@ export default function StepThreSignUp({
               placeholder={"Ej: Bodega El Chino"}
               value={formData?.businessName}
               onChange={handleInputChange}
+              error={errors?.businessName}
+          />
+          <InputField
+              label={"Razón Social"}
+              obligatory={true}
+              icon={Briefcase}
+              name={"nombre_empresa"}
+              placeholder={"Ej: Inversiones Pérez SAC"}
+              value={formData?.nombre_empresa}
+              onChange={handleInputChange}
+              error={errors?.nombre_empresa}
           />
           <InputField
               label={"RUC Empresa"}
               icon={Building2}
               name="ruc"
               placeholder="2012346789"
-            obligatory={true}
-            onChange={handleInputChange}  
+              obligatory={true}
+              value={formData?.ruc}
+              onChange={handleInputChange}
+              error={errors?.ruc}
           />
           <div>
               <label className='text-xs font-bold text-[#333] block mb-2'>Selecciona tu Rubro</label>

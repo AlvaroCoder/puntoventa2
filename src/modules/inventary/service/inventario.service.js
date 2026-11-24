@@ -101,6 +101,38 @@ export const inventarioService = {
     if (!response.ok) throw new Error("Error al cargar los almacenes");
     const data = await response.json();
     return data?.data || [];
-  }
-  
+  },
+
+  async getEstadoInventario(tiendaId) {
+    const qs = tiendaId ? `?tiendaId=${tiendaId}` : ''
+    const response = await fetch(`/api/analytics/estado-inventario${qs}`)
+    if (!response.ok) throw new Error('Error al obtener estado inventario')
+    const json = await response.json()
+    return json?.data ?? json
+  },
+
+  async getValorInventario(tiendaId) {
+    const qs = tiendaId ? `?tiendaId=${tiendaId}` : ''
+    const response = await fetch(`/api/analytics/valor-inventario${qs}`)
+    if (!response.ok) throw new Error('Error al obtener valor inventario')
+    const json = await response.json()
+    return json?.data ?? json
+  },
+
+  async getTopProductos(tiendaId, dias = 30) {
+    const qs = new URLSearchParams({ ...(tiendaId ? { tiendaId } : {}), dias }).toString()
+    const response = await fetch(`/api/analytics/top-productos?${qs}`)
+    if (!response.ok) throw new Error('Error al obtener top productos')
+    const json = await response.json()
+    return json?.data ?? json
+  },
+
+  async getMovimientosSemanales(tiendaId, semanas = 8) {
+    const qs = new URLSearchParams({ ...(tiendaId ? { tiendaId } : {}), semanas }).toString()
+    const response = await fetch(`/api/analytics/movimientos-semanales?${qs}`)
+    if (!response.ok) throw new Error('Error al obtener movimientos semanales')
+    const json = await response.json()
+    return json?.data ?? json
+  },
+
 };

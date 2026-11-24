@@ -4,10 +4,13 @@ import React from 'react'
 
 export default function TrabajadoresLayout({children}) {
   return (
-      <ContainerLayout
+    <ContainerLayout
+      hrefPrincipal='/dashboard/trabajadores'
           icon={Workflow}
           title={"Personal"}
-          links={[]}
+      links={[
+            {href : "/dashboard/trabajadores/roles", label :"Roles y Permisos"}
+          ]}
       >
           {children}
     </ContainerLayout>

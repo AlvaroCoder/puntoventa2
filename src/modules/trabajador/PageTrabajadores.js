@@ -3,31 +3,41 @@ import { Title } from '@/shared/components/Title';
 import Text from '@/shared/components/Text';
 import SkeletonCard from '@/shared/components/SkeletonCard';
 import { AnimatePresence } from 'framer-motion';
-import { Plus, Users, Shield, ShoppingCart, Package } from 'lucide-react';
+import { Plus, Users, Shield, ShoppingCart, Package, Wallet, BadgePercent } from 'lucide-react';
 import TrabajadorCard from './components/TrabajadorCard';
 
 const ROLES_INFO = [
   {
-    rol: 'Administrador',
+    rol: "Gerente",
     icon: Shield,
-    desc: 'Todo: configuracion, reportes, personal y facturacion.',
+    desc: "Todo: configuracion, reportes, personal y facturacion.",
   },
   {
-    rol: 'Cajero',
+    rol: "Encargado",
     icon: ShoppingCart,
-    desc: 'Abrir y cerrar su caja, vender, registrar clientes.',
+    desc: "Encargado del local cuando el gerente no esta.",
   },
   {
-    rol: 'Almacenero',
+    rol: "Cajero",
+    icon: Wallet,
+    desc: "Abrir y cerrar su caja, vender, registrar clientes.",
+  },
+  {
+    rol: "Vendedor",
+    icon: BadgePercent,
+    desc: "Encargado de vender y atender al cliente.",
+  },
+  {
+    rol: "Almacenero",
     icon: Package,
-    desc: 'Productos, ingresos de stock y recepcion de ordenes.',
+    desc: "Productos, ingresos de stock y recepcion de ordenes.",
   },
 ];
 
 const ROL_ICON_STYLES = {
   Administrador: { background: 'rgba(57,96,169,0.1)', color: '#3960A9' },
-  Cajero:        { background: 'rgba(30,179,178,0.1)', color: '#0E9090' },
-  Almacenero:    { background: 'rgba(232,160,32,0.1)', color: '#B87A10' },
+  Cajero: { background: 'rgba(30,179,178,0.1)', color: '#0E9090' },
+  Almacenero: { background: 'rgba(232,160,32,0.1)', color: '#B87A10' },
 };
 
 function InviteCard({ onInvitar }) {
@@ -112,7 +122,6 @@ export default function PageTrabajadores({
         </div>
       )}
 
-      {/* Sección ¿Qué puede hacer cada rol? */}
       <div className="mt-2">
         <p
           className="text-sm font-semibold mb-3"

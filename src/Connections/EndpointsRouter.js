@@ -47,3 +47,14 @@ export const VARIANTES_ENDPOINTS = {
 export const IMAGES_ENDPOINTS = {
     uploadImage : ()=>`${BASE_IMAGES}/subir`
 }
+
+const BASE_ANALYTICS = BASE_URL_SPRING + '/api/analytics'
+
+export const ANALYTICS_ENDPOINTS = {
+    estadoInventario:       (tiendaId)          => `${BASE_ANALYTICS}/estado-inventario${tiendaId ? `?tiendaId=${tiendaId}` : ''}`,
+    valorInventario:        (tiendaId)          => `${BASE_ANALYTICS}/valor-inventario${tiendaId ? `?tiendaId=${tiendaId}` : ''}`,
+    topProductos:           (tiendaId, dias=30) => `${BASE_ANALYTICS}/top-productos?${tiendaId ? `tiendaId=${tiendaId}&` : ''}dias=${dias}`,
+    ventasDiarias:          (tiendaId, dias=30) => `${BASE_ANALYTICS}/ventas-diarias?${tiendaId ? `tiendaId=${tiendaId}&` : ''}dias=${dias}`,
+    deadStock:              (tiendaId, dias=60) => `${BASE_ANALYTICS}/dead-stock?${tiendaId ? `tiendaId=${tiendaId}&` : ''}dias=${dias}`,
+    movimientosSemanales:   (tiendaId, sem=8)   => `${BASE_ANALYTICS}/movimientos-semanales?${tiendaId ? `tiendaId=${tiendaId}&` : ''}semanas=${sem}`,
+}

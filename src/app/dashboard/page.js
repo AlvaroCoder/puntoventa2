@@ -48,16 +48,7 @@ const MODULES = [
     Icon: BadgeIcon,
     bg: '#1F4363',
     badge: null,
-  },
-  {
-    id: 'sunat',
-    title: 'NUBEFACT',
-    subtitle: 'Facturación electrónica',
-    href: '/dashboard/bd/clientes',
-    Icon: ReceiptLongIcon,
-    bg: '#1B8D7C',
-    badge: { label: '1 rechazado', color: 'orange' },
-  },
+  }
 ]
 
 const DAYS   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
@@ -104,9 +95,9 @@ export default function Page() {
       </div>
       <div className="flex flex-col gap-4">
         <h2 className="text-base font-bold text-azulMarino" >
-          Tus módulos
+          Que quieres hacer hoy ? 
         </h2>
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           {MODULES.map((mod) => (
             <button
               key={mod.id}
@@ -127,18 +118,6 @@ export default function Page() {
                 >
                   {mod.subtitle}
                 </p>
-                {mod.badge && (
-                  <span
-                    className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full mt-0.5"
-                    style={
-                      mod.badge.color === "orange"
-                        ? { background: "#FFF1E6", color: "#D97706" }
-                        : { background: "#E8F5F3", color: "#1B8D7C" }
-                    }
-                  >
-                    {mod.badge.label}
-                  </span>
-                )}
               </div>
             </button>
           ))}

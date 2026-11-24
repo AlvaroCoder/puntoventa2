@@ -3,13 +3,18 @@ import { motion } from 'framer-motion';
 import { MoreVertical, Store, Pencil, Trash2 } from 'lucide-react';
 
 const ROL_STYLES = {
-  Administrador: { background: 'rgba(57,96,169,0.1)', color: '#3960A9' },
-  Cajero:        { background: 'rgba(30,179,178,0.1)', color: '#0E9090' },
-  Almacenero:    { background: 'rgba(232,160,32,0.1)', color: '#B87A10' },
+  // Roles senior — fondo sólido, texto blanco
+  Gerente:       { background: '#1F2F57', color: '#FFFFFF', solid: true },
+  Encargado:     { background: '#3960A9', color: '#FFFFFF', solid: true },
+  Administrador: { background: '#3960A9', color: '#FFFFFF', solid: true },
+  // Roles operativos — fondo tenue, texto de color
+  Vendedor:      { background: 'rgba(249,115,22,0.12)',  color: '#C45500' },
+  Cajero:        { background: 'rgba(25,142,123,0.12)',  color: '#147A6C' },
+  Almacenero:    { background: 'rgba(232,160,32,0.12)',  color: '#97620A' },
 };
 
 function getRolStyle(rol) {
-  return ROL_STYLES[rol] ?? { background: 'rgba(31,47,87,0.07)', color: 'rgba(31,47,87,0.5)' };
+  return ROL_STYLES[rol] ?? { background: 'rgba(31,47,87,0.07)', color: 'rgba(31,47,87,0.45)' };
 }
 
 function MenuDesplegable({ onEditar, onEliminar, onClose }) {
@@ -73,7 +78,6 @@ export default function TrabajadorCard({ trabajador, onEditar, onEliminar }) {
       className="bg-white rounded-xl flex flex-col overflow-hidden hover:shadow-sm transition-shadow duration-200"
       style={{ border: '0.5px solid rgba(31,47,87,0.12)' }}
     >
-      {/* Top: Avatar + Nombre + Menu */}
       <div className="flex items-start gap-3.5 px-5 pt-5 pb-4">
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-extrabold"
@@ -84,7 +88,7 @@ export default function TrabajadorCard({ trabajador, onEditar, onEliminar }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
+            <div className="ml-3 min-w-0">
               <h3
                 className="text-sm font-bold truncate"
                 style={{ color: '#1F2F57' }}
@@ -119,10 +123,8 @@ export default function TrabajadorCard({ trabajador, onEditar, onEliminar }) {
         </div>
       </div>
 
-      {/* Separador */}
       <div className="mx-5" style={{ borderTop: '0.5px solid rgba(31,47,87,0.08)' }} />
 
-      {/* Middle: Badges rol + tienda */}
       <div className="px-5 py-3.5 flex flex-wrap items-center gap-2">
         <span
           className="px-2.5 py-1 rounded-full text-[11px] font-bold"

@@ -12,9 +12,9 @@ export default function InventarioLayout({ children }) {
       title={"Inventario"}
       links={[
         { href: "/dashboard/inventario/productos", label: "Productos" },
-        { href: "/dashboard/inventario/reportes", label: "Reportes" },
-        {href : "/dashboard/inventario/tienda", label : "Tiendas"},
-        { href: "/dashboard/inventario/categoria" , label : "Categoria"},
+        { href: "/dashboard/inventario/tienda", label: "Tiendas" },
+        { href: "/dashboard/inventario/almacenes", label: "Almacenes" },
+        { href: "/dashboard/inventario/categoria", label: "Categoria" },
       ]}
     >
       {children}

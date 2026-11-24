@@ -258,7 +258,7 @@ export default function TopBarNavigationDashbord() {
     }, [])
 
     return (
-        <nav className="w-full h-16 z-10 bg-azulMarino sticky top-0 z-10 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
+        <nav className="w-full h-16 z-10 bg-azulMarino sticky top-0 flex items-center justify-between px-6 shrink-0 border-b border-grisClaro shadow-sm">
 
             <Link href="/dashboard" className="flex items-center gap-2.5">
                 <Image

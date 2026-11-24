@@ -5,14 +5,12 @@ import {ArrowRight, ArrowLeft, Loader2,
 import Link from "next/link";
 import Image from "next/image";
 import { validateEmail } from "@/lib/validation";
-//import { getVerificarDocumento, getVerificarEmail } from "../../../API/user/getConnections";
-import { REGISTER_USER, CREATE_COMPANY } from "@/conexion/apiconexion";
-import { login } from "@/lib/authentication";
+import { REGISTER_USER } from "@/conexion/apiconexion";
 import { useRouter } from "next/navigation";
 import HorizontalStepper from "@/components/Stepper/HorizontalStepper";
 import StepOneSignUp from "@/components/Stepper/StepOneSignUp";
+import StepTwoSignUp from "@/components/Stepper/StepTwoSignUp";
 import StepThreSignUp from "@/components/Stepper/StepThreSignUp";
-import { createTrabajador } from "@/Connections/trabajadores";
 import {toast} from 'react-toastify'
 import PageLoader from "@/components/Loading/PageLoader";
 
@@ -32,7 +30,8 @@ export default function SignUpPage() {
   const [isLoading,   setIsLoading]   = useState(false);
   const [formData, setFormData] = useState({
     email: "", password: "", confirmPassword: "",
-    businessName: "", ruc: "", businessType: "",
+    nombre_completo: "", tipo_documento: "DNI", numero_documento: "", telefono: "",
+    businessName: "", nombre_empresa: "", ruc: "",
   });
   const [formDataEnterprise, setFormDataEnterprise] = useState({ rubro_id: 1 });
   const [errors, setErrors]      = useState({});
@@ -72,14 +71,32 @@ export default function SignUpPage() {
           } else if (formData.password !== formData.confirmPassword) {
             setErrors((p) => ({ ...p, confirmPassword: "Las contraseñas no coinciden" })); hasError = true;
           }
-          /**
-           * if (!hasError) {
-            const emailStatus = await getVerificarEmail(formData.email);
-            if (emailStatus === 404) {
-              setErrors((p) => ({ ...p, email: "Este correo ya está registrado" })); hasError = true;
-            }
+          break;
+        }
+
+        case 2: {
+          if (!formData.nombre_completo.trim()) {
+            setErrors((p) => ({ ...p, nombre_completo: "El nombre es obligatorio" })); hasError = true;
           }
-           */
+          if (!formData.numero_documento.trim()) {
+            setErrors((p) => ({ ...p, numero_documento: "El número de documento es obligatorio" })); hasError = true;
+          }
+          if (!formData.telefono.trim()) {
+            setErrors((p) => ({ ...p, telefono: "El teléfono es obligatorio" })); hasError = true;
+          }
+          break;
+        }
+
+        case 3: {
+          if (!formData.businessName.trim()) {
+            setErrors((p) => ({ ...p, businessName: "El nombre comercial es obligatorio" })); hasError = true;
+          }
+          if (!formData.nombre_empresa.trim()) {
+            setErrors((p) => ({ ...p, nombre_empresa: "La razón social es obligatoria" })); hasError = true;
+          }
+          if (!formData.ruc.trim()) {
+            setErrors((p) => ({ ...p, ruc: "El RUC es obligatorio" })); hasError = true;
+          }
           break;
         }
 
@@ -91,7 +108,7 @@ export default function SignUpPage() {
     }
 
     setIsLoading(false);
-    if (!hasError && currentStep < 4) setCurrentStep((p) => p + 1);
+    if (!hasError && currentStep < 3) setCurrentStep((p) => p + 1);
     return !hasError;
   };
 
@@ -99,100 +116,34 @@ export default function SignUpPage() {
 
   const handleClickSubmit = async () => {
 
-    if (currentStep < 2) { await changeStep("next"); return; }
+    if (currentStep < 3) { await changeStep("next"); return; }
     const isValid = await changeStep("next");
     if (!isValid) return;
 
     setIsLoading(true);
-    
+
     try {
-      const dataToSendUser = {
-        email: formData.email,
-        password: formData.password,
+      const payload = {
+        email:            formData.email,
+        password:         formData.password,
+        nombre_completo:  formData.nombre_completo,
+        tipo_documento:   formData.tipo_documento,
+        numero_documento: formData.numero_documento,
+        telefono:         formData.telefono,
+        empresa: {
+          nombre_comercial: formData.businessName,
+          nombre_empresa:   formData.nombre_empresa,
+          ruc:              formData.ruc,
+          rubro_id:         formDataEnterprise.rubro_id,
+          plan_id:          4,
+        },
       };
 
-      const responseRegister     = await REGISTER_USER(dataToSendUser);
+      const responseRegister     = await REGISTER_USER(payload);
       const responseRegisterJSON = await responseRegister.json();
 
-      if (!responseRegister.ok) {
-        toast.error(
-          responseRegisterJSON?.message || "Error al registrar usuario",
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      const plan_actual = 4;
-      const token  = responseRegisterJSON?.data?.token;
-      const idUser = responseRegisterJSON?.data?.usuario?.id;
-
-      const dataToSendEnterprise = {
-        usuario_id: idUser,
-        rubro_id: formDataEnterprise.rubro_id,
-        plan_actual_id: plan_actual,
-        nombre_empresa: formData.businessName,
-        nombre_comercial: formData.businessName,
-        ruc: formData.ruc,
-        direccion: "",
-        telefono: 0,
-        email: formData.email,
-        logo_url: "",
-        moneda_base: "PEN",
-      };
-      
-      console.log("DATA ENTERPRISE : ", dataToSendEnterprise);
-
-      const responseCreateEnterprise = await CREATE_COMPANY(dataToSendEnterprise, token);
-      const jsonResponseCreateEnterprise = await responseCreateEnterprise.json();
-
-      if (!responseCreateEnterprise.ok) {
-        console.log("Error al crear la empresa : ", jsonResponseCreateEnterprise);
-        
-        toast.error("No se pudo crear la empresa e: ", jsonResponseCreateEnterprise);
-        setIsLoading(false);
-        return;
-      }
-
-      console.log("RESPONSE CREATE ENTERPRISE : ", jsonResponseCreateEnterprise);
-      
-      const IdEmpresa = jsonResponseCreateEnterprise?.data?.empresa?.id;
-
-      const dataToSendTrabajador = {
-        usuario_id: idUser,
-        empresa_id: IdEmpresa,
-        email : formData?.email,
-        nombre_completo: "",
-        tipo_documento: "DNI",
-        numero_documento: "",
-        telefono: "",
-        codigo_empleado: `EMP-${Date.now()}`,
-        fecha_contratacion: null,
-        salario_base: 0,
-        rol_id: 1,
-        tienda_id : null
-      }
-      console.log('Data Send Trabajador : ',dataToSendTrabajador);
-      
-      const responseCreateTrabajador = await createTrabajador(dataToSendTrabajador, token);
-      const jsonResponseCreateTrabajador = await responseCreateTrabajador.json();
-      console.log(jsonResponseCreateTrabajador);
-      
-      if (!responseCreateTrabajador.ok) {
-          toast.error("No se pudo crear al trabajador")
-          setIsLoading(false);
-          return;
-      }
-
-      const loginResult = await login({ email: formData.email, password: formData.password });
-      if (loginResult.error) {
-        toast.error("Hubo un error al iniciar sesión");
-        setIsLoading(false);
-        router.push("/login");
-        return;
-      }
-
       router.push("/dashboard");
-      toast.success("Te registraste exitosamente")
+      toast.success("Te registraste exitosamente");
     } catch (error) {
       toast.error("Error inesperado. Por favor intenta de nuevo.");
       setIsLoading(false);
@@ -221,6 +172,15 @@ export default function SignUpPage() {
         );
 
       case 2:
+        return (
+          <StepTwoSignUp
+            formData={formData}
+            handleInputChange={handleInputChange}
+            errors={errors}
+          />
+        );
+
+      case 3:
         return (
           <StepThreSignUp
             formData={formData}
@@ -251,13 +211,13 @@ export default function SignUpPage() {
               <div className="flex items-center justify-between mb-1.5">
                 <Image src={URL_LOGO} alt="PV360" width={60} height={24} />
                 <span className="text-xs font-semibold text-gray-400">
-                  Paso {currentStep} de 4
+                  Paso {currentStep} de 3
                 </span>
               </div>
               <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#FE811F] rounded-full transition-all duration-300"
-                  style={{ width: `${(currentStep / 4) * 100}%` }}
+                  style={{ width: `${(currentStep / 3) * 100}%` }}
                 />
               </div>
             </div>
@@ -318,7 +278,7 @@ export default function SignUpPage() {
                 disabled={isLoading}
                 className="flex items-center gap-2 px-7 py-2.5 rounded-xl font-bold text-sm bg-verdeAgua text-white hover:bg-verdeAgua/90 shadow-md shadow-orange-500/20 active:scale-95 transition-all disabled:opacity-70 disabled:cursor-wait"
               >
-                {currentStep === 2 ? "Finalizar" : "Continuar"}
+                {currentStep === 3 ? "Finalizar" : "Continuar"}
                 {!isLoading && <ArrowRight size={16} />}
               </button>
             </div>

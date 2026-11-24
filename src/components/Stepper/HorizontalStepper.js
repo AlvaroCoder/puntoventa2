@@ -1,8 +1,9 @@
 import { Check } from 'lucide-react';
 import React from 'react'
 const STEPS = [
-  { id: 1, title: "Tu Cuenta", subtitle: "Credenciales de acceso"   },
-  { id: 2, title: "Tu Empresa", subtitle: "Empresa y rubro"   },
+  { id: 1, title: "Tu Cuenta", subtitle: "Credenciales de acceso" },
+  {id : 2, title : "Datos Personal", subtitle : "Datos personales del usuario"},
+  { id: 3, title: "Tu Empresa", subtitle: "Empresa y rubro"   },
 ];
 
 export default function HorizontalStepper({currentStep}) {
