@@ -7,12 +7,12 @@ import { inventarioService } from '@/modules/inventary/service/inventario.servic
 
 const C = {
   saludable: '#4CAF50',
-  bajo:      '#F5A623',
+  bajo: '#F5A623',
   agotado:   '#EF4444',
-  azul:      '#3960A9',
-  teal:      '#198E7B',
-  navy:      '#1F2F57',
-  texto:     'rgba(31,47,87,0.5)',
+  azul: '#3960A9',
+  teal: '#198E7B',
+  navy: '#1F2F57',
+  texto: 'rgba(31,47,87,0.5)',
 }
 const PALETTE = ['#3960A9', '#F97316', '#10B981', '#E8A020', '#EC4899', '#8B5CF6', '#06B6D4']
 
@@ -71,7 +71,6 @@ function HBar({ items, valueKey = 'valor', labelKey = 'nombre', sublabelKey }) {
   )
 }
 
-// ─── Grouped VBar (movimientos semanales) ─────────────────────────────────────
 function GroupedVBar({ items }) {
   const W = 420, H = 170
   const PAD_L = 28, PAD_B = 42, PAD_T = 20
@@ -120,7 +119,6 @@ function GroupedVBar({ items }) {
   )
 }
 
-// ─── CardWrapper ──────────────────────────────────────────────────────────────
 function Card({ title, subtitle, actionLabel, actionHref, children, footer, footerLabel, footerAction }) {
   const router = useRouter()
   return (
@@ -167,7 +165,6 @@ function Empty({ msg = 'Sin datos' }) {
   )
 }
 
-// ─── Helper de carga ──────────────────────────────────────────────────────────
 function useFetchAnalytics(fn, deps) {
   const [data,    setData]    = useState(null)
   const [loading, setLoading] = useState(true)
@@ -179,7 +176,6 @@ function useFetchAnalytics(fn, deps) {
   return { data, loading }
 }
 
-// ─── PAGE ─────────────────────────────────────────────────────────────────────
 export default function PageInventarioResumen() {
   const [tiendaFiltro, setTiendaFiltro] = useState('')
   const tid = tiendaFiltro || null
